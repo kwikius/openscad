@@ -68,17 +68,28 @@ endif()
 
 add_executable(OpenSCAD)
 
+add_subdirectory(submodules)
+
+add_subdirectory(src/geometry/cgal)
+
+target_link_libraries(OpenSCAD PUBLIC
+    openscadCGAL
+)
+
+foreach(library OpenSCAD openscadCGAL)
 # Strict c++17, e.g. no GNU extensions
-set_property(TARGET OpenSCAD PROPERTY CXX_STANDARD 17)
-set_property(TARGET OpenSCAD PROPERTY CXX_EXTENSIONS OFF)
-set_property(TARGET OpenSCAD PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${library} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${library} PROPERTY CXX_EXTENSIONS OFF)
+set_property(TARGET ${library} PROPERTY CXX_STANDARD_REQUIRED ON)
 # Output compilation database (compile_commands.json), so we can e.g. run clang-tidy or other tools separately
-set_property(TARGET OpenSCAD PROPERTY EXPORT_COMPILE_COMMANDS ON)
-set_property(TARGET OpenSCAD PROPERTY LINKER_LANGUAGE CXX)
+set_property(TARGET ${library} PROPERTY EXPORT_COMPILE_COMMANDS ON)
+set_property(TARGET ${library} PROPERTY LINKER_LANGUAGE CXX)
 # Verbose link step
 if(CMAKE_CXX_COMPILER_ID MATCHES "AppleClang|Clang|GNU")
-  set_property(TARGET OpenSCAD PROPERTY LINK_FLAGS -v)
+  set_property(TARGET ${library} PROPERTY LINK_FLAGS -v)
 endif()
+
+endforeach(library)
 
 set(SUFFIX "" CACHE STRING "Installation suffix for binary (e.g. 'nightly')")
 set(STACKSIZE 8388608 CACHE STRING "Stack size (default is 8MB)")
@@ -95,7 +106,8 @@ endif()
 if(WASM)
   set(NULLGL ON CACHE BOOL "" FORCE)
   set(ENV{PKG_CONFIG_PATH} "/emsdk/upstream/emscripten/cache/sysroot/lib/pkgconfig")
-  target_compile_definitions(OpenSCAD PRIVATE CGAL_DISABLE_ROUNDING_MATH_CHECK)
+ # target_compile_definitions(OpenSCAD PRIVATE CGAL_DISABLE_ROUNDING_MATH_CHECK)
+  target_compile_definitions(openscadCGAL PRIVATE CGAL_DISABLE_ROUNDING_MATH_CHECK)
 endif()
 
 if(NULLGL)
@@ -129,10 +141,10 @@ file(MAKE_DIRECTORY ${OPENSCAD_LIB_OUTPUT_DIR})
 #else()
 #  message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 #endif()
-
-target_compile_options(OpenSCAD PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG>")
-
-target_compile_definitions(OpenSCAD PRIVATE _REENTRANT UNICODE _UNICODE)
+foreach(library OpenSCAD openscadCGAL)
+target_compile_options(${library} PRIVATE "$<$<CONFIG:DEBUG>:-DDEBUG>")
+target_compile_definitions(${library} PRIVATE _REENTRANT UNICODE _UNICODE)
+endforeach(library)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math")
@@ -142,8 +154,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 find_package(PkgConfig)
-
-add_subdirectory(submodules)
 
 if (MXECROSS)
   target_compile_definitions(OpenSCAD PRIVATE GLEW_STATIC LIBXML_STATIC STATIC_QT_SVG_PLUGIN)
@@ -205,9 +215,10 @@ if (MSVC)
   target_link_libraries(OpenSCAD PRIVATE unofficial::fontconfig::fontconfig)
 
   find_package(unofficial-glib CONFIG REQUIRED)
-  target_include_directories(OpenSCAD SYSTEM PRIVATE ${GLIB2_INCLUDE_DIRS})
-  target_link_libraries(OpenSCAD PRIVATE unofficial::glib::gio unofficial::glib::glib unofficial::glib::gmodule unofficial::glib::gobject)
-
+foreach(library OpenSCAD openscadCGAL)
+  target_include_directories(${library} SYSTEM PRIVATE ${GLIB2_INCLUDE_DIRS})
+  target_link_libraries(${library} PRIVATE unofficial::glib::gio unofficial::glib::glib unofficial::glib::gmodule unofficial::glib::gobject)
+endforeach(library)
   find_package(double-conversion CONFIG REQUIRED)
   target_link_libraries(OpenSCAD PRIVATE double-conversion::double-conversion)
 
@@ -226,38 +237,37 @@ else()
   endif()
 
   find_package(Eigen3 REQUIRED)
-  target_include_directories(OpenSCAD SYSTEM PRIVATE ${EIGEN3_INCLUDE_DIR})
-  target_compile_definitions(OpenSCAD PRIVATE EIGEN_DONT_ALIGN)
-
   find_package(Boost 1.56 REQUIRED COMPONENTS filesystem system regex program_options)
   message(STATUS "Boost: ${Boost_VERSION}")
-  target_include_directories(OpenSCAD SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-  target_link_libraries(OpenSCAD PRIVATE ${Boost_LIBRARIES})
-
   find_package(HarfBuzz 0.9.19 REQUIRED QUIET)
   message(STATUS "Harfbuzz: ${HARFBUZZ_VERSION}")
-  target_include_directories(OpenSCAD SYSTEM PRIVATE ${HARFBUZZ_INCLUDE_DIRS})
-  target_link_libraries(OpenSCAD PRIVATE ${HARFBUZZ_LIBRARIES})
-
   find_package(FontConfig 2.8.0 REQUIRED QUIET)
   message(STATUS "Fontconfig: ${FONTCONFIG_VERSION}")
-  target_link_libraries(OpenSCAD PRIVATE ${FONTCONFIG_LIBRARIES})
-
   find_package(GLIB2 2.26 REQUIRED QUIET)
   message(STATUS "Glib: ${GLIB2_VERSION}")
-  target_include_directories(OpenSCAD SYSTEM PRIVATE ${GLIB2_INCLUDE_DIRS})
-  target_link_libraries(OpenSCAD PRIVATE ${GLIB2_LIBRARIES})
-
   find_package(DoubleConversion REQUIRED QUIET)
-  target_link_libraries(OpenSCAD PRIVATE ${DoubleConversion_LIBRARIES})
 
+foreach(library OpenSCAD openscadCGAL)
+   target_include_directories(${library} SYSTEM PRIVATE ${EIGEN3_INCLUDE_DIR})
+   target_compile_definitions(${library} PRIVATE EIGEN_DONT_ALIGN)
+   target_include_directories(${library} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+   target_link_libraries(${library} PRIVATE ${Boost_LIBRARIES})
+   target_include_directories(${library} SYSTEM PRIVATE ${HARFBUZZ_INCLUDE_DIRS})
+   target_link_libraries(${library} PRIVATE ${HARFBUZZ_LIBRARIES})
+   target_link_libraries(${library} PRIVATE ${FONTCONFIG_LIBRARIES})
+   target_include_directories(${library} SYSTEM PRIVATE ${GLIB2_INCLUDE_DIRS})
+   target_link_libraries(${library} PRIVATE ${GLIB2_LIBRARIES})
+   target_link_libraries(${library} PRIVATE ${DoubleConversion_LIBRARIES})
+endforeach(library)
   find_graphics()
 endif()
 
 if (("${Boost_VERSION}" VERSION_GREATER "1.72") AND ("${Boost_VERSION}" VERSION_LESS "1.76"))
   # Avoid warning messages from boost which are also caused by boost's code.
   #   https://github.com/boostorg/property_tree/issues/51
-  target_compile_definitions(OpenSCAD PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
+foreach(library OpenSCAD openscadCGAL)
+  target_compile_definitions(${library} PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
+endforeach(library)
 endif()
 
 # Note: Saving CMAKE_MODULE_PATH as CGAL will overwrite it.
@@ -270,18 +280,21 @@ if (${CGAL_MAJOR_VERSION} LESS 5)
   message(FATAL_ERROR "CGAL: ${CGAL_MAJOR_VERSION}.${CGAL_MINOR_VERSION} less than required minimum version 5.0")
 endif()
 message(STATUS "CGAL: ${CGAL_MAJOR_VERSION}.${CGAL_MINOR_VERSION}")
-target_compile_definitions(OpenSCAD PRIVATE ENABLE_CGAL)
+foreach(library OpenSCAD openscadCGAL)
+  target_compile_definitions(${library} PRIVATE ENABLE_CGAL)
 # The macro `CGAL_DEBUG` allows to force CGAL assertions, even if `NDEBUG` is defined,
 # Enabling CGAL assertions is necessary for us to catch them before they cause a crash
 # on bad geometry input.
-target_compile_definitions(OpenSCAD PRIVATE CGAL_DEBUG)
-target_compile_definitions(OpenSCAD PRIVATE CGAL_USE_GMPXX)
+  target_compile_definitions(${library} PRIVATE CGAL_DEBUG)
+  target_compile_definitions(${library} PRIVATE CGAL_USE_GMPXX)
+
 if(TARGET CGAL::CGAL)
-  target_link_libraries(OpenSCAD PRIVATE CGAL::CGAL CGAL::CGAL_Core)
+  target_link_libraries(${library}  PRIVATE CGAL::CGAL CGAL::CGAL_Core)
   message(STATUS "CGAL: Using target CGAL::CGAL CGAL::CGAL_Core")
 else()
-  target_link_libraries(OpenSCAD PRIVATE ${CGAL_LIBRARY} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
+  target_link_libraries(${library}  PRIVATE ${CGAL_LIBRARY} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
 endif()
+endforeach(library)
 # revert any changes to module path from CGAL_Macros.cmake; see note above
 # Commented out code should work in CGAL>= 5.4
 #if (CGAL_MODULE_PATH_IS_SET)
@@ -297,9 +310,10 @@ target_compile_definitions(OpenSCAD PRIVATE ENABLE_LIBZIP)
 
 find_package(Freetype 2.4.9 REQUIRED QUIET)
 message(STATUS "Freetype: ${FREETYPE_VERSION_STRING}")
-target_include_directories(OpenSCAD SYSTEM PRIVATE ${FREETYPE_INCLUDE_DIRS})
-target_link_libraries(OpenSCAD PRIVATE ${FREETYPE_LIBRARIES})
-
+foreach(library OpenSCAD openscadCGAL)
+   target_include_directories(${library} SYSTEM PRIVATE ${FREETYPE_INCLUDE_DIRS})
+   target_link_libraries(${library} PRIVATE ${FREETYPE_LIBRARIES})
+endforeach(library)
 find_package(LibXml2 2.9 REQUIRED QUIET)
 message(STATUS "LibXml2: ${LIBXML2_VERSION_STRING}")
 target_include_directories(OpenSCAD SYSTEM PRIVATE ${LIBXML2_INCLUDE_DIR})
@@ -376,6 +390,18 @@ endif()
 # Automatically add the current source and build directories to the include path.
 set(CMAKE_INCLUDE_CURRENT_DIR ON) # (does not propagate down to subdirectories)
 
+target_include_directories(openscadCGAL PRIVATE
+  "src"
+  "src/core"
+  "src/core/customizer"
+  "src/geometry"
+  "src/geometry/cgal"
+  "src/platform"
+  "src/io"
+  "src/utils"
+  "src/glview"
+  "src/glview/cgal"
+)
 target_include_directories(OpenSCAD PRIVATE
   "src"
   "src/core"
@@ -683,32 +709,32 @@ set(CORE_SOURCES
   ${FLEX_comment_lexer_OUTPUTS}
   ${BISON_comment_parser_OUTPUTS})
 
-set(CGAL_SOURCES
-  src/geometry/GeometryEvaluator.cc
-  src/geometry/cgal/cgalutils.cc
-  src/geometry/cgal/cgalutils-applyops.cc
-  src/geometry/cgal/cgalutils-applyops-hybrid.cc
-  src/geometry/cgal/cgalutils-applyops-hybrid-minkowski.cc
-  src/geometry/cgal/cgalutils-closed.cc
-  src/geometry/cgal/cgalutils-convex.cc
-  src/geometry/cgal/cgalutils-corefine.cc
-  src/geometry/cgal/cgalutils-kernel.cc
-  src/geometry/cgal/cgalutils-hybrid.cc
-  src/geometry/cgal/cgalutils-mesh.cc
-  src/geometry/cgal/cgalutils-minkowski.cc
-  src/geometry/cgal/cgalutils-nef.cc
-  src/geometry/cgal/cgalutils-orient.cc
-  src/geometry/cgal/cgalutils-polyhedron.cc
-  src/geometry/cgal/cgalutils-project.cc
-  src/geometry/cgal/cgalutils-tess.cc
-  src/geometry/cgal/cgalutils-triangulate.cc
-  src/geometry/cgal/CGALHybridPolyhedron.cc
-  src/geometry/cgal/CGAL_Nef_polyhedron.cc
-  src/geometry/cgal/CGALCache.cc
-  src/geometry/cgal/Polygon2d-CGAL.cc
-  src/io/export_nef.cc
-  src/io/import_nef.cc
-)
+#set(CGAL_SOURCES
+#  src/geometry/GeometryEvaluator.cc
+#  src/geometry/cgal/cgalutils.cc
+#  src/geometry/cgal/cgalutils-applyops.cc
+#  src/geometry/cgal/cgalutils-applyops-hybrid.cc
+#  src/geometry/cgal/cgalutils-applyops-hybrid-minkowski.cc
+#  src/geometry/cgal/cgalutils-closed.cc
+#  src/geometry/cgal/cgalutils-convex.cc
+#  src/geometry/cgal/cgalutils-corefine.cc
+#  src/geometry/cgal/cgalutils-kernel.cc
+#  src/geometry/cgal/cgalutils-hybrid.cc
+#  src/geometry/cgal/cgalutils-mesh.cc
+#  src/geometry/cgal/cgalutils-minkowski.cc
+#  src/geometry/cgal/cgalutils-nef.cc
+#  src/geometry/cgal/cgalutils-orient.cc
+#  src/geometry/cgal/cgalutils-polyhedron.cc
+#  src/geometry/cgal/cgalutils-project.cc
+#  src/geometry/cgal/cgalutils-tess.cc
+#  src/geometry/cgal/cgalutils-triangulate.cc
+#  src/geometry/cgal/CGALHybridPolyhedron.cc
+#  src/geometry/cgal/CGAL_Nef_polyhedron.cc
+#  src/geometry/cgal/CGALCache.cc
+#  src/geometry/cgal/Polygon2d-CGAL.cc
+#  src/io/export_nef.cc
+#  src/io/import_nef.cc
+#)
 
 #
 # Offscreen OpenGL context source code
@@ -820,7 +846,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties("src/ext/polyclipping/clipper.cpp" PROPERTIES COMPILE_FLAGS "-Wno-class-memaccess")
 endif()
 
-list(APPEND Sources src/openscad.cc ${CORE_SOURCES} ${CGAL_SOURCES} ${OFFSCREEN_SOURCES})
+# list(APPEND Sources src/openscad.cc ${CORE_SOURCES} ${CGAL_SOURCES} ${OFFSCREEN_SOURCES})
+list(APPEND Sources src/openscad.cc ${CORE_SOURCES} ${OFFSCREEN_SOURCES})
 
 set(RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 if(HEADLESS)
