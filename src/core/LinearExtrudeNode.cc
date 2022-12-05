@@ -78,6 +78,7 @@ static std::shared_ptr<AbstractNode> builtin_linear_extrude(const ModuleInstanti
   auto node = std::make_shared<LinearExtrudeNode>(inst);
 
   Parameters parameters = parse_parameters(std::move(arguments), inst->location());
+  parameters.set_caller("linear_extrude");
 
   node->fn = parameters["$fn"].toDouble();
   node->fs = parameters["$fs"].toDouble();
@@ -118,8 +119,8 @@ static std::shared_ptr<AbstractNode> builtin_linear_extrude(const ModuleInstanti
   if (node->scale_x < 0) node->scale_x = 0;
   if (node->scale_y < 0) node->scale_y = 0;
 
-  node->has_slices = parameters["slices"].getUnsignedInt(node->slices);
-  node->has_segments = parameters["segments"].getUnsignedInt(node->segments);
+  node->has_slices = parameters.validate_integral("slices", node->slices, 1u);
+  node->has_segments = parameters.validate_integral("segments", node->segments, 0u);
 
   node->twist = 0.0;
   parameters["twist"].getFiniteDouble(node->twist);
