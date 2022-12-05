@@ -804,32 +804,28 @@ set(INPUT_DRIVER_SOURCES
   ${INPUT_DRIVER_SPNAV_SOURCES}
   ${INPUT_DRIVER_DBUS_SOURCES})
 
+set(GUI_HEADERS
+  src/gui/parameter/ParameterDescriptionWidget.h
+  src/gui/parameter/ParameterWidget.h
+)
+
 set(GUI_SOURCES
   ${GUI_SOURCES}
   ${INPUT_DRIVER_SOURCES}
 )
-
-# header-only code
-set(GUI_HEADERS
-  src/gui/AboutDialog.h
-  src/gui/Network.h
-  src/gui/NetworkSignal.h
-  )
-
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # Ignore specific warning on external lib
   set_source_files_properties("src/ext/polyclipping/clipper.cpp" PROPERTIES COMPILE_FLAGS "-Wno-class-memaccess")
 endif()
 
-list(APPEND Sources src/openscad.cc ${CORE_SOURCES} ${OFFSCREEN_SOURCES})
+list(APPEND Sources ${CORE_SOURCES} ${OFFSCREEN_SOURCES} )
 
 set(RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 if(HEADLESS)
   target_compile_definitions(${openscadEXECUTABLE} PRIVATE OPENSCAD_NOGUI)
 else()
   list(APPEND RESOURCE_FILES ${RESOURCE_DIR}/common.qrc)
-  # list(APPEND Sources ${GUI_SOURCES} ${GUI_HEADERS})
   list(APPEND Sources ${GUI_SOURCES})
 endif()
 

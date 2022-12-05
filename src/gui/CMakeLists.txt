@@ -1,18 +1,21 @@
 # gui lib
 
-cmake_minimum_required(VERSION 3.13)
+#cmake_minimum_required(VERSION 3.13)
 
-if(POLICY CMP0071) # Let AUTOMOC and AUTOUIC process GENERATED files.
-  cmake_policy(SET CMP0071 NEW)
-endif()
+#if(POLICY CMP0071) # Let AUTOMOC and AUTOUIC process GENERATED files.
+#  cmake_policy(SET CMP0071 NEW)
+#endif()
 
+# headers to trigger ui_ compilations by the QT moc
 set(GUI_LIB_HEADERS
   AboutDialog.h
   Network.h
   NetworkSignal.h
+  parameter/ParameterDescriptionWidget.h
+  parameter/ParameterWidget.h
 )
 set(GUI_LIB_SOURCES
-
+  ../openscad.cc
   AutoUpdater.cc
   CGALWorker.cc
   ViewportControl.cc
