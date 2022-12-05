@@ -66,8 +66,10 @@ if(CLANG_TIDY AND CLANG_TIDY_EXE)
   set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};-header-filter=${regex}")
 endif()
 
+#TODO sort HEADLESS
+
 set(openscadEXECUTABLE OpenSCAD)
-set(openscadSTATIC_LIBS openscadCGAL openscadGUI)
+set(openscadSTATIC_LIBS openscadCGAL openscadGUI openscadCORE openscadIO)
 set(openscadALLTARGETS ${openscadEXECUTABLE} ${openscadSTATIC_LIBS})
 
 add_executable(${openscadEXECUTABLE})
@@ -76,9 +78,11 @@ add_subdirectory(submodules)
 # static libraries
 add_subdirectory(src/geometry/cgal)
 add_subdirectory(src/gui)
+add_subdirectory(src/core)
+add_subdirectory(src/io)
 
 target_link_libraries(${openscadEXECUTABLE} PUBLIC
-    ${openscadSTATIC_LIBS}
+   ${openscadSTATIC_LIBS}
 )
 
 foreach(scadTarget ${openscadALLTARGETS})
@@ -117,7 +121,9 @@ if(NULLGL)
   set(HEADLESS ON CACHE BOOL "" FORCE)
 endif()
 if(EXPERIMENTAL)
-  target_compile_definitions(${openscadEXECUTABLE} PRIVATE ENABLE_EXPERIMENTAL)
+  foreach(library ${openscadALLTARGETS} )
+     target_compile_definitions(${library} PRIVATE ENABLE_EXPERIMENTAL)
+  endforeach(library)
 endif()
 if(IDPREFIX)
   target_compile_definitions(${openscadEXECUTABLE} PRIVATE IDPREFIX)
@@ -130,7 +136,7 @@ endif()
 
 if (MXECROSS OR WIN32)
   add_subdirectory(winconsole)
-  foreach(library ${openscadEXECUTABLE} openscadGUI)
+  foreach(library ${openscadALLTARGETS} )
     set_property(TARGET ${library} PROPERTY WIN32_EXECUTABLE ON)
   endforeach(library)
 endif()
@@ -211,33 +217,35 @@ endmacro(find_graphics)
 if (MSVC)
   # Flex lexer options
   set(WINCOMPAT "--wincompat --nounistd")
-
-  target_compile_definitions(${openscadEXECUTABLE} PRIVATE _USE_MATH_DEFINES)
-
   find_package(Eigen3 CONFIG REQUIRED)
-  target_link_libraries(${openscadEXECUTABLE} PRIVATE Eigen3::Eigen)
-
+  foreach(library ${openscadALLTARGETS})
+     target_compile_definitions(${library} PRIVATE _USE_MATH_DEFINES)
+     target_link_libraries(${library} PRIVATE Eigen3::Eigen)
+  endforeach(library)
   set(Boost_USE_STATIC_LIBS TRUE)
   find_package(Boost 1.56 REQUIRED COMPONENTS filesystem system regex program_options)
   message(STATUS "Boost: ${Boost_VERSION}")
-  target_include_directories(${openscadEXECUTABLE} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-  target_link_libraries(${openscadEXECUTABLE} PRIVATE ${Boost_LIBRARIES})
-
+  foreach(library ${openscadEXECUTABLE})
+     target_include_directories(${library} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+     target_link_libraries(${library} PRIVATE ${Boost_LIBRARIES})
+   endforeach(library)
   find_package(harfbuzz CONFIG REQUIRED)
   find_path(HARFBUZZ_INCLUDE_DIRS harfbuzz)
-  target_include_directories(${openscadEXECUTABLE} SYSTEM PRIVATE ${HARFBUZZ_INCLUDE_DIRS}/harfbuzz)
-  target_link_libraries(${openscadEXECUTABLE} PRIVATE harfbuzz::harfbuzz)
-
+  foreach(library ${openscadEXECUTABLE})
+     target_include_directories(${library} SYSTEM PRIVATE ${HARFBUZZ_INCLUDE_DIRS}/harfbuzz)
+     target_link_libraries(${library} PRIVATE harfbuzz::harfbuzz)
+  endforeach(library)
   find_package(unofficial-fontconfig CONFIG REQUIRED)
-  target_link_libraries(${openscadEXECUTABLE} PRIVATE unofficial::fontconfig::fontconfig)
-
+  foreach(library ${openscadEXECUTABLE})
+     target_link_libraries(${library} PRIVATE unofficial::fontconfig::fontconfig)
+  endforeach(library)
   find_package(unofficial-glib CONFIG REQUIRED)
+  find_package(double-conversion CONFIG REQUIRED)
   foreach(library ${openscadALLTARGETS})
      target_include_directories(${library} SYSTEM PRIVATE ${GLIB2_INCLUDE_DIRS})
      target_link_libraries(${library} PRIVATE unofficial::glib::gio unofficial::glib::glib unofficial::glib::gmodule unofficial::glib::gobject)
-  endforeach(library)
-  find_package(double-conversion CONFIG REQUIRED)
-  target_link_libraries(${openscadEXECUTABLE} PRIVATE double-conversion::double-conversion)
+     target_link_libraries(${library} PRIVATE double-conversion::double-conversion)
+   endforeach(library)
 
   find_library(GETTEXT_LIBRARY libintl)
   target_link_libraries(${openscadEXECUTABLE} PRIVATE ${GETTEXT_LIBRARY})
@@ -282,9 +290,9 @@ endif()
 if (("${Boost_VERSION}" VERSION_GREATER "1.72") AND ("${Boost_VERSION}" VERSION_LESS "1.76"))
   # Avoid warning messages from boost which are also caused by boost's code.
   #   https://github.com/boostorg/property_tree/issues/51
-foreach(library ${openscadALLTARGETS})
-  target_compile_definitions(${library} PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
-endforeach(library)
+   foreach(library ${openscadALLTARGETS})
+     target_compile_definitions(${library} PUBLIC BOOST_BIND_GLOBAL_PLACEHOLDERS)
+   endforeach(library)
 endif()
 
 # Note: Saving CMAKE_MODULE_PATH as CGAL will overwrite it.
@@ -320,10 +328,11 @@ set(CMAKE_MODULE_PATH ${ORIGINAL_CMAKE_MODULE_PATH})
 
 find_package(LibZip REQUIRED QUIET)
 message(STATUS "libzip: ${LIBZIP_VERSION}")
-target_include_directories(${openscadEXECUTABLE} SYSTEM PRIVATE ${LIBZIP_INCLUDE_DIR_ZIP} ${LIBZIP_INCLUDE_DIR_ZIPCONF})
-target_link_libraries(${openscadEXECUTABLE} PRIVATE ${LIBZIP_LIBRARY})
-target_compile_definitions(${openscadEXECUTABLE} PRIVATE ENABLE_LIBZIP)
-
+foreach(library ${openscadALLTARGETS})
+   target_include_directories(${library} SYSTEM PRIVATE ${LIBZIP_INCLUDE_DIR_ZIP} ${LIBZIP_INCLUDE_DIR_ZIPCONF})
+   target_link_libraries(${library} PRIVATE ${LIBZIP_LIBRARY})
+   target_compile_definitions(${library} PRIVATE ENABLE_LIBZIP)
+endforeach(library)
 find_package(Freetype 2.4.9 REQUIRED QUIET)
 message(STATUS "Freetype: ${FREETYPE_VERSION_STRING}")
 find_package(LibXml2 2.9 REQUIRED QUIET)
@@ -339,17 +348,21 @@ if(ENABLE_HIDAPI)
   find_package(HidAPI 0.10 QUIET)
   if(HIDAPI_FOUND)
     set(INPUT_DRIVER_HIDAPI_SOURCES src/gui/input/HidApiInputDriver.cc)
-    target_include_directories(${openscadEXECUTABLE} SYSTEM PRIVATE ${HIDAPI_INCLUDE_DIR})
-    target_link_libraries(${openscadEXECUTABLE} PRIVATE ${HIDAPI_LIBRARY})
-    target_compile_definitions(${openscadEXECUTABLE} PRIVATE ENABLE_HIDAPI)
+    foreach(library ${openscadALLTARGETS})
+       target_include_directories(${library} SYSTEM PRIVATE ${HIDAPI_INCLUDE_DIR})
+       target_link_libraries(${library} PRIVATE ${HIDAPI_LIBRARY})
+       target_compile_definitions(${library} PRIVATE ENABLE_HIDAPI)
+    endforeach(library)
     message(STATUS "HidAPI: ${HIDAPI_VERSION_STRING}")
   elseif(ALLOW_BUNDLED_HIDAPI)
     set(HIDAPI_SRC_DIR "src/ext/hidapi")
     file(STRINGS "${HIDAPI_SRC_DIR}/VERSION" HIDAPI_VERSION_STRING)
-    target_include_directories(${openscadEXECUTABLE} SYSTEM PRIVATE "${HIDAPI_SRC_DIR}")
     set(INPUT_DRIVER_HIDAPI_SOURCES "${HIDAPI_SRC_DIR}/hid.c" src/gui/input/HidApiInputDriver.cc)
-    target_compile_definitions(${openscadEXECUTABLE} PRIVATE ENABLE_HIDAPI)
-    target_link_libraries(${openscadEXECUTABLE} PRIVATE setupapi hid)
+    foreach(library ${openscadALLTARGETS})
+       target_include_directories(${library} SYSTEM PRIVATE "${HIDAPI_SRC_DIR}")
+       target_compile_definitions(${library} PRIVATE ENABLE_HIDAPI)
+       target_link_libraries(${library} PRIVATE setupapi hid)
+    endforeach(library)
     message(STATUS "HidAPI: ${HIDAPI_VERSION_STRING} (bundled)")
   else()
     message(STATUS "HIDAPI: disabled")
@@ -363,9 +376,11 @@ if(ENABLE_SPNAV)
   if(SPNAV_FOUND)
     message(STATUS "SpNav: found")
     set(INPUT_DRIVER_SPNAV_SOURCES src/gui/input/SpaceNavInputDriver.cc)
-    target_include_directories(${openscadEXECUTABLE} SYSTEM PRIVATE ${SPNAV_INCLUDE_DIR})
-    target_link_libraries(${openscadEXECUTABLE} PRIVATE ${SPNAV_LIBRARY})
-    target_compile_definitions(${openscadEXECUTABLE} PRIVATE ENABLE_SPNAV)
+    foreach(library ${openscadALLTARGETS})
+       target_include_directories(${library} SYSTEM PRIVATE ${SPNAV_INCLUDE_DIR})
+       target_link_libraries(${library} PRIVATE ${SPNAV_LIBRARY})
+       target_compile_definitions(${library} PRIVATE ENABLE_SPNAV)
+    endforeach(library)
   else()
     message(STATUS "SpNav: disabled")
   endif()
@@ -439,6 +454,41 @@ target_include_directories(openscadGUI PRIVATE
   "src/utils"
 )
 
+target_include_directories(openscadIO PRIVATE
+  "src"
+  "src/core"
+  "src/core/customizer"
+  "src/ext/json"
+  "src/ext/lexertl/include"
+  "src/ext/libtess2/Include"
+  "src/geometry"
+  "src/geometry/cgal"
+  "src/glview"
+  "src/glview/preview"
+  "src/glview/cgal"
+  "src/gui"
+  "src/io"
+  "src/platform"
+  "src/utils"
+)
+
+target_include_directories(openscadCORE PRIVATE
+  "src"
+  "src/core"
+  "src/core/customizer"
+  "src/ext/json"
+  "src/ext/lexertl/include"
+  "src/ext/libtess2/Include"
+  "src/geometry"
+  "src/geometry/cgal"
+  "src/glview"
+  "src/glview/preview"
+  "src/glview/cgal"
+  "src/gui"
+  "src/io"
+  "src/platform"
+  "src/utils"
+)
 
 target_include_directories(${openscadEXECUTABLE} PRIVATE
   "src"
@@ -523,7 +573,9 @@ endforeach(library)
     if (Qt5Gamepad_FOUND)
       message(STATUS "Qt5Gamepad input driver enabled")
       set(GUI_SOURCES ${GUI_SOURCES} src/gui/input/QGamepadInputDriver.cc)
-      target_compile_definitions(${openscadEXECUTABLE} PRIVATE ENABLE_QGAMEPAD)
+      foreach(library ${openscadALLTARGETS})
+         target_compile_definitions(${library} PRIVATE ENABLE_QGAMEPAD)
+      endforeach(library)
     else()
       message(STATUS "Qt5Gamepad input driver disabled as the Qt5Gamepad module could not be found.")
     endif()
@@ -544,21 +596,22 @@ if(USE_CCACHE)
   endif()
 endif()
 
-target_compile_definitions(${openscadEXECUTABLE} PRIVATE OPENSCAD_VERSION=${OPENSCAD_VERSION} OPENSCAD_SHORTVERSION=${OPENSCAD_SHORTVERSION} OPENSCAD_YEAR=${OPENSCAD_YEAR} OPENSCAD_MONTH=${OPENSCAD_MONTH})
-if (DEFINED OPENSCAD_DAY)
-  target_compile_definitions(${openscadEXECUTABLE} PRIVATE OPENSCAD_DAY=${OPENSCAD_DAY})
-endif()
-if(DEFINED OPENSCAD_COMMIT)
-  target_compile_definitions(${openscadEXECUTABLE} PRIVATE OPENSCAD_COMMIT=${OPENSCAD_COMMIT})
-endif()
-
-#
-# Platform specific settings
-#
-
-# Stack size 8MB; github issue 116
-target_compile_definitions(${openscadEXECUTABLE} PRIVATE "STACKSIZE=${STACKSIZE}") # used as default in src/platform/PlatformUtils.h
-
+foreach(library ${openscadALLTARGETS})
+   target_compile_definitions(${library}
+     PRIVATE OPENSCAD_VERSION=${OPENSCAD_VERSION}
+     OPENSCAD_SHORTVERSION=${OPENSCAD_SHORTVERSION}
+     OPENSCAD_YEAR=${OPENSCAD_YEAR}
+     OPENSCAD_MONTH=${OPENSCAD_MONTH}
+   )
+   if (DEFINED OPENSCAD_DAY)
+     target_compile_definitions(${library} PRIVATE OPENSCAD_DAY=${OPENSCAD_DAY})
+   endif()
+   if(DEFINED OPENSCAD_COMMIT)
+     target_compile_definitions(${library} PRIVATE OPENSCAD_COMMIT=${OPENSCAD_COMMIT})
+   endif()
+   # Stack size 8MB; github issue 116
+   target_compile_definitions(${library} PRIVATE "STACKSIZE=${STACKSIZE}") # used as default in src/platform/PlatformUtils.h
+endforeach(library)
 if(NULLGL)
   set(OFFSCREEN_METHOD "NULLGL")
   message(STATUS "Offscreen OpenGL Context - using NULLGL")
@@ -566,7 +619,7 @@ else()
   SET(OFFSCREEN_METHOD "<undefined>")
 endif()
 if(APPLE)
-  foreach(library ${openscadEXECUTABLE} openscadGUI)
+  foreach(library  ${openscadALLTARGETS})
      target_compile_definitions(${library} PRIVATE OPENSCAD_OS="Mac OS X")
   endforeach(library)
   message(STATUS "Offscreen OpenGL Context - using Apple CGL")
@@ -575,15 +628,17 @@ if(APPLE)
     set(PLATFORM_SOURCES ${PLATFORM_SOURCES} src/gui/AppleEvents.cc)
   endif()
   if(NOT NULLGL)
-    target_compile_definitions(${openscadEXECUTABLE} PRIVATE GL_SILENCE_DEPRECATION)
+    foreach(library  ${openscadALLTARGETS})
+    target_compile_definitions(${library} PRIVATE GL_SILENCE_DEPRECATION)
+    endforeach(library)
     set(OFFSCREEN_METHOD "Apple CGL")
     set(PLATFORM_SOURCES ${PLATFORM_SOURCES} src/glview/OffscreenContextCGL.mm)
   endif()
   find_library(COCOA_LIBRARY Cocoa)
   target_link_libraries(${openscadEXECUTABLE} PRIVATE ${COCOA_LIBRARY})
 elseif(UNIX)
-  foreach(library ${openscadEXECUTABLE} openscadGUI)
-     target_compile_definitions(${openscadEXECUTABLE} PRIVATE OPENSCAD_OS="Unix")
+  foreach(library ${openscadALLTARGETS})
+     target_compile_definitions(${library} PRIVATE OPENSCAD_OS="Unix")
   endforeach(library)
   set(PLATFORM_SOURCES src/io/imageutils-lodepng.cc src/platform/PlatformUtils-posix.cc)
   if(NOT NULLGL)
@@ -606,7 +661,7 @@ elseif(UNIX)
     endif()
   endif()
 elseif(WIN32)
-  foreach(library ${openscadEXECUTABLE} openscadGUI)
+  foreach(library ${openscadALLTARGETS})
      target_compile_definitions(${library} PRIVATE NOGDI)
      target_compile_definitions(${library} PRIVATE OPENSCAD_OS="Windows")
   endforeach(library)
@@ -621,70 +676,13 @@ endif()
 
 # NOTE: To keep HEADLESS builds working, do NOT add Qt-dependent sources here,
 #       see GUI_SOURCES list below for that.
-set(CORE_SOURCES
+set(MISC_SOURCES
   src/Feature.cc
   src/FontCache.cc
   src/handle_dep.cc
   src/LibraryInfo.cc
   src/RenderStatistic.cc
   src/version.cc
-  src/core/Arguments.cc
-  src/core/Builtins.cc
-  src/core/BuiltinContext.cc
-  src/core/CgalAdvNode.cc
-  src/core/Children.cc
-  src/core/ColorNode.cc
-  src/core/Context.cc
-  src/core/ContextFrame.cc
-  src/core/ContextMemoryManager.cc
-  src/core/control.cc
-  src/core/CSGNode.cc
-  src/core/CsgOpNode.cc
-  src/core/CSGTreeEvaluator.cc
-  src/core/customizer/Annotation.cc
-  src/core/customizer/CommentParser.cc
-  src/core/EvaluationSession.cc
-  src/core/Expression.cc
-  src/core/ValueWrapper.cc
-  src/core/builtin_functions.cc
-  src/core/function.cc
-  src/core/ImportNode.cc
-  src/core/LinearExtrudeNode.cc
-  src/core/LocalScope.cc
-  src/core/ScopeContext.cc
-  src/core/module.cc
-  src/core/node.cc
-  src/core/NodeDumper.cc
-  src/core/OffsetNode.cc
-  src/core/Parameters.cc
-  src/core/parsersettings.cc
-  src/core/primitives.cc
-  src/core/progress.cc
-  src/core/ProjectionNode.cc
-  src/core/RenderNode.cc
-  src/core/RoofNode.cc
-  src/core/DrawingCallback.cc
-  src/core/RotateExtrudeNode.cc
-  src/core/SurfaceNode.cc
-  src/core/TextNode.cc
-  src/core/TransformNode.cc
-  src/core/Value.cc
-  src/core/Assignment.cc
-  src/core/AST.cc
-  src/core/FreetypeRenderer.cc
-  src/core/GroupModule.cc
-  src/core/ModuleLiteral.cc
-  src/core/ModuleReference.cc
-  src/core/ModuleInstantiation.cc
-  src/core/MemberLookup.cc
-  src/core/NodeVisitor.cc
-  src/core/SourceFile.cc
-  src/core/SourceFileCache.cc
-  src/core/StatCache.cc
-  src/core/UserModule.cc
-  src/core/Tree.cc
-  src/core/customizer/ParameterObject.cc
-  src/core/customizer/ParameterSet.cc
   src/ext/lodepng/lodepng.cpp
   src/ext/polyclipping/clipper.cpp
   src/ext/libtess2/Source/bucketalloc.c
@@ -709,43 +707,6 @@ set(CORE_SOURCES
   src/glview/Camera.cc
   src/glview/ColorMap.cc
   src/glview/preview/CSGTreeNormalizer.cc
-  src/io/DxfData.cc
-  src/io/dxfdim.cc
-  src/io/export.cc
-  src/io/export_3mf.cc
-  src/io/export_amf.cc
-  src/io/export_dxf.cc
-  src/io/export_obj.cc
-  src/io/export_off.cc
-  src/io/export_wrl.cc
-  src/io/export_pdf.cc
-  src/io/export_stl.cc
-  src/io/export_svg.cc
-  src/io/export_param.cc
-  src/io/fileutils.cc
-  src/io/import_3mf.cc
-  src/io/import_amf.cc
-  src/io/import_stl.cc
-  src/io/import_off.cc
-  src/io/import_svg.cc
-  src/io/import_json.cc
-  src/io/libsvg/circle.cc
-  src/io/libsvg/data.cc
-  src/io/libsvg/ellipse.cc
-  src/io/libsvg/group.cc
-  src/io/libsvg/libsvg.cc
-  src/io/libsvg/line.cc
-  src/io/libsvg/path.cc
-  src/io/libsvg/polygon.cc
-  src/io/libsvg/polyline.cc
-  src/io/libsvg/rect.cc
-  src/io/libsvg/shape.cc
-  src/io/libsvg/svgpage.cc
-  src/io/libsvg/text.cc
-  src/io/libsvg/transformation.cc
-  src/io/libsvg/tspan.cc
-  src/io/libsvg/use.cc
-  src/io/libsvg/util.cc
   src/platform/PlatformUtils.cc
   src/utils/boost-utils.cc
   src/utils/calc.cc
@@ -790,10 +751,9 @@ else()
     src/io/imageutils.cc)
 endif()
 
-
 if(UNIX AND (NOT APPLE) AND (NOT HEADLESS))
   set(PLATFORM_INPUT_DRIVER_SOURCES src/gui/input/JoystickInputDriver.cc)
-  foreach(library ${openscadEXECUTABLE} openscadGUI)
+  foreach(library ${openscadALLTARGETS})
      target_compile_definitions(${library} PRIVATE ENABLE_JOYSTICK)
   endforeach(library)
 endif()
@@ -803,11 +763,6 @@ set(INPUT_DRIVER_SOURCES
   ${INPUT_DRIVER_HIDAPI_SOURCES}
   ${INPUT_DRIVER_SPNAV_SOURCES}
   ${INPUT_DRIVER_DBUS_SOURCES})
-
-set(GUI_HEADERS
-  src/gui/parameter/ParameterDescriptionWidget.h
-  src/gui/parameter/ParameterWidget.h
-)
 
 set(GUI_SOURCES
   ${GUI_SOURCES}
@@ -819,18 +774,22 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties("src/ext/polyclipping/clipper.cpp" PROPERTIES COMPILE_FLAGS "-Wno-class-memaccess")
 endif()
 
-list(APPEND Sources ${CORE_SOURCES} ${OFFSCREEN_SOURCES} )
+list(APPEND Sources ${MISC_SOURCES} ${OFFSCREEN_SOURCES} )
 
 set(RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 if(HEADLESS)
-  target_compile_definitions(${openscadEXECUTABLE} PRIVATE OPENSCAD_NOGUI)
+  foreach(library ${openscadALLTARGETS})
+     target_compile_definitions(${library} PRIVATE OPENSCAD_NOGUI)
+  endforeach(library)
 else()
   list(APPEND RESOURCE_FILES ${RESOURCE_DIR}/common.qrc)
   list(APPEND Sources ${GUI_SOURCES})
 endif()
 
 if (SNAPSHOT)
-  target_compile_definitions(${openscadEXECUTABLE} PRIVATE OPENSCAD_SNAPSHOT)
+  foreach(library ${openscadALLTARGETS})
+     target_compile_definitions(${library} PRIVATE OPENSCAD_SNAPSHOT)
+  endforeach(library)
   set(MACOSX_BUNDLE_ICON_FILE icon-nightly.icns)
   set(WINDOWS_RESOURCE_PATH ${RESOURCE_DIR}/openscad_win32-nightly.rc)
 else()

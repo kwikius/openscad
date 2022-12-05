@@ -1,0 +1,64 @@
+#core lib
+
+set(CORE_LIB_SOURCES
+  Arguments.cc
+  Builtins.cc
+  BuiltinContext.cc
+  CgalAdvNode.cc
+  Children.cc
+  ColorNode.cc
+  Context.cc
+  ContextFrame.cc
+  ContextMemoryManager.cc
+  control.cc
+  CSGNode.cc
+  CsgOpNode.cc
+  CSGTreeEvaluator.cc
+  customizer/Annotation.cc
+  customizer/CommentParser.cc
+  EvaluationSession.cc
+  Expression.cc
+  ValueWrapper.cc
+  builtin_functions.cc
+  function.cc
+  ImportNode.cc
+  LinearExtrudeNode.cc
+  LocalScope.cc
+  ScopeContext.cc
+  module.cc
+  node.cc
+  NodeDumper.cc
+  OffsetNode.cc
+  Parameters.cc
+  parsersettings.cc
+  primitives.cc
+  progress.cc
+  ProjectionNode.cc
+  RenderNode.cc
+  RoofNode.cc
+  DrawingCallback.cc
+  RotateExtrudeNode.cc
+  SurfaceNode.cc
+  TextNode.cc
+  TransformNode.cc
+  Value.cc
+  Assignment.cc
+  AST.cc
+  FreetypeRenderer.cc
+  GroupModule.cc
+  ModuleLiteral.cc
+  ModuleReference.cc
+  ModuleInstantiation.cc
+  MemberLookup.cc
+  NodeVisitor.cc
+  SourceFile.cc
+  SourceFileCache.cc
+  StatCache.cc
+  UserModule.cc
+  Tree.cc
+  customizer/ParameterObject.cc
+  customizer/ParameterSet.cc
+)
+
+add_library(openscadCORE ${CORE_LIB_SOURCES})
+

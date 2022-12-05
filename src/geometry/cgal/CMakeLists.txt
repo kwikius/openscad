@@ -23,8 +23,6 @@ set(CGAL_LIB_SOURCES
   CGAL_Nef_polyhedron.cc
   CGALCache.cc
   Polygon2d-CGAL.cc
-  ../../io/export_nef.cc
-  ../../io/import_nef.cc
 )
 
 add_library(openscadCGAL ${CGAL_LIB_SOURCES})
