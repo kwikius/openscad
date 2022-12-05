@@ -67,7 +67,7 @@ if(CLANG_TIDY AND CLANG_TIDY_EXE)
 endif()
 
 set(openscadEXECUTABLE OpenSCAD)
-set(openscadSTATIC_LIBS openscadCGAL)
+set(openscadSTATIC_LIBS openscadCGAL openscadGUI)
 set(openscadALLTARGETS ${openscadEXECUTABLE} ${openscadSTATIC_LIBS})
 
 add_executable(${openscadEXECUTABLE})
@@ -75,6 +75,7 @@ add_executable(${openscadEXECUTABLE})
 add_subdirectory(submodules)
 
 add_subdirectory(src/geometry/cgal)
+add_subdirectory(src/gui)
 
 target_link_libraries(${openscadEXECUTABLE} PUBLIC
     ${openscadSTATIC_LIBS}
@@ -158,7 +159,9 @@ endif()
 find_package(PkgConfig)
 
 if (MXECROSS)
-  target_compile_definitions(${openscadEXECUTABLE} PRIVATE GLEW_STATIC LIBXML_STATIC STATIC_QT_SVG_PLUGIN)
+  foreach(library ${openscadEXECUTABLE} openscadGUI)
+     target_compile_definitions(${library} PRIVATE GLEW_STATIC LIBXML_STATIC STATIC_QT_SVG_PLUGIN)
+  endforeach(library)
   target_link_libraries(${openscadEXECUTABLE} PRIVATE bcrypt)
 endif()
 
@@ -189,7 +192,9 @@ macro(find_graphics)
     endif()
 
     find_package(OpenGL REQUIRED QUIET)
-    target_link_libraries(${openscadEXECUTABLE} PRIVATE ${OPENGL_LIBRARIES})
+    foreach(library ${openscadEXECUTABLE} openscadGUI)
+    target_link_libraries(${library} PRIVATE ${OPENGL_LIBRARIES})
+    endforeach(library)
     message(STATUS "OpenGL: ${OPENGL_LIBRARIES}")
   endif()
 endmacro(find_graphics)
@@ -361,9 +366,11 @@ if(ENABLE_CAIRO)
   find_package(Cairo 1.14 QUIET)
   if (CAIRO_VERSION)
     message(STATUS "Cairo: ${CAIRO_VERSION}")
-    target_include_directories(${openscadEXECUTABLE} SYSTEM PRIVATE ${CAIRO_INCLUDE_DIRS})
-    target_link_libraries(${openscadEXECUTABLE} PRIVATE ${CAIRO_LIBRARIES})
-    target_compile_definitions(${openscadEXECUTABLE} PRIVATE ENABLE_CAIRO)
+    foreach(library ${openscadEXECUTABLE} openscadGUI)
+       target_include_directories(${library} SYSTEM PRIVATE ${CAIRO_INCLUDE_DIRS})
+       target_link_libraries(${library} PRIVATE ${CAIRO_LIBRARIES})
+       target_compile_definitions(${library} PRIVATE ENABLE_CAIRO)
+    endforeach(library)
   else()
     message(STATUS "Cairo: disabled")
   endif()
@@ -404,6 +411,26 @@ target_include_directories(openscadCGAL PRIVATE
   "src/glview"
   "src/glview/cgal"
 )
+
+target_include_directories(openscadGUI PRIVATE
+  "src"
+  "src/core"
+  "src/core/customizer"
+  "src/ext/json"
+  "src/ext/lexertl/include"
+  "src/ext/libtess2/Include"
+  "src/geometry"
+  "src/geometry/cgal"
+  "src/glview"
+  "src/glview/preview"
+  "src/glview/cgal"
+  "src/gui"
+  "src/io"
+  "src/platform"
+  "src/utils"
+)
+
+
 target_include_directories(${openscadEXECUTABLE} PRIVATE
   "src"
   "src/core"
@@ -441,25 +468,27 @@ if(NOT HEADLESS)
     list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew/opt/qt@5")
   endif()
 
-  if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.14")
-    set_property(TARGET ${openscadEXECUTABLE} PROPERTY AUTOGEN_ORIGIN_DEPENDS OFF)
-  endif()
-  set_property(TARGET ${openscadEXECUTABLE} PROPERTY AUTOMOC ON)
-  set_property(TARGET ${openscadEXECUTABLE} PROPERTY AUTOUIC ON)
-  set_property(TARGET ${openscadEXECUTABLE} PROPERTY AUTORCC ON)
-  set_property(TARGET ${openscadEXECUTABLE} PROPERTY AUTOUIC_OPTIONS --tr q_)
-  set_property(TARGET ${openscadEXECUTABLE} PROPERTY AUTORCC_OPTIONS --threshold 10 --compress 9)
   find_package(Qt5 5.4 COMPONENTS Core Widgets Multimedia OpenGL Concurrent Network Svg REQUIRED QUIET)
   message(STATUS "Qt5: ${Qt5_VERSION}")
 
+foreach(library ${openscadEXECUTABLE} )
+  if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.14")
+    set_property(TARGET ${library} PROPERTY AUTOGEN_ORIGIN_DEPENDS OFF)
+  endif()
+  set_property(TARGET ${library} PROPERTY AUTOMOC ON)
+  set_property(TARGET ${library} PROPERTY AUTOUIC ON)
+  set_property(TARGET ${library} PROPERTY AUTORCC ON)
+  set_property(TARGET ${library} PROPERTY AUTOUIC_OPTIONS --tr q_)
+  set_property(TARGET ${library} PROPERTY AUTORCC_OPTIONS --threshold 10 --compress 9)
+
   if (Qt5_POSITION_INDEPENDENT_CODE)
-    set_property(TARGET ${openscadEXECUTABLE} PROPERTY POSITION_INDEPENDENT_CODE ON)
+    set_property(TARGET ${library} PROPERTY POSITION_INDEPENDENT_CODE ON)
   endif()
 
   if (("${Qt5_VERSION}" VERSION_GREATER_EQUAL "5.4"))
-    target_compile_definitions(${openscadEXECUTABLE} PRIVATE USE_QOPENGLWIDGET)
+    target_compile_definitions(${library} PRIVATE USE_QOPENGLWIDGET)
   endif()
-
+endforeach(library)
   find_package(Qt5QScintilla 2.8.0 REQUIRED QUIET)
   message(STATUS "QScintilla: ${QT5QSCINTILLA_VERSION_STRING}")
 
@@ -467,7 +496,9 @@ if(NOT HEADLESS)
     find_package(Qt5DBus QUIET)
     if (Qt5DBus_FOUND)
       message(STATUS "DBus input driver enabled")
-      target_compile_definitions(${openscadEXECUTABLE} PRIVATE ENABLE_DBUS)
+foreach(library ${openscadEXECUTABLE} openscadGUI)
+      target_compile_definitions(${library} PRIVATE ENABLE_DBUS)
+endforeach(library)
       set(INPUT_DRIVER_DBUS_SOURCES src/gui/input/DBusInputDriver.cc)
       qt5_add_dbus_interface(INPUT_DRIVER_DBUS_SOURCES org.openscad.OpenSCAD.xml openscad_interface)
       qt5_add_dbus_adaptor(INPUT_DRIVER_DBUS_SOURCES org.openscad.OpenSCAD.xml gui/input/DBusInputDriver.h DBusInputDriver openscad_adaptor)
@@ -754,59 +785,8 @@ set(INPUT_DRIVER_SOURCES
 
 set(GUI_SOURCES
   ${GUI_SOURCES}
-  src/gui/AutoUpdater.cc
-  src/gui/CGALWorker.cc
-  src/gui/ViewportControl.cc
-  src/gui/Console.cc
-  src/gui/Dock.cc
-  src/gui/Editor.cc
-  src/gui/ErrorLog.cc
-  src/gui/EventFilter.h
-  src/gui/FontListDialog.cc
-  src/gui/FontListTableView.cc
-  src/gui/InitConfigurator.cc
-  src/gui/LaunchingScreen.cc
-  src/gui/LibraryInfoDialog.cc
-  src/gui/MainWindow.cc
-  src/gui/Animate.cc
-  src/gui/MouseSelector.cc
-  src/gui/OctoPrint.cc
-  src/gui/OpenCSGWarningDialog.cc
-  src/gui/OpenSCADApp.cc
-  src/gui/Preferences.cc
-  src/gui/PrintInitDialog.cc
-  src/gui/PrintService.cc
-  src/gui/ProgressWidget.cc
-  src/gui/QGLView.cc
-  src/gui/QGLView2.cc
-  src/gui/QSettingsCached.cc
-  src/gui/QWordSearchField.cc
-  src/gui/ScadApi.cc
-  src/gui/ScadLexer.cc
-  src/gui/ScintillaEditor.cc
-  src/gui/Settings.cc
-  src/gui/SettingsWriter.cc
-  src/gui/TabManager.cc
-  src/gui/TabWidget.cc
-  src/gui/UIUtils.cc
-  src/gui/WindowManager.cc
-  src/gui/IgnoreWheelWhenNotFocused.cc
-  src/gui/input/AxisConfigWidget.cc
-  src/gui/input/ButtonConfigWidget.cc
-  src/gui/input/InputDriver.cc
-  src/gui/input/InputDriverManager.cc
-  src/gui/input/InputEventMapper.cc
-  src/gui/parameter/GroupWidget.cc
-  src/gui/parameter/ParameterCheckBox.cc
-  src/gui/parameter/ParameterComboBox.cc
-  src/gui/parameter/ParameterSlider.cc
-  src/gui/parameter/ParameterSpinBox.cc
-  src/gui/parameter/ParameterText.cc
-  src/gui/parameter/ParameterVector.cc
-  src/gui/parameter/ParameterVirtualWidget.cc
-  src/gui/parameter/ParameterWidget.cc
   ${INPUT_DRIVER_SOURCES}
-  )
+)
 
 # header-only code
 set(GUI_HEADERS
@@ -821,7 +801,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties("src/ext/polyclipping/clipper.cpp" PROPERTIES COMPILE_FLAGS "-Wno-class-memaccess")
 endif()
 
-# list(APPEND Sources src/openscad.cc ${CORE_SOURCES} ${CGAL_SOURCES} ${OFFSCREEN_SOURCES})
 list(APPEND Sources src/openscad.cc ${CORE_SOURCES} ${OFFSCREEN_SOURCES})
 
 set(RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
@@ -889,15 +868,17 @@ elseif(MSVC)
   )
 endif()
 
-if(NOT HEADLESS)
-  target_link_libraries(${openscadEXECUTABLE} PRIVATE
-    Qt5::Core Qt5::Widgets Qt5::Multimedia Qt5::OpenGL Qt5::Concurrent Qt5::Network Qt5::Svg
-    ${QT5QSCINTILLA_LIBRARY} ${Qt5DBus_LIBRARIES} ${Qt5Gamepad_LIBRARIES}
-  )
-endif()
-if(MXECROSS)
-  target_link_libraries(${openscadEXECUTABLE} PRIVATE Qt5::QSvgPlugin)
-endif()
+foreach(library ${openscadEXECUTABLE} openscadGUI)
+   if(NOT HEADLESS)
+        target_link_libraries(${library} PRIVATE
+          Qt5::Core Qt5::Widgets Qt5::Multimedia Qt5::OpenGL Qt5::Concurrent Qt5::Network Qt5::Svg
+          ${QT5QSCINTILLA_LIBRARY} ${Qt5DBus_LIBRARIES} ${Qt5Gamepad_LIBRARIES}
+        )
+   endif()
+   if(MXECROSS)
+     target_link_libraries(${library} PRIVATE Qt5::QSvgPlugin)
+   endif()
+endforeach(library)
 
 # Configure icon-related files, for release vs nightly
 configure_file(${CMAKE_CURRENT_LIST_DIR}/openscad.appdata.xml.in ${CMAKE_CURRENT_LIST_DIR}/openscad.appdata.xml.in2)

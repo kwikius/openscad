@@ -1,0 +1,57 @@
+# gui lib
+
+set(GUI_LIB_SOURCES
+  AutoUpdater.cc
+  CGALWorker.cc
+  ViewportControl.cc
+  Console.cc
+  Dock.cc
+  Editor.cc
+  ErrorLog.cc
+  EventFilter.h
+  FontListDialog.cc
+  FontListTableView.cc
+  InitConfigurator.cc
+  LaunchingScreen.cc
+  LibraryInfoDialog.cc
+  MainWindow.cc
+  Animate.cc
+  MouseSelector.cc
+  OctoPrint.cc
+  OpenCSGWarningDialog.cc
+  OpenSCADApp.cc
+  Preferences.cc
+  PrintInitDialog.cc
+  PrintService.cc
+  ProgressWidget.cc
+  QGLView.cc
+  QGLView2.cc
+  QSettingsCached.cc
+  QWordSearchField.cc
+  ScadApi.cc
+  ScadLexer.cc
+  ScintillaEditor.cc
+  Settings.cc
+  SettingsWriter.cc
+  TabManager.cc
+  TabWidget.cc
+  UIUtils.cc
+  WindowManager.cc
+  IgnoreWheelWhenNotFocused.cc
+  input/AxisConfigWidget.cc
+  input/ButtonConfigWidget.cc
+  input/InputDriver.cc
+  input/InputDriverManager.cc
+  input/InputEventMapper.cc
+  parameter/GroupWidget.cc
+  parameter/ParameterCheckBox.cc
+  parameter/ParameterComboBox.cc
+  parameter/ParameterSlider.cc
+  parameter/ParameterSpinBox.cc
+  parameter/ParameterText.cc
+  parameter/ParameterVector.cc
+  parameter/ParameterVirtualWidget.cc
+  parameter/ParameterWidget.cc
+)
+
+add_library(openscadGUI ${GUI_LIB_SOURCES})

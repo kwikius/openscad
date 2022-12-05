@@ -1,6 +1,6 @@
 #cgal lib
 
-set(CGAL_SOURCES
+set(CGAL_LIB_SOURCES
   ../GeometryEvaluator.cc
   cgalutils.cc
   cgalutils-applyops.cc
@@ -27,5 +27,5 @@ set(CGAL_SOURCES
   ../../io/import_nef.cc
 )
 
-add_library(openscadCGAL ${CGAL_SOURCES})
+add_library(openscadCGAL ${CGAL_LIB_SOURCES})
 #target_include_directories(openscadCGAL INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
