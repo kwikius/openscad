@@ -28,4 +28,4 @@ set(CGAL_LIB_SOURCES
 )
 
 add_library(openscadCGAL ${CGAL_LIB_SOURCES})
-#target_include_directories(openscadCGAL INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
