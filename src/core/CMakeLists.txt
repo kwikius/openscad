@@ -14,11 +14,11 @@ set(CORE_LIB_SOURCES
   CSGNode.cc
   CsgOpNode.cc
   CSGTreeEvaluator.cc
-  customizer/Annotation.cc
-  customizer/CommentParser.cc
   EvaluationSession.cc
   Expression.cc
-  ValueWrapper.cc
+  expression/ValueWrapper.cc
+  expression/ModuleLiteral.cc
+  expression/MemberLookup.cc
   builtin_functions.cc
   function.cc
   ImportNode.cc
@@ -46,18 +46,14 @@ set(CORE_LIB_SOURCES
   AST.cc
   FreetypeRenderer.cc
   GroupModule.cc
-  ModuleLiteral.cc
   ModuleReference.cc
   ModuleInstantiation.cc
-  MemberLookup.cc
   NodeVisitor.cc
   SourceFile.cc
   SourceFileCache.cc
   StatCache.cc
   UserModule.cc
   Tree.cc
-  customizer/ParameterObject.cc
-  customizer/ParameterSet.cc
 )
 
 add_library(openscadCORE ${CORE_LIB_SOURCES})

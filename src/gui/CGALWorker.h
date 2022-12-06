@@ -1,7 +1,12 @@
 #pragma once
 
+#include <memory>
+
 #include <QObject>
-#include "memory.h"
+
+class Geometry;
+class Tree;
+class QThread;
 
 class CGALWorker : public QObject
 {
@@ -11,16 +16,16 @@ public:
   ~CGALWorker();
 
 public slots:
-  void start(const class Tree& tree);
+  void start(const Tree& tree);
 
 protected slots:
   void work();
 
 signals:
-  void done(shared_ptr<const class Geometry>);
+  void done(std::shared_ptr<const Geometry>);
 
 protected:
 
-  class QThread *thread;
-  const class Tree *tree;
+  QThread *thread;
+  const Tree *tree;
 };

@@ -140,9 +140,9 @@ static void append_amf(const CGAL_Nef_polyhedron& root_N, std::ostream& output)
   }
 }
 
-static void append_amf(const shared_ptr<const Geometry>& geom, std::ostream& output)
+static void append_amf(const std::shared_ptr<const Geometry>& geom, std::ostream& output)
 {
-  if (const auto geomlist = dynamic_pointer_cast<const GeometryList>(geom)) {
+  if (const auto geomlist = std::dynamic_pointer_cast<const GeometryList>(geom)) {
     for (const auto& item : geomlist->getChildren()) {
       append_amf(item.second, output);
     }
@@ -156,7 +156,7 @@ static void append_amf(const shared_ptr<const Geometry>& geom, std::ostream& out
   }
 }
 
-void export_amf(const shared_ptr<const Geometry>& geom, std::ostream& output)
+void export_amf(const std::shared_ptr<const Geometry>& geom, std::ostream& output)
 {
   setlocale(LC_NUMERIC, "C"); // Ensure radix is . (not ,) in output
 

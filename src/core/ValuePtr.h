@@ -3,8 +3,7 @@
 #include <memory>
 
 template <typename T>
-class ValuePtr
-{
+class ValuePtr{
 private:
   explicit ValuePtr(const std::shared_ptr<T>& val_in) : value(val_in) { }
 public:
@@ -18,4 +17,3 @@ public:
 private:
   std::shared_ptr<T> value;
 };
-

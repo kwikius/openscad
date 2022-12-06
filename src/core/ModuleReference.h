@@ -1,30 +1,24 @@
+
 #pragma once
+
 /*
 Copyright (C) Andy Little (kwikius@yahoo.com) 10/10/2022  initial revision
 https://github.com/openscad/openscad/blob/master/COPYING
 */
 
 #include <cstdint>
-//#include <limits>
 #include <iostream>
 #include <memory>
 
-// Workaround for https://bugreports.qt-project.org/browse/QTBUG-22829
-//#ifndef Q_MOC_RUN
-//#include <boost/variant.hpp>
-//#include <boost/lexical_cast.hpp>
-//#include <glib.h>
-//#endif
-
 #include "Assignment.h"
 #include "ValuePtr.h"
+
 
 class Context;
 class Expression;
 class Value;
 
-class ModuleReference
-{
+class ModuleReference{
 public:
   ModuleReference(std::shared_ptr<const Context> context_in,
                   std::shared_ptr<AssignmentList> literal_params_in,

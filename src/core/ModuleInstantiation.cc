@@ -3,13 +3,17 @@
 Copyright (C) Andy Little (kwikius@yahoo.com) 10/10/2022  initial revision module_reference evaluate
 https://github.com/openscad/openscad/blob/master/COPYING
 */
-#include "compiler_specific.h"
-#include "Context.h"
+
+
 #include "ModuleInstantiation.h"
-#include "Expression.h"
+#include "module.h"
+#include "Context.h"
 #include "exceptions.h"
 #include "printutils.h"
 #include <boost/filesystem.hpp>
+
+#include "compiler_specific.h"
+
 namespace fs = boost::filesystem;
 
 ModuleInstantiation::~ModuleInstantiation()

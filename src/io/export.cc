@@ -48,7 +48,7 @@ bool canPreview(const FileFormat format) {
           format == FileFormat::PNG);
 }
 
-void exportFile(const shared_ptr<const Geometry>& root_geom, std::ostream& output, const ExportInfo& exportInfo)
+void exportFile(const std::shared_ptr<const Geometry>& root_geom, std::ostream& output, const ExportInfo& exportInfo)
 {
   switch (exportInfo.format) {
   case FileFormat::ASCIISTL:
@@ -92,7 +92,7 @@ void exportFile(const shared_ptr<const Geometry>& root_geom, std::ostream& outpu
   }
 }
 
-bool exportFileByNameStdout(const shared_ptr<const Geometry>& root_geom, const ExportInfo& exportInfo)
+bool exportFileByNameStdout(const std::shared_ptr<const Geometry>& root_geom, const ExportInfo& exportInfo)
 {
 #ifdef _WIN32
   _setmode(_fileno(stdout), _O_BINARY);
@@ -101,7 +101,7 @@ bool exportFileByNameStdout(const shared_ptr<const Geometry>& root_geom, const E
   return true;
 }
 
-bool exportFileByNameStream(const shared_ptr<const Geometry>& root_geom, const ExportInfo& exportInfo)
+bool exportFileByNameStream(const std::shared_ptr<const Geometry>& root_geom, const ExportInfo& exportInfo)
 {
   std::ios::openmode mode = std::ios::out | std::ios::trunc;
   if (exportInfo.format == FileFormat::_3MF || exportInfo.format == FileFormat::STL || exportInfo.format == FileFormat::PDF) {
@@ -131,7 +131,7 @@ bool exportFileByNameStream(const shared_ptr<const Geometry>& root_geom, const E
   }
 }
 
-bool exportFileByName(const shared_ptr<const Geometry>& root_geom, const ExportInfo& exportInfo)
+bool exportFileByName(const std::shared_ptr<const Geometry>& root_geom, const ExportInfo& exportInfo)
 {
   bool exportResult = false;
   if (exportInfo.useStdOut) {

@@ -2,7 +2,6 @@
 
 #include "Editor.h"
 #include "export.h"
-#include "memory.h"
 #include "RenderStatistic.h"
 #include "TabManager.h"
 #include "Tree.h"
@@ -226,7 +225,7 @@ private slots:
   void sendToPrintService();
 #ifdef ENABLE_CGAL
   void actionRender();
-  void actionRenderDone(shared_ptr<const class Geometry>);
+  void actionRenderDone(std::shared_ptr<const class Geometry>);
   void cgalRender();
 #endif
   void actionCheckValidity();

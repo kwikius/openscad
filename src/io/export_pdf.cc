@@ -147,7 +147,7 @@ void draw_geom(const Polygon2d& poly, cairo_t *cr, bool& inpaper, OriginPosition
   }
 }
 
-void draw_geom(const shared_ptr<const Geometry>& geom, cairo_t *cr, bool& inpaper, OriginPosition pos){
+void draw_geom(const std::shared_ptr<const Geometry>& geom, cairo_t *cr, bool& inpaper, OriginPosition pos){
   if (const auto geomlist = dynamic_pointer_cast<const GeometryList>(geom)) {
     for (const auto& item : geomlist->getChildren()) {
       draw_geom(item.second, cr, inpaper, pos);
@@ -168,7 +168,7 @@ static cairo_status_t export_pdf_write(void *closure, const unsigned char *data,
   return !(*stream) ? CAIRO_STATUS_WRITE_ERROR : CAIRO_STATUS_SUCCESS;
 }
 
-void export_pdf(const shared_ptr<const Geometry>& geom, std::ostream& output, const ExportInfo& exportInfo)
+void export_pdf(const std::shared_ptr<const Geometry>& geom, std::ostream& output, const ExportInfo& exportInfo)
 {
   cairo_surface_t *surface = cairo_pdf_surface_create_for_stream(export_pdf_write, &output, WPOINTS, HPOINTS);
   if (cairo_surface_status(surface) == cairo_status_t::CAIRO_STATUS_NULL_POINTER) {
@@ -237,7 +237,7 @@ const std::string get_cairo_version() {
   return cairo_version;
 }
 
-void export_pdf(const shared_ptr<const Geometry>&, std::ostream&, const ExportInfo&) {
+void export_pdf(const std::shared_ptr<const Geometry>&, std::ostream&, const ExportInfo&) {
 
   LOG(message_group::Error, Location::NONE, "", "Export to PDF format was not enabled when building the application.");
 

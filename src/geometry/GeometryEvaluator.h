@@ -1,14 +1,14 @@
 #pragma once
 
-#include "NodeVisitor.h"
-#include "enums.h"
-#include "memory.h"
-#include "Geometry.h"
-
+#include <memory>
 #include <utility>
 #include <list>
 #include <vector>
 #include <map>
+
+#include "NodeVisitor.h"
+#include "enums.h"
+#include "Geometry.h"
 
 class GeometryEvaluator : public NodeVisitor
 {
@@ -16,7 +16,7 @@ public:
   GeometryEvaluator(const class Tree& tree);
   ~GeometryEvaluator() {}
 
-  shared_ptr<const Geometry> evaluateGeometry(const AbstractNode& node, bool allownef);
+  std::shared_ptr<const Geometry> evaluateGeometry(const AbstractNode& node, bool allownef);
 
   Response visit(State& state, const AbstractNode& node) override;
   Response visit(State& state, const AbstractIntersectionNode& node) override;
@@ -46,26 +46,26 @@ public:
     // for example union() with no children, etc.
     ResultObject() : is_const(true) {}
     ResultObject(const Geometry *g) : is_const(true), const_pointer(g) {}
-    ResultObject(shared_ptr<const Geometry> g) : is_const(true), const_pointer(g) {}
+    ResultObject(std::shared_ptr<const Geometry> g) : is_const(true), const_pointer(g) {}
     ResultObject(Geometry *g) : is_const(false), pointer(g) {}
-    ResultObject(shared_ptr<Geometry>& g) : is_const(false), pointer(g) {}
+    ResultObject(std::shared_ptr<Geometry>& g) : is_const(false), pointer(g) {}
     bool isConst() const { return is_const; }
-    shared_ptr<Geometry> ptr() { assert(!is_const); return pointer; }
-    shared_ptr<const Geometry> constptr() const {
-      return is_const ? const_pointer : static_pointer_cast<const Geometry>(pointer);
+    std::shared_ptr<Geometry> ptr() { assert(!is_const); return pointer; }
+    std::shared_ptr<const Geometry> constptr() const {
+      return is_const ? const_pointer : std::static_pointer_cast<const Geometry>(pointer);
     }
-    shared_ptr<Geometry> asMutableGeometry() {
-      if (isConst()) return shared_ptr<Geometry>(constptr() ? constptr()->copy() : nullptr);
+    std::shared_ptr<Geometry> asMutableGeometry() {
+      if (isConst()) return std::shared_ptr<Geometry>(constptr() ? constptr()->copy() : nullptr);
       else return ptr();
     }
 private:
     bool is_const;
-    shared_ptr<Geometry> pointer;
-    shared_ptr<const Geometry> const_pointer;
+    std::shared_ptr<Geometry> pointer;
+    std::shared_ptr<const Geometry> const_pointer;
   };
 
-  void smartCacheInsert(const AbstractNode& node, const shared_ptr<const Geometry>& geom);
-  shared_ptr<const Geometry> smartCacheGet(const AbstractNode& node, bool preferNef);
+  void smartCacheInsert(const AbstractNode& node, const std::shared_ptr<const Geometry>& geom);
+  std::shared_ptr<const Geometry> smartCacheGet(const AbstractNode& node, bool preferNef);
   bool isSmartCached(const AbstractNode& node);
   bool isValidDim(const Geometry::GeometryItem& item, unsigned int& dim) const;
   std::vector<const class Polygon2d *> collectChildren2D(const AbstractNode& node);
@@ -78,15 +78,15 @@ private:
   Polygon2d *applyToChildren2D(const AbstractNode& node, OpenSCADOperator op);
   ResultObject applyToChildren3D(const AbstractNode& node, OpenSCADOperator op);
   ResultObject applyToChildren(const AbstractNode& node, OpenSCADOperator op);
-  shared_ptr<const Geometry> projectionCut(const ProjectionNode& node);
-  shared_ptr<const Geometry> projectionNoCut(const ProjectionNode& node);
+  std::shared_ptr<const Geometry> projectionCut(const ProjectionNode& node);
+  std::shared_ptr<const Geometry> projectionNoCut(const ProjectionNode& node);
 
-  void addToParent(const State& state, const AbstractNode& node, const shared_ptr<const Geometry>& geom);
+  void addToParent(const State& state, const AbstractNode& node, const std::shared_ptr<const Geometry>& geom);
   Response lazyEvaluateRootNode(State& state, const AbstractNode& node);
 
   std::map<int, Geometry::Geometries> visitedchildren;
   const Tree& tree;
-  shared_ptr<const Geometry> root;
+  std::shared_ptr<const Geometry> root;
 
 public:
 };

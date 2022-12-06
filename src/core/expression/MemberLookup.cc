@@ -5,14 +5,11 @@ https://github.com/openscad/openscad/blob/master/COPYING
 */
 #include <typeinfo>
 #include <boost/regex.hpp>
+
 #include "MemberLookup.h"
-#include "ModuleReference.h"
-#include "Value.h"
-#include "Context.h"
-#include "UserModule.h"
-#include "Children.h"
-#include "Arguments.h"
-#include "ScopeContext.h"
+#include "../Context.h"
+
+#include "../../utils/printutils.h"
 
 MemberLookup::MemberLookup(Expression *expr, const std::string& member, const Location& loc)
   : Expression(loc), expr(expr), member(member) {}
@@ -52,7 +49,8 @@ Value MemberLookup::evaluate(const std::shared_ptr<const Context>& context) cons
   case Value::Type::OBJECT:
     return v[this->member];
   case Value::Type::MODULE:
-    LOG(message_group::Warning, loc, context->documentRoot(),"Member access not available for module reference");
+    LOG(message_group::Warning, loc, context->documentRoot(),
+      "Member access not available for module reference");
     break;
   default:
     break;

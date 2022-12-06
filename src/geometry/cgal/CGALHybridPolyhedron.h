@@ -38,8 +38,8 @@ public:
   typedef CGAL::Point_3<CGAL_HybridKernel3> point_t;
   typedef CGAL::Iso_cuboid_3<CGAL_HybridKernel3> bbox_t;
 
-  CGALHybridPolyhedron(const shared_ptr<CGAL_HybridNef>& nef);
-  CGALHybridPolyhedron(const shared_ptr<CGAL_HybridMesh>& mesh);
+  CGALHybridPolyhedron(const std::shared_ptr<CGAL_HybridNef>& nef);
+  CGALHybridPolyhedron(const std::shared_ptr<CGAL_HybridMesh>& mesh);
   CGALHybridPolyhedron(const CGALHybridPolyhedron& other);
   CGALHybridPolyhedron();
   CGALHybridPolyhedron& operator=(const CGALHybridPolyhedron& other);

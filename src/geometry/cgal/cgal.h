@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CGAL
+#include <memory>
 
 // STL Allocator doesn't make any significant difference on my Linux dev machine - Hans
 /*

@@ -26,9 +26,12 @@
 
 #include "Arguments.h"
 #include "Expression.h"
+#include "expression/FunctionCall.h"
 #include "function.h"
+#include "Feature.h"
 
-BuiltinFunction::BuiltinFunction(Value(*f)(const std::shared_ptr<const Context>&, const FunctionCall *), const Feature *feature) :
+BuiltinFunction::BuiltinFunction(Value(*f)(const std::shared_ptr<const Context>&, const FunctionCall *),
+   const Feature *feature) :
   evaluate(f),
   feature(feature)
 {}
@@ -41,7 +44,8 @@ BuiltinFunction::BuiltinFunction(Value(*f)(Arguments, const Location&), const Fe
     };
 }
 
-UserFunction::UserFunction(const char *name, AssignmentList& parameters, shared_ptr<Expression> expr, const Location& loc)
+UserFunction::UserFunction(const char *name, AssignmentList& parameters,
+   std::shared_ptr<Expression> expr, const Location& loc)
   : ASTNode(loc), name(name), parameters(parameters), expr(expr)
 {
 }

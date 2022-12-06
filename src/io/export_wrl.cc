@@ -29,7 +29,7 @@
 
 #include "IndexedMesh.h"
 
-void export_wrl(const shared_ptr<const Geometry>& geom, std::ostream& output)
+void export_wrl(const std::shared_ptr<const Geometry>& geom, std::ostream& output)
 {
   IndexedMesh mesh;
   mesh.append_geometry(geom);
@@ -52,7 +52,7 @@ void export_wrl(const shared_ptr<const Geometry>& geom, std::ostream& output)
   output << "coord Coordinate { point [\n";
   const auto& v = mesh.vertices.getArray();
   const size_t numverts = mesh.vertices.size();
-  for (size_t i = 0; i < numverts; ++i) {
+  for (std::size_t i = 0; i < numverts; ++i) {
     output << v[i][0] << " " << v[i][1] << " " << v[i][2];
     if (i < numverts - 1) {
       output << ",";
@@ -62,8 +62,8 @@ void export_wrl(const shared_ptr<const Geometry>& geom, std::ostream& output)
   output << "] }\n\n";
 
   output << "coordIndex [\n";
-  const size_t numindices = mesh.indices.size();
-  for (size_t i = 0; i < numindices; ++i) {
+  const std::size_t numindices = mesh.indices.size();
+  for (std::size_t i = 0; i < numindices; ++i) {
     output << mesh.indices[i];
     if (i < numindices - 1) {
       output << ",";

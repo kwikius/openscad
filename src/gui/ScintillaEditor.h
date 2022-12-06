@@ -13,7 +13,7 @@
 #include <Qsci/qsciscintilla.h>
 
 #include "Editor.h"
-#include "memory.h"
+
 #include "ScadApi.h"
 
 // don't need the full definition, because it confuses Qt
@@ -46,7 +46,7 @@ class ScintillaEditor : public EditorInterface
 {
   Q_OBJECT;
 
-  using colorscheme_set_t = std::multimap<int, shared_ptr<EditorColorScheme>, std::less<int>>;
+  using colorscheme_set_t = std::multimap<int, std::shared_ptr<EditorColorScheme>, std::less<int>>;
 
 public:
   ScintillaEditor(QWidget *parent);

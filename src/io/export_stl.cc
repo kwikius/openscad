@@ -199,21 +199,21 @@ uint64_t append_stl(const CGALHybridPolyhedron& hybrid, std::ostream& output,
   return triangle_count;
 }
 
-uint64_t append_stl(const shared_ptr<const Geometry>& geom, std::ostream& output,
+uint64_t append_stl(const std::shared_ptr<const Geometry>& geom, std::ostream& output,
                     bool binary)
 {
   uint64_t triangle_count = 0;
-  if (const auto geomlist = dynamic_pointer_cast<const GeometryList>(geom)) {
+  if (const auto geomlist = std::dynamic_pointer_cast<const GeometryList>(geom)) {
     for (const Geometry::GeometryItem& item : geomlist->getChildren()) {
       triangle_count += append_stl(item.second, output, binary);
     }
-  } else if (const auto N = dynamic_pointer_cast<const CGAL_Nef_polyhedron>(geom)) {
+  } else if (const auto N = std::dynamic_pointer_cast<const CGAL_Nef_polyhedron>(geom)) {
     triangle_count += append_stl(*N, output, binary);
-  } else if (const auto ps = dynamic_pointer_cast<const PolySet>(geom)) {
+  } else if (const auto ps = std::dynamic_pointer_cast<const PolySet>(geom)) {
     triangle_count += append_stl(*ps, output, binary);
-  } else if (const auto hybrid = dynamic_pointer_cast<const CGALHybridPolyhedron>(geom)) {
+  } else if (const auto hybrid = std::dynamic_pointer_cast<const CGALHybridPolyhedron>(geom)) {
     triangle_count += append_stl(*hybrid, output, binary);
-  } else if (dynamic_pointer_cast<const Polygon2d>(geom)) {
+  } else if (std::dynamic_pointer_cast<const Polygon2d>(geom)) {
     assert(false && "Unsupported file format");
   } else {
     assert(false && "Not implemented");
@@ -224,7 +224,7 @@ uint64_t append_stl(const shared_ptr<const Geometry>& geom, std::ostream& output
 
 } // namespace
 
-void export_stl(const shared_ptr<const Geometry>& geom, std::ostream& output,
+void export_stl(const std::shared_ptr<const Geometry>& geom, std::ostream& output,
                 bool binary)
 {
   if (binary) {

@@ -43,15 +43,15 @@ public:
 
     Grid3d<int> grid(GRID_FINE);
     std::vector<CGALPoint> vertices;
-    std::vector<std::vector<size_t>> indices;
+    std::vector<std::vector<std::size_t>> indices;
 
     // Align all vertices to grid and build vertex array in vertices
     for (const auto& p : ps.polygons) {
-      indices.push_back(std::vector<size_t>());
+      indices.push_back(std::vector<std::size_t>());
       indices.back().reserve(p.size());
       for (auto v : boost::adaptors::reverse(p)) {
         // align v to the grid; the CGALPoint will receive the aligned vertex
-        size_t idx = grid.align(v);
+        std::size_t idx = grid.align(v);
         if (idx == vertices.size()) {
           CGALPoint p(v[0], v[1], v[2]);
           vertices.push_back(p);
@@ -75,7 +75,7 @@ public:
 
       // We remove duplicate indices since there is a bug in CGAL's
       // Polyhedron_incremental_builder_3::test_facet() which fails to detect this
-      std::vector<size_t>::iterator last = std::unique(pindices.begin(), pindices.end());
+      std::vector<std::size_t>::iterator last = std::unique(pindices.begin(), pindices.end());
       std::advance(last, -1);
       if (*last != pindices.front()) last++; // In case the first & last are equal
       pindices.erase(last, pindices.end());
@@ -111,7 +111,7 @@ public:
   {
     CGAL_Polybuilder B(hds, true);
     Reindexer<Vector3d> vertices;
-    std::vector<size_t> indices(3);
+    std::vector<std::size_t> indices(3);
 
     // Estimating same # of vertices as polygons (very rough)
     B.begin_surface(ps.polygons.size(), ps.polygons.size());
@@ -125,8 +125,8 @@ public:
 #endif
       indices.clear();
       for (const auto& v: boost::adaptors::reverse(p)) {
-        size_t s = vertices.size();
-        size_t idx = vertices.lookup(v);
+        std::size_t s = vertices.size();
+        std::size_t idx = vertices.lookup(v);
         // If we added a vertex, also add it to the CGAL builder
         if (idx == s) B.add_vertex(CGALPoint(v[0], v[1], v[2]));
         indices.push_back(idx);

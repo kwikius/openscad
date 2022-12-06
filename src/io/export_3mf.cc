@@ -133,7 +133,7 @@ static bool append_nef(const CGAL_Nef_polyhedron& root_N, PLib3MFModelMeshObject
   return append_polyset(ps, model);
 }
 
-static bool append_3mf(const shared_ptr<const Geometry>& geom, PLib3MFModelMeshObject *& model)
+static bool append_3mf(const std::shared_ptr<const Geometry>& geom, PLib3MFModelMeshObject *& model)
 {
   if (const auto geomlist = dynamic_pointer_cast<const GeometryList>(geom)) {
     for (const auto& item : geomlist->getChildren()) {
@@ -160,7 +160,7 @@ static bool append_3mf(const shared_ptr<const Geometry>& geom, PLib3MFModelMeshO
     Saves the current 3D Geometry as 3MF to the given file.
     The file must be open.
  */
-void export_3mf(const shared_ptr<const Geometry>& geom, std::ostream& output)
+void export_3mf(const std::shared_ptr<const Geometry>& geom, std::ostream& output)
 {
   DWORD interfaceVersionMajor, interfaceVersionMinor, interfaceVersionMicro;
   HRESULT result = lib3mf_getinterfaceversion(&interfaceVersionMajor, &interfaceVersionMinor, &interfaceVersionMicro);
@@ -300,7 +300,7 @@ static bool append_nef(const CGAL_Nef_polyhedron& root_N, Lib3MF::PWrapper& wrap
   return append_polyset(ps, wrapper, model);
 }
 
-static bool append_3mf(const shared_ptr<const Geometry>& geom, Lib3MF::PWrapper& wrapper, Lib3MF::PModel& model)
+static bool append_3mf(const std::shared_ptr<const Geometry>& geom, Lib3MF::PWrapper& wrapper, Lib3MF::PModel& model)
 {
   if (const auto geomlist = dynamic_pointer_cast<const GeometryList>(geom)) {
     for (const auto& item : geomlist->getChildren()) {
@@ -328,7 +328,7 @@ static bool append_3mf(const shared_ptr<const Geometry>& geom, Lib3MF::PWrapper&
     The file must be open.
  */
 
-void export_3mf(const shared_ptr<const Geometry>& geom, std::ostream& output)
+void export_3mf(const std::shared_ptr<const Geometry>& geom, std::ostream& output)
 {
   Lib3MF_uint32 interfaceVersionMajor, interfaceVersionMinor, interfaceVersionMicro;
   Lib3MF::PWrapper wrapper;
@@ -394,7 +394,7 @@ void export_3mf(const shared_ptr<const Geometry>& geom, std::ostream& output)
 
 #else // ENABLE_LIB3MF
 
-void export_3mf(const shared_ptr<const Geometry>&, std::ostream&)
+void export_3mf(const std::shared_ptr<const Geometry>&, std::ostream&)
 {
   LOG(message_group::None, Location::NONE, "", "Export to 3MF format was not enabled when building the application.");
 }

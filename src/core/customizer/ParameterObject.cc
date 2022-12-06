@@ -1,11 +1,16 @@
-#include "Annotation.h"
-#include "Assignment.h"
-#include "Expression.h"
-#include "SourceFile.h"
-#include "ParameterObject.h"
 
 #include <sstream>
 #include <boost/algorithm/string.hpp>
+
+#include "Annotation.h"
+#include "Assignment.h"
+
+#include "expression/Literal.h"
+#include "expression/Vector.h"
+#include "expression/Range.h"
+
+#include "SourceFile.h"
+#include "ParameterObject.h"
 
 namespace {
 

@@ -40,23 +40,20 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <unistd.h>
 #endif
 
+#include <stack>
+#include <list>
+#include <sstream>
+
+#include <boost/filesystem.hpp>
+#include "boost-utils.h"
+
 #include "SourceFile.h"
 #include "UserModule.h"
 #include "ModuleInstantiation.h"
 #include "Assignment.h"
-#include "Expression.h"
-#include "ModuleLiteral.h"
-#include "MemberLookup.h"
+#include "expression/expressions.h"
 #include "function.h"
 #include "printutils.h"
-#include "memory.h"
-#include <sstream>
-#include <stack>
-#include <list>
-#include <boost/filesystem.hpp>
-#include "boost-utils.h"
-
-namespace fs = boost::filesystem;
 
 #define YYMAXDEPTH 20000
 #define LOC(loc) Location(loc.first_line, loc.first_column, loc.last_line, loc.last_column, sourcefile())
@@ -194,7 +191,7 @@ statement
         | '{' inner_input '}'
         | module_instantiation
             {
-              if ($1) scope_stack.top()->addModuleInst(shared_ptr<ModuleInstantiation>($1));
+              if ($1) scope_stack.top()->addModuleInst(std::shared_ptr<ModuleInstantiation>($1));
             }
         | assignment
         | TOK_MODULE TOK_ID '(' parameters ')'
@@ -203,7 +200,7 @@ statement
               newmodule->parameters = *$4;
               auto top = scope_stack.top();
               scope_stack.push(&newmodule->body);
-              top->addModule(shared_ptr<UserModule>(newmodule));
+              top->addModule(std::shared_ptr<UserModule>(newmodule));
               free($2);
               delete $4;
             }
@@ -214,7 +211,7 @@ statement
         | TOK_FUNCTION TOK_ID '(' parameters ')' '=' expr ';'
             {
               scope_stack.top()->addFunction(
-                make_shared<UserFunction>($2, *$4, shared_ptr<Expression>($7), LOCD("function", @$))
+                std::make_shared<UserFunction>($2, *$4, std::shared_ptr<Expression>($7), LOCD("function", @$))
               );
               free($2);
               delete $4;
@@ -294,7 +291,7 @@ ifelse_statement
 if_statement
         : TOK_IF '(' expr ')'
             {
-                $<ifelse>$ = new IfElseModuleInstantiation(shared_ptr<Expression>($3), LOCD("if", @$));
+                $<ifelse>$ = new IfElseModuleInstantiation(std::shared_ptr<Expression>($3), LOCD("if", @$));
                 scope_stack.push(&$<ifelse>$->scope);
             }
           child_statement
@@ -315,7 +312,7 @@ child_statement
         | '{' child_statements '}'
         | module_instantiation
             {
-                if ($1) scope_stack.top()->addModuleInst(shared_ptr<ModuleInstantiation>($1));
+                if ($1) scope_stack.top()->addModuleInst(std::shared_ptr<ModuleInstantiation>($1));
             }
         ;
 
@@ -337,7 +334,7 @@ single_module_instantiation
         }
      | '(' expr ')' '(' arguments ')'
          {
-            $$ = new ModuleInstantiation(shared_ptr<Expression>($2), *$5, LOCD("modulecall", @$));
+            $$ = new ModuleInstantiation(std::shared_ptr<Expression>($2), *$5, LOCD("modulecall", @$));
             delete $5;
          }
         ;
@@ -409,9 +406,9 @@ module_literal
               delete $3;
               auto top = scope_stack.top();
               scope_stack.push(&newmodule->body);
-              top->addModule(shared_ptr<UserModule>(newmodule));
+              top->addModule(std::shared_ptr<UserModule>(newmodule));
               auto inst = new ModuleInstantiation($5, *$7, LOCD("modulecall", @$));
-              scope_stack.top()->addModuleInst(shared_ptr<ModuleInstantiation>(inst));
+              scope_stack.top()->addModuleInst(std::shared_ptr<ModuleInstantiation>(inst));
               free($5);
               delete($7);
               scope_stack.pop();
@@ -427,7 +424,7 @@ module_literal
               delete $2;
               auto top = scope_stack.top();
               scope_stack.push(&newmodule->body);
-              top->addModule(shared_ptr<UserModule>(newmodule));
+              top->addModule(std::shared_ptr<UserModule>(newmodule));
           }
             inner_input '}'
           {
@@ -518,7 +515,6 @@ multiplication
               $$ = new BinaryOp($1, BinaryOp::Op::Modulo, $3, LOCD("modulo", @$));
             }
 		;
-
 
 unary
         : exponent
@@ -724,7 +720,7 @@ parameter
             }
         | TOK_ID '=' expr
             {
-              $$ = new Assignment($1, shared_ptr<Expression>($3), LOCD("assignment", @$));
+              $$ = new Assignment($1, std::shared_ptr<Expression>($3), LOCD("assignment", @$));
                 free($1);
             }
         ;
@@ -753,11 +749,11 @@ argument_list
 argument
         : expr
             {
-                $$ = new Assignment("", shared_ptr<Expression>($1), LOCD("argumentcall", @$));
+                $$ = new Assignment("", std::shared_ptr<Expression>($1), LOCD("argumentcall", @$));
             }
         | TOK_ID '=' expr
             {
-                $$ = new Assignment($1, shared_ptr<Expression>($3), LOCD("argumentcall", @$));
+                $$ = new Assignment($1, std::shared_ptr<Expression>($3), LOCD("argumentcall", @$));
                 free($1);
             }
         ;
@@ -785,7 +781,7 @@ static Location debug_location(const std::string& info, const YYLTYPE& loc)
 }
 #endif
 
-static void warn_reassignment(const Location& loc, const shared_ptr<Assignment>& assignment, const fs::path& path)
+static void warn_reassignment(const Location& loc, const std::shared_ptr<Assignment>& assignment, const fs::path& path)
 {
 	LOG(message_group::Warning,
 			loc,
@@ -796,7 +792,7 @@ static void warn_reassignment(const Location& loc, const shared_ptr<Assignment>&
 
 }
 
-static void warn_reassignment(const Location& loc, const shared_ptr<Assignment>& assignment, const fs::path& path1, const fs::path& path2)
+static void warn_reassignment(const Location& loc, const std::shared_ptr<Assignment>& assignment, const fs::path& path1, const fs::path& path2)
 {
 	LOG(message_group::Warning,
 			loc,
@@ -833,14 +829,14 @@ void handle_assignment(const std::string token, Expression *expr, const Location
 				//assignment from the mainFile overwritten by an include
 				warn_reassignment(loc, assignment, mainFilePath, uncPathPrev);
 			}
-			assignment->setExpr(shared_ptr<Expression>(expr));
+			assignment->setExpr(std::shared_ptr<Expression>(expr));
 			assignment->setLocationOfOverwrite(loc);
 			found = true;
 			break;
 		}
 	}
 	if (!found) {
-		scope_stack.top()->addAssignment(assignment(token, shared_ptr<Expression>(expr), loc));
+		scope_stack.top()->addAssignment(assignment(token, std::shared_ptr<Expression>(expr), loc));
 	}
 }
 

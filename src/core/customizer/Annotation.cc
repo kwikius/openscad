@@ -28,7 +28,7 @@
 #include "Annotation.h"
 #include "Expression.h"
 
-Annotation::Annotation(const std::string& name, shared_ptr<Expression> expr)
+Annotation::Annotation(const std::string& name, std::shared_ptr<Expression> expr)
   : name(name), expr(expr)
 {
 }
