@@ -16,7 +16,6 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <glib.h>
 
 #include "Assignment.h"
-#include "memory.h"
 #include "ValuePtr.h"
 #include "ModuleReference.h"
 
@@ -176,7 +175,7 @@ private:
     glong u8len = LENGTH_UNKNOWN;
   };
   // private constructor for copying members
-  explicit str_utf8_wrapper(const shared_ptr<str_utf8_t>& str_in) : str_ptr(str_in) { }
+  explicit str_utf8_wrapper(const std::shared_ptr<str_utf8_t>& str_in) : str_ptr(str_in) { }
 
 public:
   class iterator
@@ -205,11 +204,11 @@ private:
 
   iterator begin() const { return iterator(*this); }
   iterator end() const { return iterator(*this, true); }
-  str_utf8_wrapper() : str_ptr(make_shared<str_utf8_t>()) { }
-  str_utf8_wrapper(const std::string& s) : str_ptr(make_shared<str_utf8_t>(s)) { }
-  str_utf8_wrapper(const char *cstr) : str_ptr(make_shared<str_utf8_t>(cstr)) { }
+  str_utf8_wrapper() : str_ptr(std::make_shared<str_utf8_t>()) { }
+  str_utf8_wrapper(const std::string& s) : str_ptr(std::make_shared<str_utf8_t>(s)) { }
+  str_utf8_wrapper(const char *cstr) : str_ptr(std::make_shared<str_utf8_t>(cstr)) { }
   // for enumerating single utf8 chars from iterator
-  str_utf8_wrapper(const char *cstr, size_t clen) : str_ptr(make_shared<str_utf8_t>(cstr, clen, 1)) { }
+  str_utf8_wrapper(const char *cstr, size_t clen) : str_ptr(std::make_shared<str_utf8_t>(cstr, clen, 1)) { }
   str_utf8_wrapper(const str_utf8_wrapper&) = delete; // never copy, move instead
   str_utf8_wrapper& operator=(const str_utf8_wrapper&) = delete; // never copy, move instead
   str_utf8_wrapper(str_utf8_wrapper&&) = default;
@@ -235,13 +234,14 @@ private:
   }
 
 private:
-  shared_ptr<str_utf8_t> str_ptr;
+  std::shared_ptr<str_utf8_t> str_ptr;
 };
 
 class FunctionType
 {
 public:
-  FunctionType(std::shared_ptr<const Context> context, std::shared_ptr<Expression> expr, std::shared_ptr<AssignmentList> parameters)
+  FunctionType(std::shared_ptr<const Context> context,
+  std::shared_ptr<Expression> expr, std::shared_ptr<AssignmentList> parameters)
     : context(context), expr(expr), parameters(parameters) { }
   Value operator==(const FunctionType& other) const;
   Value operator!=(const FunctionType& other) const;
@@ -370,7 +370,7 @@ protected:
     };
     using vec_t = VectorObject::vec_t;
 public:
-    shared_ptr<VectorObject> ptr;
+    std::shared_ptr<VectorObject> ptr;
 protected:
 
     // A Deleter is used on the shared_ptrs to avoid stack overflow in cases
@@ -383,7 +383,7 @@ protected:
     void flatten() const; // flatten replaces VectorObject::vec with a new vector
                           // where any embedded elements are copied directly into the top level vec,
                           // leaving only true elements for straightforward indexing by operator[].
-    explicit VectorType(const shared_ptr<VectorObject>& copy) : ptr(copy) { } // called by clone()
+    explicit VectorType(const std::shared_ptr<VectorObject>& copy) : ptr(copy) { } // called by clone()
 public:
     using size_type = VectorObject::size_type;
     static const VectorType EMPTY;
@@ -485,7 +485,7 @@ public:
   class EmbeddedVectorType : public VectorType
   {
 private:
-    explicit EmbeddedVectorType(const shared_ptr<VectorObject>& copy) : VectorType(copy) { } // called by clone()
+    explicit EmbeddedVectorType(const std::shared_ptr<VectorObject>& copy) : VectorType(copy) { } // called by clone()
 public:
     EmbeddedVectorType(class EvaluationSession *session) : VectorType(session) {}
     EmbeddedVectorType(const EmbeddedVectorType&) = delete;
@@ -507,10 +507,10 @@ protected:
     };
 
 private:
-    explicit ObjectType(const shared_ptr<ObjectObject>& copy);
+    explicit ObjectType(const std::shared_ptr<ObjectObject>& copy);
 
 public:
-    shared_ptr<ObjectObject> ptr;
+    std::shared_ptr<ObjectObject> ptr;
     ObjectType(class EvaluationSession *session);
     ObjectType clone() const;
     const Value& get(const std::string& key) const;

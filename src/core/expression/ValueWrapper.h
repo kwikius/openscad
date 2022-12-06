@@ -5,8 +5,7 @@ Copyright (C) Andy Little (kwikius@yahoo.com) 10/10/2022  initial revision
 https://github.com/openscad/openscad/blob/master/COPYING
 */
 
-#include "Value.h"
-#include "Expression.h"
+#include "../Expression.h"
 
 class ValueWrapper : public Expression{
 public:

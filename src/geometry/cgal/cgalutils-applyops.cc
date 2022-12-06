@@ -21,7 +21,6 @@
 
 #include <CGAL/convex_hull_3.h>
 
-#include "memory.h"
 #include "Reindexer.h"
 #include "GeometryUtils.h"
 
@@ -35,7 +34,7 @@ namespace CGALUtils {
    Applies op to all children and returns the result.
    The child list should be guaranteed to contain non-NULL 3D or empty Geometry objects
  */
-shared_ptr<const Geometry> applyOperator3D(const Geometry::Geometries& children, OpenSCADOperator op)
+std::shared_ptr<const Geometry> applyOperator3D(const Geometry::Geometries& children, OpenSCADOperator op)
 {
   if (Feature::ExperimentalFastCsg.is_enabled()) {
     return applyOperator3DHybrid(children, op);
@@ -48,7 +47,7 @@ shared_ptr<const Geometry> applyOperator3D(const Geometry::Geometries& children,
 
   try {
     for (const auto& item : children) {
-      const shared_ptr<const Geometry>& chgeom = item.second;
+      const std::shared_ptr<const Geometry>& chgeom = item.second;
       auto chN = getNefPolyhedronFromGeometry(chgeom);
 
       // Initialize N with first expected geometric object
@@ -100,17 +99,17 @@ shared_ptr<const Geometry> applyOperator3D(const Geometry::Geometries& children,
     std::string opstr = op == OpenSCADOperator::INTERSECTION ? "intersection" : op == OpenSCADOperator::DIFFERENCE ? "difference" : op == OpenSCADOperator::UNION ? "union" : "UNKNOWN";
     LOG(message_group::Error, Location::NONE, "", "exception in CGALUtils::applyBinaryOperator %1$s: %2$s", opstr, e.what());
   }
-  return shared_ptr<Geometry>(N);
+  return std::shared_ptr<Geometry>(N);
 }
 
-shared_ptr<const Geometry> applyUnion3D(
+std::shared_ptr<const Geometry> applyUnion3D(
   Geometry::Geometries::iterator chbegin, Geometry::Geometries::iterator chend)
 {
   if (Feature::ExperimentalFastCsg.is_enabled()) {
     return applyUnion3DHybrid(chbegin, chend);
   }
 
-  typedef std::pair<shared_ptr<const CGAL_Nef_polyhedron>, int> QueueConstItem;
+  typedef std::pair<std::shared_ptr<const CGAL_Nef_polyhedron>, int> QueueConstItem;
   struct QueueItemGreater {
     // stable sort for priority_queue by facets, then progress mark
     bool operator()(const QueueConstItem& lhs, const QueueConstItem& rhs) const
@@ -141,12 +140,12 @@ shared_ptr<const Geometry> applyUnion3D(
       q.pop();
       auto p2 = q.top();
       q.pop();
-      q.emplace(make_shared<const CGAL_Nef_polyhedron>(*p1.first + *p2.first), -1);
+      q.emplace(std::make_shared<const CGAL_Nef_polyhedron>(*p1.first + *p2.first), -1);
       progress_tick();
     }
 
     if (q.size() == 1) {
-      return shared_ptr<const Geometry>(new CGAL_Nef_polyhedron(q.top().first->p3));
+      return std::shared_ptr<const Geometry>(new CGAL_Nef_polyhedron(q.top().first->p3));
     } else {
       return nullptr;
     }
@@ -178,14 +177,14 @@ bool applyHull(const Geometry::Geometries& children, PolySet& result)
 
   for (const auto& item : children) {
     auto& chgeom = item.second;
-    if (auto N = dynamic_pointer_cast<const CGAL_Nef_polyhedron>(chgeom)) {
+    if (auto N = std::dynamic_pointer_cast<const CGAL_Nef_polyhedron>(chgeom)) {
       if (!N->isEmpty()) {
         points.reserve(points.size() + N->p3->number_of_vertices());
         for (CGAL_Nef_polyhedron3::Vertex_const_iterator i = N->p3->vertices_begin(); i != N->p3->vertices_end(); ++i) {
           addPoint(vector_convert<K::Point_3>(i->point()));
         }
       }
-    } else if (auto hybrid = dynamic_pointer_cast<const CGALHybridPolyhedron>(chgeom)) {
+    } else if (auto hybrid = std::dynamic_pointer_cast<const CGALHybridPolyhedron>(chgeom)) {
       points.reserve(points.size() + hybrid->numVertices());
       hybrid->foreachVertexUntilTrue([&](auto& p) {
           addPoint(vector_convert<K::Point_3>(p));
@@ -228,7 +227,7 @@ bool applyHull(const Geometry::Geometries& children, PolySet& result)
 /*!
    children cannot contain nullptr objects
  */
-shared_ptr<const Geometry> applyMinkowski(const Geometry::Geometries& children)
+std::shared_ptr<const Geometry> applyMinkowski(const Geometry::Geometries& children)
 {
   if (Feature::ExperimentalFastCsg.is_enabled()) {
     return applyMinkowskiHybrid(children);
@@ -237,7 +236,7 @@ shared_ptr<const Geometry> applyMinkowski(const Geometry::Geometries& children)
   assert(children.size() >= 2);
   Geometry::Geometries::const_iterator it = children.begin();
   t_tot.start();
-  shared_ptr<const Geometry> operands[2] = {it->second, shared_ptr<const Geometry>()};
+  std::shared_ptr<const Geometry> operands[2] = {it->second, std::shared_ptr<const Geometry>()};
   try {
     while (++it != children.end()) {
       operands[1] = it->second;
@@ -250,9 +249,9 @@ shared_ptr<const Geometry> applyMinkowski(const Geometry::Geometries& children)
       for (size_t i = 0; i < 2; ++i) {
         CGAL_Polyhedron poly;
 
-        auto ps = dynamic_pointer_cast<const PolySet>(operands[i]);
-        auto nef = dynamic_pointer_cast<const CGAL_Nef_polyhedron>(operands[i]);
-        if (auto hybrid = dynamic_pointer_cast<const CGALHybridPolyhedron>(operands[i])) {
+        auto ps = std::dynamic_pointer_cast<const PolySet>(operands[i]);
+        auto nef = std::dynamic_pointer_cast<const CGAL_Nef_polyhedron>(operands[i]);
+        if (auto hybrid = std::dynamic_pointer_cast<const CGALHybridPolyhedron>(operands[i])) {
           nef = CGALUtils::createNefPolyhedronFromHybrid(*hybrid);
         }
 
@@ -393,10 +392,10 @@ shared_ptr<const Geometry> applyMinkowski(const Geometry::Geometries& children)
 
       if (it != std::next(children.begin())) operands[0].reset();
 
-      auto partToGeom = [&](auto& poly) -> shared_ptr<const Geometry> {
+      auto partToGeom = [&](auto& poly) -> std::shared_ptr<const Geometry> {
           PolySet *ps = new PolySet(3, /* convex= */ true);
           createPolySetFromPolyhedron(poly, *ps);
-          return shared_ptr<const Geometry>(ps);
+          return std::shared_ptr<const Geometry>(ps);
         };
 
       if (result_parts.size() == 1) {
@@ -418,7 +417,7 @@ shared_ptr<const Geometry> applyMinkowski(const Geometry::Geometries& children)
         t.reset();
         operands[0] = N;
       } else {
-        operands[0] = shared_ptr<const Geometry>(new CGAL_Nef_polyhedron());
+        operands[0] = std::shared_ptr<const Geometry>(new CGAL_Nef_polyhedron());
       }
     }
 
@@ -430,7 +429,7 @@ shared_ptr<const Geometry> applyMinkowski(const Geometry::Geometries& children)
     // If anything throws we simply fall back to Nef Minkowski
     PRINTD("Minkowski: Falling back to Nef Minkowski");
 
-    auto N = shared_ptr<const Geometry>(applyOperator3D(children, OpenSCADOperator::MINKOWSKI));
+    auto N = std::shared_ptr<const Geometry>(applyOperator3D(children, OpenSCADOperator::MINKOWSKI));
     return N;
   }
 }

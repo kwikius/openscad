@@ -1,7 +1,6 @@
 #cgal lib
 
 set(CGAL_LIB_SOURCES
-  ../GeometryEvaluator.cc
   cgalutils.cc
   cgalutils-applyops.cc
   cgalutils-applyops-hybrid.cc

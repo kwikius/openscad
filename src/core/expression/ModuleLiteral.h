@@ -5,19 +5,11 @@ Copyright (C) Andy Little (kwikius@yahoo.com) 10/10/2022  initial revision
 https://github.com/openscad/openscad/blob/master/COPYING
 */
 
-#include <string>
-#include <memory>
-#include "Assignment.h"
-#include "Expression.h"
-#include "Context.h"
-#include "AST.h"
+#include "../Expression.h"
+#include "../Assignment.h"
 
-class Value;
-
-class ModuleLiteral : public Expression
-{
+class ModuleLiteral : public Expression{
 public:
-
   ModuleLiteral(const std::string& name, const AssignmentList & literal_params,
                const AssignmentList& module_args, const Location& loc );
   Value evaluate(const std::shared_ptr<const Context>& context) const override;

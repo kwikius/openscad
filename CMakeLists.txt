@@ -694,6 +694,7 @@ set(MISC_SOURCES
   src/ext/libtess2/Source/tess.c
   src/geometry/ClipperUtils.cc
   src/geometry/Geometry.cc
+  src/geometry/GeometryEvaluator.cc
   src/geometry/GeometryCache.cc
   src/geometry/GeometryUtils.cc
   src/geometry/IndexedMesh.cc
@@ -708,6 +709,10 @@ set(MISC_SOURCES
   src/glview/ColorMap.cc
   src/glview/preview/CSGTreeNormalizer.cc
   src/platform/PlatformUtils.cc
+  src/core/customizer/Annotation.cc
+  src/core/customizer/CommentParser.cc
+  src/core/customizer/ParameterObject.cc
+  src/core/customizer/ParameterSet.cc
   src/utils/boost-utils.cc
   src/utils/calc.cc
   src/utils/degree_trig.cc

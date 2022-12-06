@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Cache.h"
-#include "memory.h"
 #include "Geometry.h"
 
 class GeometryCache

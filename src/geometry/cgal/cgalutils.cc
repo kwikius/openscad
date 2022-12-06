@@ -101,7 +101,7 @@ static CGAL_Nef_polyhedron *createNefPolyhedronFromPolySet(const PolySet& ps)
 
 static CGAL_Nef_polyhedron *createNefPolyhedronFromPolygon2d(const Polygon2d& polygon)
 {
-  shared_ptr<PolySet> ps(polygon.tessellate());
+  std::shared_ptr<PolySet> ps(polygon.tessellate());
   return createNefPolyhedronFromPolySet(*ps);
 }
 
@@ -238,15 +238,16 @@ bool is_approximately_convex(const PolySet& ps) {
   return explored_facets.size() == ps.polygons.size();
 }
 
-shared_ptr<const CGAL_Nef_polyhedron> getNefPolyhedronFromGeometry(const shared_ptr<const Geometry>& geom)
+std::shared_ptr<const CGAL_Nef_polyhedron> getNefPolyhedronFromGeometry(
+   const std::shared_ptr<const Geometry>& geom)
 {
-  if (auto ps = dynamic_pointer_cast<const PolySet>(geom)) {
-    return shared_ptr<CGAL_Nef_polyhedron>(createNefPolyhedronFromPolySet(*ps));
-  } else if (auto poly = dynamic_pointer_cast<const CGALHybridPolyhedron>(geom)) {
+  if (auto ps = std::dynamic_pointer_cast<const PolySet>(geom)) {
+    return std::shared_ptr<CGAL_Nef_polyhedron>(createNefPolyhedronFromPolySet(*ps));
+  } else if (auto poly = std::dynamic_pointer_cast<const CGALHybridPolyhedron>(geom)) {
     return createNefPolyhedronFromHybrid(*poly);
-  } else if (auto poly2d = dynamic_pointer_cast<const Polygon2d>(geom)) {
-    return shared_ptr<CGAL_Nef_polyhedron>(createNefPolyhedronFromPolygon2d(*poly2d));
-  } else if (auto nef = dynamic_pointer_cast<const CGAL_Nef_polyhedron>(geom)) {
+  } else if (auto poly2d = std::dynamic_pointer_cast<const Polygon2d>(geom)) {
+    return std::shared_ptr<CGAL_Nef_polyhedron>(createNefPolyhedronFromPolygon2d(*poly2d));
+  } else if (auto nef = std::dynamic_pointer_cast<const CGAL_Nef_polyhedron>(geom)) {
     return nef;
   }
   return nullptr;
@@ -480,13 +481,13 @@ template Transform3d computeResizeTransform(
   const CGAL::Iso_cuboid_3<CGAL_HybridKernel3>& bb, unsigned int dimension, const Vector3d& newsize,
   const Eigen::Matrix<bool, 3, 1>& autosize);
 
-shared_ptr<const PolySet> getGeometryAsPolySet(const shared_ptr<const Geometry>& geom)
+std::shared_ptr<const PolySet> getGeometryAsPolySet(const std::shared_ptr<const Geometry>& geom)
 {
-  if (auto ps = dynamic_pointer_cast<const PolySet>(geom)) {
+  if (auto ps = std::dynamic_pointer_cast<const PolySet>(geom)) {
     return ps;
   }
-  if (auto N = dynamic_pointer_cast<const CGAL_Nef_polyhedron>(geom)) {
-    auto ps = make_shared<PolySet>(3);
+  if (auto N = std::dynamic_pointer_cast<const CGAL_Nef_polyhedron>(geom)) {
+    auto ps = std::make_shared<PolySet>(3);
     ps->setConvexity(N->getConvexity());
     if (!N->isEmpty()) {
       bool err = CGALUtils::createPolySetFromNefPolyhedron3(*N->p3, *ps);
@@ -496,7 +497,7 @@ shared_ptr<const PolySet> getGeometryAsPolySet(const shared_ptr<const Geometry>&
     }
     return ps;
   }
-  if (auto hybrid = dynamic_pointer_cast<const CGALHybridPolyhedron>(geom)) {
+  if (auto hybrid = std::dynamic_pointer_cast<const CGALHybridPolyhedron>(geom)) {
     return hybrid->toPolySet();
   }
   return nullptr;

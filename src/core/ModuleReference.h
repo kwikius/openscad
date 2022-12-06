@@ -5,7 +5,6 @@ https://github.com/openscad/openscad/blob/master/COPYING
 */
 
 #include <cstdint>
-//#include <limits>
 #include <iostream>
 #include <memory>
 

@@ -29,7 +29,6 @@
 #include "Expression.h"
 #include "Builtins.h"
 #include "printutils.h"
-#include "memory.h"
 #include "UserModule.h"
 #include "degree_trig.h"
 #include "FreetypeRenderer.h"

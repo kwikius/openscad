@@ -24,7 +24,9 @@
  *
  */
 #include <iostream>
+
 #include "boost-utils.h"
+
 #include "BuiltinContext.h"
 #include "CommentParser.h"
 #include "openscad.h"
@@ -38,7 +40,7 @@
 #include "printutils.h"
 #include "node.h"
 #include "CSGNode.h"
-#include "memory.h"
+
 #include "Expression.h"
 #include "ScopeContext.h"
 #include "progress.h"

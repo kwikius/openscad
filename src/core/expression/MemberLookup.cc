@@ -52,7 +52,8 @@ Value MemberLookup::evaluate(const std::shared_ptr<const Context>& context) cons
   case Value::Type::OBJECT:
     return v[this->member];
   case Value::Type::MODULE:
-    LOG(message_group::Warning, loc, context->documentRoot(),"Member access not available for module reference");
+    LOG(message_group::Warning, loc, context->documentRoot(),
+      "Member access not available for module reference");
     break;
   default:
     break;

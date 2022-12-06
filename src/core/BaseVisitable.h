@@ -5,21 +5,18 @@
 // FIXME: Default constructor Response()
 enum class Response {ContinueTraversal, AbortTraversal, PruneTraversal};
 
-class BaseVisitor
-{
+class BaseVisitor{
 public:
   virtual ~BaseVisitor() {}
 };
 
 template <class T>
-class Visitor
-{
+class Visitor{
 public:
   virtual Response visit(class State& state, const T&) = 0;
 };
 
-class BaseVisitable
-{
+class BaseVisitable{
 public:
   virtual ~BaseVisitable() {}
   virtual Response accept(class State&, BaseVisitor&) const = 0;

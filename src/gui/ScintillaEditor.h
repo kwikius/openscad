@@ -13,7 +13,7 @@
 #include <Qsci/qsciscintilla.h>
 
 #include "Editor.h"
-#include "memory.h"
+
 #include "ScadApi.h"
 
 // don't need the full definition, because it confuses Qt

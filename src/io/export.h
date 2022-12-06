@@ -8,7 +8,6 @@
 
 #include "Tree.h"
 #include "Camera.h"
-#include "memory.h"
 
 class PolySet;
 

@@ -1,14 +1,13 @@
 #pragma once
 
-#include "NodeVisitor.h"
-#include "enums.h"
-#include "memory.h"
-#include "Geometry.h"
-
 #include <utility>
 #include <list>
 #include <vector>
 #include <map>
+
+#include "NodeVisitor.h"
+#include "enums.h"
+#include "Geometry.h"
 
 class GeometryEvaluator : public NodeVisitor
 {

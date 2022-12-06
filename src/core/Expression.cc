@@ -23,9 +23,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#include "compiler_specific.h"
-#include "Expression.h"
-#include "Value.h"
+
 #include <cstdint>
 #include <cmath>
 #include <cassert>
@@ -34,14 +32,40 @@
 #include <typeinfo>
 #include <forward_list>
 #include <variant>
-#include "printutils.h"
-#include "StackCheck.h"
-#include "Context.h"
-#include "exceptions.h"
-#include "Parameters.h"
-#include "printutils.h"
+
 #include "boost-utils.h"
 #include <boost/assign/std/vector.hpp>
+
+#include "Parameters.h"
+#include "printutils.h"
+#include "StackCheck.h"
+#include "exceptions.h"
+
+#include "Expression.h"
+#include "expression/UnaryOp.h"
+#include "expression/ArrayLookup.h"
+#include "expression/Assert.h"
+#include "expression/BinaryOp.h"
+#include "expression/Echo.h"
+#include "expression/FunctionDefinition.h"
+#include "expression/LcEach.h"
+#include "expression/LcForC.h"
+#include "expression/LcFor.h"
+#include "expression/LcIf.h"
+#include "expression/LcLet.h"
+#include "expression/Let.h"
+#include "expression/ListComprehension.h"
+#include "expression/Literal.h"
+#include "expression/Lookup.h"
+#include "expression/MemberLookup.h"
+#include "expression/ModuleLiteral.h"
+#include "expression/Range.h"
+#include "expression/TernaryOp.h"
+#include "expression/UnaryOp.h"
+#include "expression/ValueWrapper.h"
+#include "expression/Vector.h"
+
+#include "compiler_specific.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
@@ -432,7 +456,8 @@ struct SimplifiedExpression {
 };
 typedef std::variant<SimplifiedExpression, Value> SimplificationResult;
 
-static SimplificationResult simplify_function_body(const Expression *expression, const std::shared_ptr<const Context>& context)
+static SimplificationResult simplify_function_body(
+const Expression *expression, const std::shared_ptr<const Context>& context)
 {
   if (!expression) {
     return Value::undefined.clone();
@@ -567,9 +592,7 @@ Expression *FunctionCall::create(const std::string& funcname, const AssignmentLi
 
 Assert::Assert(const AssignmentList& args, Expression *expr, const Location& loc)
   : Expression(loc), arguments(args), expr(expr)
-{
-
-}
+{}
 
 void Assert::performAssert(const AssignmentList& arguments, const Location& location, const std::shared_ptr<const Context>& context)
 {
@@ -610,9 +633,7 @@ void Assert::print(std::ostream& stream, const std::string&) const
 
 Echo::Echo(const AssignmentList& args, Expression *expr, const Location& loc)
   : Expression(loc), arguments(args), expr(expr)
-{
-
-}
+{}
 
 const Expression *Echo::evaluateStep(const std::shared_ptr<const Context>& context) const
 {

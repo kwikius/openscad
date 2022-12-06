@@ -2,16 +2,13 @@
 
 #include "cgal.h"
 #include "Geometry.h"
-#include "memory.h"
-#include <string>
-#include "linalg.h"
 
 class CGAL_Nef_polyhedron : public Geometry
 {
 public:
   VISITABLE_GEOMETRY();
   CGAL_Nef_polyhedron(const CGAL_Nef_polyhedron3 *p = nullptr);
-  CGAL_Nef_polyhedron(shared_ptr<const CGAL_Nef_polyhedron3> p) : p3(p) {}
+  CGAL_Nef_polyhedron(std::shared_ptr<const CGAL_Nef_polyhedron3> p) : p3(p) {}
   CGAL_Nef_polyhedron(const CGAL_Nef_polyhedron& src);
   ~CGAL_Nef_polyhedron() {}
 
@@ -34,5 +31,5 @@ public:
   virtual void transform(const Transform3d& matrix) override;
   virtual void resize(const Vector3d& newsize, const Eigen::Matrix<bool, 3, 1>& autosize) override;
 
-  shared_ptr<const CGAL_Nef_polyhedron3> p3;
+  std::shared_ptr<const CGAL_Nef_polyhedron3> p3;
 };

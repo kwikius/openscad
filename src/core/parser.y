@@ -40,6 +40,13 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <unistd.h>
 #endif
 
+#include <stack>
+#include <list>
+#include <sstream>
+
+#include <boost/filesystem.hpp>
+#include "boost-utils.h"
+
 #include "SourceFile.h"
 #include "UserModule.h"
 #include "ModuleInstantiation.h"
@@ -49,14 +56,8 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "MemberLookup.h"
 #include "function.h"
 #include "printutils.h"
-#include "memory.h"
-#include <sstream>
-#include <stack>
-#include <list>
-#include <boost/filesystem.hpp>
-#include "boost-utils.h"
 
-namespace fs = boost::filesystem;
+//namespace fs = boost::filesystem;
 
 #define YYMAXDEPTH 20000
 #define LOC(loc) Location(loc.first_line, loc.first_column, loc.last_line, loc.last_column, sourcefile())

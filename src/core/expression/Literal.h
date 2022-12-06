@@ -1,0 +1,23 @@
+#pragma one
+
+#include "../Expression.h"
+
+class Literal : public Expression{
+public:
+  Literal(const Location& loc = Location::NONE) : Expression(loc), value(Value::undefined.clone()) { };
+  Literal(Value val, const Location& loc = Location::NONE) : Expression(loc), value(std::move(val)) { };
+  bool isBool() const { return value.type() == Value::Type::BOOL; }
+  bool toBool() const { return value.toBool(); }
+  bool isDouble() const { return value.type() == Value::Type::NUMBER; }
+  double toDouble() const { return value.toDouble(); }
+  bool isString() const { return value.type() == Value::Type::STRING; }
+  const std::string& toString() const { return value.toStrUtf8Wrapper().toString(); }
+  bool isUndefined() const { return value.type() == Value::Type::UNDEFINED; }
+
+  Value evaluate(const std::shared_ptr<const Context>& context) const override;
+  void print(std::ostream& stream, const std::string& indent) const override;
+  bool isLiteral() const override { return true; }
+private:
+  const Value value;
+};
+

@@ -1,11 +1,6 @@
 #pragma once
 
-#include <memory>
-#include <string>
-#include <iostream>
-#include "Expression.h"
-#include "AST.h"
-#include "Context.h"
+#include "../Expression.h"
 
 class MemberLookup : public Expression{
 public:

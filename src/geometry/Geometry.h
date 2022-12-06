@@ -3,9 +3,9 @@
 #include <cstddef>
 #include <string>
 #include <list>
+#include <memory>
 
 #include "linalg.h"
-#include "memory.h"
 
 class AbstractNode;
 class GeometryVisitor;
@@ -13,7 +13,10 @@ class GeometryVisitor;
 class Geometry
 {
 public:
-  typedef std::pair<std::shared_ptr<const AbstractNode>, shared_ptr<const Geometry>> GeometryItem;
+  typedef std::pair<
+         std::shared_ptr<const AbstractNode>,
+         std::shared_ptr<const Geometry>
+  > GeometryItem;
   typedef std::list<GeometryItem> Geometries;
 
   Geometry() : convexity(1) {}
