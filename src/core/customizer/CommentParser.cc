@@ -297,7 +297,7 @@ void CommentParser::collectParameters(const std::string& fulltext, SourceFile *r
     std::string descr = getDescription(fulltext, firstLine - 1);
     if (descr != "") {
       //creating node for description
-      shared_ptr<Expression> expr(new Literal(descr));
+      std::shared_ptr<Expression> expr(new Literal(descr));
       annotationList->push_back(Annotation("Description", expr));
     }
 
@@ -305,7 +305,7 @@ void CommentParser::collectParameters(const std::string& fulltext, SourceFile *r
     for (const auto& groupInfo :boost::adaptors::reverse(groupList)) {
       if (groupInfo.lineNo < firstLine) {
         //creating node for description
-        shared_ptr<Expression> expr(new Literal(groupInfo.commentString));
+        std::shared_ptr<Expression> expr(new Literal(groupInfo.commentString));
         annotationList->push_back(Annotation("Group", expr));
         break;
       }

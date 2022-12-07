@@ -10,5 +10,5 @@ public:
   void print(std::ostream& stream, const std::string& indent) const override;
 private:
   Value evalRecur(Value&& v, const std::shared_ptr<const Context>& context) const;
-  shared_ptr<Expression> expr;
+  std::shared_ptr<Expression> expr;
 };

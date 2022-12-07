@@ -31,7 +31,7 @@
 
 #include "IndexedMesh.h"
 
-void export_obj(const shared_ptr<const Geometry>& geom, std::ostream& output)
+void export_obj(const std::shared_ptr<const Geometry>& geom, std::ostream& output)
 {
   IndexedMesh mesh;
   mesh.append_geometry(geom);

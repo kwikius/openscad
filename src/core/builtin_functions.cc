@@ -24,9 +24,25 @@
  *
  */
 
+
+/*Unicode support for string lengths and array accesses*/
+#include <glib.h>
+
+#include <cmath>
+#include <sstream>
+#include <ctime>
+#include <limits>
+#include <algorithm>
+#include <random>
+#include <array>
+
+#include "boost-utils.h"
+
 #include "function.h"
 #include "Arguments.h"
 #include "Expression.h"
+#include "expression/FunctionCall.h"
+#include "expression/Lookup.h"
 #include "Builtins.h"
 #include "printutils.h"
 #include "UserModule.h"
@@ -36,16 +52,6 @@
 #include "import.h"
 #include "fileutils.h"
 
-#include <cmath>
-#include <sstream>
-#include <ctime>
-#include <limits>
-#include <algorithm>
-#include <random>
-
-#include "boost-utils.h"
-/*Unicode support for string lengths and array accesses*/
-#include <glib.h>
 // hash double
 #include "linalg.h"
 
@@ -59,7 +65,7 @@ int process_id = getpid();
 #endif
 
 std::mt19937 deterministic_rng(std::time(nullptr) + process_id);
-#include <array>
+
 
 static inline bool check_arguments(const char *function_name, const Arguments& arguments, const Location& loc, unsigned int expected_count, bool warn = true)
 {
@@ -874,7 +880,7 @@ Value builtin_is_undef(const std::shared_ptr<const Context>& context, const Func
     print_argCnt_warning("is_undef", call->arguments.size(), "1", call->location(), context->documentRoot());
     return Value::undefined.clone();
   }
-  if (auto lookup = dynamic_pointer_cast<Lookup>(call->arguments[0]->getExpr())) {
+  if (auto lookup = std::dynamic_pointer_cast<Lookup>(call->arguments[0]->getExpr())) {
     auto result = context->try_lookup_variable(lookup->get_name());
     return !result || result->isUndefined();
   } else {

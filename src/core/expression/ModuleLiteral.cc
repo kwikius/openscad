@@ -6,13 +6,14 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <cstdio>
 #include <stack>
 #include <algorithm>
+
+#include "../ModuleReference.h"
+#include "../LocalScope.h"
+#include "../UserModule.h"
+#include "../Feature.h"
+
 #include "ModuleLiteral.h"
-#include "ModuleReference.h"
-#include "Expression.h"
-#include "LocalScope.h"
-#include "UserModule.h"
-#include "Value.h"
-#include "Feature.h"
+#include "Literal.h"
 #include "ValueWrapper.h"
 
 extern std::stack<LocalScope *> scope_stack;

@@ -30,7 +30,7 @@ private:
   const char *opString() const;
 
   Op op;
-  shared_ptr<Expression> left;
-  shared_ptr<Expression> right;
+  std::shared_ptr<Expression> left;
+  std::shared_ptr<Expression> right;
 };
 

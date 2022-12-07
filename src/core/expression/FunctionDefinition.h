@@ -9,8 +9,8 @@ public:
   Value evaluate(const std::shared_ptr<const Context>& context) const override;
   void print(std::ostream& stream, const std::string& indent) const override;
 public:
-  shared_ptr<const Context> context;
+  std::shared_ptr<const Context> context;
   AssignmentList parameters;
-  shared_ptr<Expression> expr;
+  std::shared_ptr<Expression> expr;
 };
 

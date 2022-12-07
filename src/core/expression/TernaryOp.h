@@ -10,8 +10,8 @@ public:
   Value evaluate(const std::shared_ptr<const Context>& context) const override;
   void print(std::ostream& stream, const std::string& indent) const override;
 private:
-  shared_ptr<Expression> cond;
-  shared_ptr<Expression> ifexpr;
-  shared_ptr<Expression> elseexpr;
+  std::shared_ptr<Expression> cond;
+  std::shared_ptr<Expression> ifexpr;
+  std::shared_ptr<Expression> elseexpr;
 };
 

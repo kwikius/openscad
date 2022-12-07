@@ -1,7 +1,8 @@
 #pragma once
 
+#include "../Assignment.h"
+
 #include "ListComprehension.h"
-#include "../AssignmentList.h"
 
 class LcLet : public ListComprehension
 {
@@ -11,5 +12,5 @@ public:
   void print(std::ostream& stream, const std::string& indent) const override;
 private:
   AssignmentList arguments;
-  shared_ptr<Expression> expr;
+  std::shared_ptr<Expression> expr;
 };

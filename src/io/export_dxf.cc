@@ -235,15 +235,15 @@ void export_dxf(const Polygon2d& poly, std::ostream& output)
   setlocale(LC_NUMERIC, ""); // set default locale
 }
 
-void export_dxf(const shared_ptr<const Geometry>& geom, std::ostream& output)
+void export_dxf(const std::shared_ptr<const Geometry>& geom, std::ostream& output)
 {
-  if (const auto geomlist = dynamic_pointer_cast<const GeometryList>(geom)) {
+  if (const auto geomlist = std::dynamic_pointer_cast<const GeometryList>(geom)) {
     for (const auto& item : geomlist->getChildren()) {
       export_dxf(item.second, output);
     }
-  } else if (dynamic_pointer_cast<const PolySet>(geom)) {
+  } else if (std::dynamic_pointer_cast<const PolySet>(geom)) {
     assert(false && "Unsupported file format");
-  } else if (const auto poly = dynamic_pointer_cast<const Polygon2d>(geom)) {
+  } else if (const auto poly = std::dynamic_pointer_cast<const Polygon2d>(geom)) {
     export_dxf(*poly, output);
   } else {
     assert(false && "Export as DXF for this geometry type is not supported");

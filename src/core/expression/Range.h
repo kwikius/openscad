@@ -14,8 +14,8 @@ public:
   void print(std::ostream& stream, const std::string& indent) const override;
   bool isLiteral() const override;
 private:
-  shared_ptr<Expression> begin;
-  shared_ptr<Expression> step;
-  shared_ptr<Expression> end;
+  std::shared_ptr<Expression> begin;
+  std::shared_ptr<Expression> step;
+  std::shared_ptr<Expression> end;
 };
 

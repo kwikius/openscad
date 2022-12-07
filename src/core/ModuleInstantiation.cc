@@ -6,6 +6,8 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 
 #include "ModuleInstantiation.h"
+#include "module.h"
+#include "Context.h"
 #include "exceptions.h"
 #include "printutils.h"
 #include <boost/filesystem.hpp>

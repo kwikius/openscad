@@ -18,5 +18,5 @@ private:
   const char *opString() const;
 
   Op op;
-  shared_ptr<Expression> expr;
+  std::shared_ptr<Expression> expr;
 };

@@ -27,7 +27,7 @@ public:
   void setHighlight(bool on) { on ? this->flags |= FLAG_HIGHLIGHT : this->flags &= ~FLAG_HIGHLIGHT; }
   void setBackground(bool on) { on ? this->flags |= FLAG_BACKGROUND : this->flags &= ~FLAG_BACKGROUND; }
 
-  static shared_ptr<CSGNode> createEmptySet();
+  static std::shared_ptr<CSGNode> createEmptySet();
 
 protected:
   virtual void initBoundingBox() = 0;
@@ -47,31 +47,32 @@ public:
   void initBoundingBox() override;
   std::string dump() const override;
 
-  shared_ptr<CSGNode>& left() { return this->children[0]; }
-  shared_ptr<CSGNode>& right() { return this->children[1]; }
-  const shared_ptr<CSGNode>& left() const { return this->children[0]; }
-  const shared_ptr<CSGNode>& right() const { return this->children[1]; }
+  std::shared_ptr<CSGNode>& left() { return this->children[0]; }
+  std::shared_ptr<CSGNode>& right() { return this->children[1]; }
+  const std::shared_ptr<CSGNode>& left() const { return this->children[0]; }
+  const std::shared_ptr<CSGNode>& right() const { return this->children[1]; }
 
   OpenSCADOperator getType() const { return this->type; }
 
-  static shared_ptr<CSGNode> createCSGNode(OpenSCADOperator type, shared_ptr<CSGNode> left, shared_ptr<CSGNode> right);
+  static std::shared_ptr<CSGNode>
+  createCSGNode(OpenSCADOperator type, std::shared_ptr<CSGNode> left, std::shared_ptr<CSGNode> right);
 
 private:
-  CSGOperation(OpenSCADOperator type, shared_ptr<CSGNode> left, shared_ptr<CSGNode> right);
+  CSGOperation(OpenSCADOperator type, std::shared_ptr<CSGNode> left, std::shared_ptr<CSGNode> right);
   OpenSCADOperator type;
-  std::vector<shared_ptr<CSGNode>> children;
+  std::vector<std::shared_ptr<CSGNode>> children;
 };
 
 // very large lists of children can overflow stack due to recursive destruction of shared_ptr,
 // so move shared_ptrs into a temporary vector
 struct CSGOperationDeleter {
   void operator()(CSGOperation *node) {
-    std::vector<shared_ptr<CSGNode>> purge;
+    std::vector<std::shared_ptr<CSGNode>> purge;
     purge.emplace_back(std::move(node->right()));
     purge.emplace_back(std::move(node->left()));
     delete node;
     do {
-      auto op = dynamic_pointer_cast<CSGOperation>(purge.back());
+      auto op = std::dynamic_pointer_cast<CSGOperation>(purge.back());
       purge.pop_back();
       if (op && op.use_count() == 1) {
         purge.emplace_back(std::move(op->right()));
@@ -85,13 +86,14 @@ class CSGLeaf : public CSGNode
 {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  CSGLeaf(const shared_ptr<const class Geometry>& geom, const Transform3d& matrix, const Color4f& color, const std::string& label, const int index);
+  CSGLeaf(const std::shared_ptr<const class Geometry>& geom,
+    const Transform3d& matrix, const Color4f& color, const std::string& label, const int index);
   ~CSGLeaf() {}
   void initBoundingBox() override;
   bool isEmptySet() override { return geom == nullptr || geom->isEmpty(); }
   std::string dump() const override;
   std::string label;
-  shared_ptr<const Geometry> geom;
+  std::shared_ptr<const Geometry> geom;
   Transform3d matrix;
   Color4f color;
 
@@ -107,10 +109,11 @@ public:
 class CSGChainObject
 {
 public:
-  CSGChainObject(const shared_ptr<CSGLeaf>& leaf, CSGNode::Flag flags = CSGNode::FLAG_NONE)
+  CSGChainObject(const std::shared_ptr<CSGLeaf>& leaf,
+   CSGNode::Flag flags = CSGNode::FLAG_NONE)
     : leaf(leaf), flags(flags) {}
 
-  shared_ptr<CSGLeaf> leaf;
+  std::shared_ptr<CSGLeaf> leaf;
   CSGNode::Flag flags;
 };
 
@@ -135,7 +138,9 @@ public:
   }
   ~CSGProducts() {}
 
-  void import(shared_ptr<CSGNode> csgtree, OpenSCADOperator type = OpenSCADOperator::UNION, CSGNode::Flag flags = CSGNode::FLAG_NONE);
+  void import(std::shared_ptr<CSGNode> csgtree,
+  OpenSCADOperator type = OpenSCADOperator::UNION,
+   CSGNode::Flag flags = CSGNode::FLAG_NONE);
   std::string dump() const;
   BoundingBox getBoundingBox(bool throwntogether = false) const;
 

@@ -225,7 +225,7 @@ private slots:
   void sendToPrintService();
 #ifdef ENABLE_CGAL
   void actionRender();
-  void actionRenderDone(shared_ptr<const class Geometry>);
+  void actionRenderDone(std::shared_ptr<const class Geometry>);
   void cgalRender();
 #endif
   void actionCheckValidity();

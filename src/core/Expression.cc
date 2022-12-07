@@ -37,33 +37,11 @@
 #include <boost/assign/std/vector.hpp>
 
 #include "Parameters.h"
+#include "Arguments.h"
 #include "printutils.h"
 #include "StackCheck.h"
 #include "exceptions.h"
-
-#include "Expression.h"
-#include "expression/UnaryOp.h"
-#include "expression/ArrayLookup.h"
-#include "expression/Assert.h"
-#include "expression/BinaryOp.h"
-#include "expression/Echo.h"
-#include "expression/FunctionDefinition.h"
-#include "expression/LcEach.h"
-#include "expression/LcForC.h"
-#include "expression/LcFor.h"
-#include "expression/LcIf.h"
-#include "expression/LcLet.h"
-#include "expression/Let.h"
-#include "expression/ListComprehension.h"
-#include "expression/Literal.h"
-#include "expression/Lookup.h"
-#include "expression/MemberLookup.h"
-#include "expression/ModuleLiteral.h"
-#include "expression/Range.h"
-#include "expression/TernaryOp.h"
-#include "expression/UnaryOp.h"
-#include "expression/ValueWrapper.h"
-#include "expression/Vector.h"
+#include "expression/expressions.h"
 
 #include "compiler_specific.h"
 
@@ -710,7 +688,7 @@ LcIf::LcIf(Expression *cond, Expression *ifexpr, Expression *elseexpr, const Loc
 
 Value LcIf::evaluate(const std::shared_ptr<const Context>& context) const
 {
-  const shared_ptr<Expression>& expr = this->cond->evaluate(context).toBool() ? this->ifexpr : this->elseexpr;
+  const std::shared_ptr<Expression>& expr = this->cond->evaluate(context).toBool() ? this->ifexpr : this->elseexpr;
   if (expr) {
     return expr->evaluate(context);
   } else {

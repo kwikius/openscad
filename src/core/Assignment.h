@@ -3,18 +3,18 @@
 #include <ostream>
 #include <string>
 #include <vector>
-
+#include <memory>
 #include "AST.h"
-#include "Expression.h"
 #include "Annotation.h"
 
-class Assignment : public ASTNode
-{
+class Expression;
+
+class Assignment : public ASTNode{
 public:
   Assignment(std::string name, const Location& loc)
     : ASTNode(loc), name(name), locOfOverwrite(Location::NONE) { }
   Assignment(std::string name,
-             std::shared_ptr<class Expression> expr = std::shared_ptr<class Expression>(),
+             std::shared_ptr<Expression> expr = std::shared_ptr<Expression>(),
              const Location& loc = Location::NONE)
     : ASTNode(loc), name(name), expr(expr), locOfOverwrite(Location::NONE){ }
 
@@ -37,16 +37,19 @@ public:
 
 protected:
   std::string name;
-  std::shared_ptr<class Expression> expr;
+  std::shared_ptr<Expression> expr;
   AnnotationMap annotations;
   Location locOfOverwrite;
 };
 
-template <class ... Args> std::shared_ptr<Assignment> assignment(Args... args) {
+template <class ... Args>
+std::shared_ptr<Assignment>
+  assignment(Args... args) {
   return std::make_shared<Assignment>(args ...);
 }
 
-typedef std::vector<std::shared_ptr<Assignment>> AssignmentList;
+using AssignmentList = std::vector<std::shared_ptr<Assignment> > ;
+
 typedef std::unordered_map<std::string, const Expression *> AssignmentMap;
 
 std::ostream& operator<<(std::ostream& stream, const AssignmentList& assignments);

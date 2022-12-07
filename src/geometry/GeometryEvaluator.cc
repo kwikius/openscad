@@ -260,7 +260,7 @@ std::vector<const class Polygon2d *> GeometryEvaluator::collectChildren2D(const 
   std::vector<const Polygon2d *> children;
   for (const auto& item : this->visitedchildren[node.index()]) {
     auto &chnode = item.first;
-    const shared_ptr<const Geometry>& chgeom = item.second;
+    const std::shared_ptr<const Geometry>& chgeom = item.second;
     if (chnode->modinst->isBackground()) continue;
 
     // NB! We insert into the cache here to ensure that all children of
@@ -295,7 +295,7 @@ std::vector<const class Polygon2d *> GeometryEvaluator::collectChildren2D(const 
    This method inserts the geometry into the appropriate cache if it's not already cached.
  */
 void GeometryEvaluator::smartCacheInsert(const AbstractNode& node,
-                                         const shared_ptr<const Geometry>& geom)
+                                         const std::shared_ptr<const Geometry>& geom)
 {
   const std::string& key = this->tree.getIdString(node);
 
@@ -337,7 +337,7 @@ Geometry::Geometries GeometryEvaluator::collectChildren3D(const AbstractNode& no
   Geometry::Geometries children;
   for (const auto& item : this->visitedchildren[node.index()]) {
     auto &chnode = item.first;
-    const shared_ptr<const Geometry>& chgeom = item.second;
+    const std::shared_ptr<const Geometry>& chgeom = item.second;
     if (chnode->modinst->isBackground()) continue;
 
     // NB! We insert into the cache here to ensure that all children of
@@ -415,7 +415,7 @@ Polygon2d *GeometryEvaluator::applyToChildren2D(const AbstractNode& node, OpenSC
  */
 void GeometryEvaluator::addToParent(const State& state,
                                     const AbstractNode& node,
-                                    const shared_ptr<const Geometry>& geom)
+                                    const std::shared_ptr<const Geometry>& geom)
 {
   this->visitedchildren.erase(node.index());
   if (state.parent()) {
@@ -464,7 +464,7 @@ Response GeometryEvaluator::visit(State& state, const ListNode& node)
       for (const auto& item : this->visitedchildren[node.index()]) {
         if (!isValidDim(item, dim)) break;
         auto &chnode = item.first;
-        const shared_ptr<const Geometry>& chgeom = item.second;
+        const std::shared_ptr<const Geometry>& chgeom = item.second;
         addToParent(state, *chnode, chgeom);
       }
       this->visitedchildren.erase(node.index());
@@ -501,7 +501,7 @@ Response GeometryEvaluator::lazyEvaluateRootNode(State& state, const AbstractNod
     for (const auto& item : this->visitedchildren[node.index()]) {
       if (!isValidDim(item, dim)) break;
       auto &chnode = item.first;
-      const shared_ptr<const Geometry>& chgeom = item.second;
+      const std::shared_ptr<const Geometry>& chgeom = item.second;
       if (chnode->modinst->isBackground()) continue;
       // NB! We insert into the cache here to ensure that all children of
       // a node is a valid object. If we inserted as we created them, the
@@ -672,7 +672,7 @@ Response GeometryEvaluator::visit(State& state, const TransformNode& node)
 {
   if (state.isPrefix() && isSmartCached(node)) return Response::PruneTraversal;
   if (state.isPostfix()) {
-    shared_ptr<const class Geometry> geom;
+    std::shared_ptr<const class Geometry> geom;
     if (!isSmartCached(node)) {
       if (matrix_contains_infinity(node.matrix) || matrix_contains_nan(node.matrix)) {
         // due to the way parse/eval works we can't currently distinguish between NaN and Inf
@@ -682,13 +682,13 @@ Response GeometryEvaluator::visit(State& state, const TransformNode& node)
         ResultObject res = applyToChildren(node, OpenSCADOperator::UNION);
         if ((geom = res.constptr())) {
           if (geom->getDimension() == 2) {
-            shared_ptr<const Polygon2d> polygons = dynamic_pointer_cast<const Polygon2d>(geom);
+            std::shared_ptr<const Polygon2d> polygons = std::dynamic_pointer_cast<const Polygon2d>(geom);
             assert(polygons);
 
             // If we got a const object, make a copy
-            shared_ptr<Polygon2d> newpoly;
+            std::shared_ptr<Polygon2d> newpoly;
             if (res.isConst()) newpoly.reset(new Polygon2d(*polygons));
-            else newpoly = dynamic_pointer_cast<Polygon2d>(res.ptr());
+            else newpoly = std::dynamic_pointer_cast<Polygon2d>(res.ptr());
 
             Transform2d mat2;
             mat2.matrix() <<
@@ -1374,14 +1374,14 @@ shared_ptr<const Geometry> GeometryEvaluator::projectionCut(const ProjectionNode
   return geom;
 }
 
-shared_ptr<const Geometry> GeometryEvaluator::projectionNoCut(const ProjectionNode& node)
+std::shared_ptr<const Geometry> GeometryEvaluator::projectionNoCut(const ProjectionNode& node)
 {
-  shared_ptr<const class Geometry> geom;
+  std::shared_ptr<const class Geometry> geom;
   std::vector<const Polygon2d *> tmp_geom;
   BoundingBox bounds;
   for (const auto& item : this->visitedchildren[node.index()]) {
     auto &chnode = item.first;
-    const shared_ptr<const Geometry>& chgeom = item.second;
+    const std::shared_ptr<const Geometry>& chgeom = item.second;
     if (chnode->modinst->isBackground()) continue;
 
     const Polygon2d *poly = nullptr;
@@ -1461,7 +1461,7 @@ Response GeometryEvaluator::visit(State& state, const CgalAdvNode& node)
 {
   if (state.isPrefix() && isSmartCached(node)) return Response::PruneTraversal;
   if (state.isPostfix()) {
-    shared_ptr<const Geometry> geom;
+    std::shared_ptr<const Geometry> geom;
     if (!isSmartCached(node)) {
       switch (node.type) {
       case CgalAdvType::MINKOWSKI: {
@@ -1469,7 +1469,7 @@ Response GeometryEvaluator::visit(State& state, const CgalAdvNode& node)
         geom = res.constptr();
         // If we added convexity, we need to pass it on
         if (geom && geom->getConvexity() != node.convexity) {
-          shared_ptr<Geometry> editablegeom;
+          std::shared_ptr<Geometry> editablegeom;
           // If we got a const object, make a copy
           if (res.isConst()) editablegeom.reset(geom->copy());
           else editablegeom = res.ptr();
@@ -1515,7 +1515,7 @@ Response GeometryEvaluator::visit(State& state, const AbstractIntersectionNode& 
     state.setPreferNef(true); // Improve quality of CSG by avoiding conversion loss
   }
   if (state.isPostfix()) {
-    shared_ptr<const class Geometry> geom;
+    std::shared_ptr<const class Geometry> geom;
     if (!isSmartCached(node)) {
       geom = applyToChildren(node, OpenSCADOperator::INTERSECTION).constptr();
     } else {
@@ -1547,7 +1547,7 @@ Response GeometryEvaluator::visit(State& state, const RoofNode& node)
 {
   if (state.isPrefix() && isSmartCached(node)) return Response::PruneTraversal;
   if (state.isPostfix()) {
-    shared_ptr<const Geometry> geom;
+    std::shared_ptr<const Geometry> geom;
     if (!isSmartCached(node)) {
       const Geometry *geometry = applyToChildren2D(node, OpenSCADOperator::UNION);
       if (geometry) {

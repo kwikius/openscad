@@ -335,8 +335,8 @@ MainWindow::MainWindow(const QStringList& filenames)
 
 #ifdef ENABLE_CGAL
   this->cgalworker = new CGALWorker();
-  connect(this->cgalworker, SIGNAL(done(shared_ptr<const Geometry>)),
-          this, SLOT(actionRenderDone(shared_ptr<const Geometry>)));
+  connect(this->cgalworker, SIGNAL(done(std::shared_ptr<const Geometry>)),
+          this, SLOT(actionRenderDone(std::shared_ptr<const Geometry>)));
 #endif
 
 #ifdef ENABLE_CGAL
@@ -2155,7 +2155,7 @@ void MainWindow::cgalRender()
   this->cgalworker->start(this->tree);
 }
 
-void MainWindow::actionRenderDone(shared_ptr<const Geometry> root_geom)
+void MainWindow::actionRenderDone(std::shared_ptr<const Geometry> root_geom)
 {
   progress_report_fin();
   if (root_geom) {

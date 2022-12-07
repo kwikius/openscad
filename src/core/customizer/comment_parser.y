@@ -14,7 +14,7 @@
     int comment_lexerlex(void);
     int comment_parserlex(void);
     extern void comment_scan_string ( const char *str );
-    shared_ptr<Expression> params;
+    std::shared_ptr<Expression> params;
 %}
 %union {
     char *text;
@@ -44,11 +44,11 @@ params:
     expr
         {
             $$ = $1;
-            params = shared_ptr<Expression>($$);
+            params = std::shared_ptr<Expression>($$);
         }
     ;
 
-expr: 
+expr:
     '[' values ']'
     {
         $$ = $2;
@@ -106,7 +106,7 @@ values:
     }
     ;
 
-labeled_vectors: 
+labeled_vectors:
     num ':' num
     {
         $$ = new Vector(Location::NONE);
@@ -144,7 +144,7 @@ wordexpr:
 word:
     WORD
     {
-        $$=$1;    
+        $$=$1;
     }
     | word NUM
     {
@@ -176,11 +176,11 @@ int comment_parserlex(void)
 }
 
 void yyerror(const char * /*msg*/) {
-    PRINTD("ERROR IN PARAMETER: Parser error in comments of file \n "); 
+    PRINTD("ERROR IN PARAMETER: Parser error in comments of file \n ");
     params = NULL;
 }
 
-shared_ptr<Expression> CommentParser::parser(const char *text)
+std::shared_ptr<Expression> CommentParser::parser(const char *text)
 {
   comment_scan_string(text);
   int parserretval = comment_parserparse();

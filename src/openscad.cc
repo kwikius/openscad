@@ -267,7 +267,7 @@ Camera get_camera(const po::variables_map& vm)
 #include "QSettingsCached.h"
 #define OPENSCAD_QTGUI 1
 #endif
-static bool checkAndExport(shared_ptr<const Geometry> root_geom, unsigned nd,
+static bool checkAndExport(std::shared_ptr<const Geometry> root_geom, unsigned nd,
                            FileFormat format, const bool is_stdout, const std::string& filename)
 {
   if (root_geom->getDimension() != nd) {
@@ -636,11 +636,11 @@ int do_export(const CommandLine& cmd, const RenderVariables& render_variables, F
 #include "Settings.h"
 
 Q_DECLARE_METATYPE(Message);
-Q_DECLARE_METATYPE(shared_ptr<const Geometry>);
+Q_DECLARE_METATYPE(std::shared_ptr<const Geometry>);
 
 // Only if "fileName" is not absolute, prepend the "absoluteBase".
 static QString assemblePath(const fs::path& absoluteBaseDir,
-                            const string& fileName) {
+                            const std::string& fileName) {
   if (fileName.empty()) return "";
   auto qsDir = QString::fromLocal8Bit(absoluteBaseDir.generic_string().c_str());
   auto qsFile = QString::fromLocal8Bit(fileName.c_str());
@@ -701,7 +701,7 @@ void registerDefaultIcon(QString applicationFilePath) {
 void registerDefaultIcon(QString) { }
 #endif
 
-int gui(vector<string>& inputFiles, const fs::path& original_path, int argc, char **argv)
+int gui(std::vector<string>& inputFiles, const fs::path& original_path, int argc, char **argv)
 {
   OpenSCADApp app(argc, argv);
   // remove ugly frames in the QStatusBar when using additional widgets
@@ -722,7 +722,7 @@ int gui(vector<string>& inputFiles, const fs::path& original_path, int argc, cha
 
   // Other global settings
   qRegisterMetaType<Message>();
-  qRegisterMetaType<shared_ptr<const Geometry>>();
+  qRegisterMetaType<std::shared_ptr<const Geometry>>();
 
   FontCache::registerProgressHandler(dialogInitHandler);
 
