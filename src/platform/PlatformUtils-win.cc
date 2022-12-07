@@ -1,6 +1,9 @@
+
+#include <utils/findversion.h>
+#include <utils/printutils.h>
+
 #include "PlatformUtils.h"
-#include "printutils.h"
-#include "findversion.h"
+
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501
 #endif
@@ -14,6 +17,7 @@
 // structure LOGFONTW.
 #define __IPreviewHandlerVisuals_INTERFACE_DEFINED__
 #define __IVisualProperties_INTERFACE_DEFINED__
+
 #include <shlobj.h>
 
 #include "version.h"

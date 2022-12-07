@@ -1,3 +1,16 @@
+
+#include <cassert>
+#include <cstddef>
+
+#include <string>
+#include <map>
+#include <list>
+
+#include <utils/printutils.h>
+
+#include <geometry/GeometryEvaluator.h>
+#include <geometry/PolySet.h>
+
 #include "CSGTreeEvaluator.h"
 #include "State.h"
 #include "CsgOpNode.h"
@@ -7,15 +20,6 @@
 #include "ColorNode.h"
 #include "RenderNode.h"
 #include "CgalAdvNode.h"
-#include "printutils.h"
-#include "GeometryEvaluator.h"
-#include "PolySet.h"
-
-#include <string>
-#include <map>
-#include <list>
-#include <cassert>
-#include <cstddef>
 
 /*!
    \class CSGTreeEvaluator
@@ -24,11 +28,11 @@
    with OpenCSG.
  */
 
-shared_ptr<CSGNode> CSGTreeEvaluator::buildCSGTree(const AbstractNode& node)
+std::shared_ptr<CSGNode> CSGTreeEvaluator::buildCSGTree(const AbstractNode& node)
 {
   this->traverse(node);
 
-  shared_ptr<CSGNode> t(this->stored_term[node.index()]);
+  std::shared_ptr<CSGNode> t(this->stored_term[node.index()]);
   if (t) {
     if (t->isHighlight()) this->highlightNodes.push_back(t);
     if (t->isBackground()) {
@@ -43,7 +47,7 @@ shared_ptr<CSGNode> CSGTreeEvaluator::buildCSGTree(const AbstractNode& node)
 void CSGTreeEvaluator::applyBackgroundAndHighlight(State& /*state*/, const AbstractNode& node)
 {
   for (const auto& chnode : this->visitedchildren[node.index()]) {
-    shared_ptr<CSGNode> t(this->stored_term[chnode->index()]);
+    std::shared_ptr<CSGNode> t(this->stored_term[chnode->index()]);
     this->stored_term.erase(chnode->index());
     if (t) {
       if (t->isBackground()) this->backgroundNodes.push_back(t);
@@ -60,15 +64,15 @@ void CSGTreeEvaluator::applyToChildren(State& state, const AbstractNode& node, O
     return;
   }
 
-  shared_ptr<CSGNode> t1;
+  std::shared_ptr<CSGNode> t1;
   for (const auto& chnode : vc) {
-    shared_ptr<CSGNode> t2(this->stored_term[chnode->index()]);
+    std::shared_ptr<CSGNode> t2(this->stored_term[chnode->index()]);
     this->stored_term.erase(chnode->index());
     if (t2 && !t1) {
       t1 = t2;
     } else if (t2 && t1) {
 
-      shared_ptr<CSGNode> t;
+      std::shared_ptr<CSGNode> t;
       // Handle background
       // Background objects are simply moved to backgroundNodes
       if (t2->isBackground()) {
@@ -168,21 +172,21 @@ Response CSGTreeEvaluator::visit(State& state, const class ListNode& node)
 
 }
 
-shared_ptr<CSGNode> CSGTreeEvaluator::evaluateCSGNodeFromGeometry(
-  State& state, const shared_ptr<const Geometry>& geom,
+std::shared_ptr<CSGNode> CSGTreeEvaluator::evaluateCSGNodeFromGeometry(
+  State& state, const std::shared_ptr<const Geometry>& geom,
   const ModuleInstantiation *modinst, const AbstractNode& node)
 {
   // We cannot render Polygon2d directly, so we preprocess (tessellate) it here
   auto g = geom;
   if (!g->isEmpty()) {
-    auto p2d = dynamic_pointer_cast<const Polygon2d>(geom);
+    auto p2d = std::dynamic_pointer_cast<const Polygon2d>(geom);
     if (p2d) {
       g.reset(p2d->tessellate());
     }
     // 3D PolySets are tessellated before inserting into Geometry cache, inside GeometryEvaluator::evaluateGeometry
   }
 
-  shared_ptr<CSGNode> t(new CSGLeaf(g, state.matrix(), state.color(), STR(node.name(), node.index()), node.index()));
+  std::shared_ptr<CSGNode> t(new CSGLeaf(g, state.matrix(), state.color(), STR(node.name(), node.index()), node.index()));
   if (modinst->isHighlight() || state.isHighlight()) t->setHighlight(true);
   if (modinst->isBackground() || state.isBackground()) t->setBackground(true);
   return t;
@@ -191,7 +195,7 @@ shared_ptr<CSGNode> CSGTreeEvaluator::evaluateCSGNodeFromGeometry(
 Response CSGTreeEvaluator::visit(State& state, const AbstractPolyNode& node)
 {
   if (state.isPostfix()) {
-    shared_ptr<CSGNode> t1;
+    std::shared_ptr<CSGNode> t1;
     if (this->geomevaluator) {
       auto geom = this->geomevaluator->evaluateGeometry(node, false);
       if (geom) {
@@ -248,8 +252,8 @@ Response CSGTreeEvaluator::visit(State& state, const ColorNode& node)
 Response CSGTreeEvaluator::visit(State& state, const RenderNode& node)
 {
   if (state.isPostfix()) {
-    shared_ptr<CSGNode> t1;
-    shared_ptr<const Geometry> geom;
+    std::shared_ptr<CSGNode> t1;
+    std::shared_ptr<const Geometry> geom;
     if (this->geomevaluator) {
       geom = this->geomevaluator->evaluateGeometry(node, false);
       if (geom) {
@@ -268,9 +272,9 @@ Response CSGTreeEvaluator::visit(State& state, const RenderNode& node)
 Response CSGTreeEvaluator::visit(State& state, const CgalAdvNode& node)
 {
   if (state.isPostfix()) {
-    shared_ptr<CSGNode> t1;
+    std::shared_ptr<CSGNode> t1;
     // FIXME: Calling evaluator directly since we're not a PolyNode. Generalize this.
-    shared_ptr<const Geometry> geom;
+    std::shared_ptr<const Geometry> geom;
     if (this->geomevaluator) {
       geom = this->geomevaluator->evaluateGeometry(node, false);
       if (geom) {

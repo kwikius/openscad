@@ -23,35 +23,41 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+#include <cstdint>
+#include <sys/types.h>
+#include <sstream>
 
-#include "import.h"
-#include "ImportNode.h"
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/assign/std/vector.hpp>
+
+#include <handle_dep.h>
+#include <Feature.h>
+
+#include <io/fileutils.h>
+#include <io/import.h>
+#include <io/DxfData.h>
+
+#include <geometry/PolySet.h>
+#include <geometry/Polygon2d.h>
+
+#ifdef ENABLE_CGAL
+  #include <geometry/cgal/CGAL_Nef_polyhedron.h>
+#endif
+
+#include <utils/boost-utils.h>
+#include <utils/printutils.h>
 
 #include "module.h"
 #include "ModuleInstantiation.h"
-#include "PolySet.h"
-#ifdef ENABLE_CGAL
-#include "CGAL_Nef_polyhedron.h"
-#endif
-#include "Polygon2d.h"
 #include "Builtins.h"
 #include "Children.h"
-#include "DxfData.h"
 #include "Parameters.h"
-#include "printutils.h"
-#include "fileutils.h"
-#include "Feature.h"
-#include "handle_dep.h"
-#include "boost-utils.h"
-#include <sys/types.h>
-#include <sstream>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-#include <boost/assign/std/vector.hpp>
-using namespace boost::assign; // bring 'operator+=()' into scope
+#include "ImportNode.h"
 
-#include <cstdint>
+namespace fs = boost::filesystem;
+
+using namespace boost::assign; // bring 'operator+=()' into scope
 
 extern PolySet *import_amf(const std::string&, const Location& loc);
 extern Geometry *import_3mf(const std::string&, const Location& loc);

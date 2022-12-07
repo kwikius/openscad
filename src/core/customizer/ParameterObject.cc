@@ -2,14 +2,14 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
+#include <core/Assignment.h>
+#include <core/SourceFile.h>
+
+#include <core/expression/Literal.h>
+#include <core/expression/Vector.h>
+#include <core/expression/Range.h>
+
 #include "Annotation.h"
-#include "Assignment.h"
-
-#include "expression/Literal.h"
-#include "expression/Vector.h"
-#include "expression/Range.h"
-
-#include "SourceFile.h"
 #include "ParameterObject.h"
 
 namespace {

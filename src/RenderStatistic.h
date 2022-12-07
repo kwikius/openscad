@@ -26,8 +26,9 @@
 #pragma once
 
 #include <chrono>
-#include "Camera.h"
-#include "Geometry.h"
+
+#include "glview/Camera.h"
+#include "geometry/Geometry.h"
 
 /**
  * An utility class to collect and print rendering statistics for the given

@@ -1,14 +1,19 @@
-#include "SourceFileCache.h"
-#include "StatCache.h"
-#include "SourceFile.h"
-#include "printutils.h"
-#include "openscad.h"
-#include <boost/format.hpp>
 
 #include <cstdio>
 #include <fstream>
 #include <sys/stat.h>
 #include <algorithm>
+
+#include <boost/format.hpp>
+
+#include <openscad.h>
+
+#include <utils/printutils.h>
+
+#include "StatCache.h"
+#include "SourceFile.h"
+
+#include "SourceFileCache.h"
 
 /*!
    FIXME: Implement an LRU scheme to avoid having an ever-growing source file cache

@@ -1,12 +1,16 @@
 #pragma once
 
+#include <locale.h>
+
 #include <string>
 #include <list>
 #include <iostream>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 #include <utility>
 #include <sstream>
+#include <set>
+
+#include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <libintl.h>
 // Undefine some defines from libintl.h to presolve
@@ -18,9 +22,8 @@
 #undef vsnprintf
 #endif
 
-#include <locale.h>
-#include "AST.h"
-#include <set>
+#include <core/Location.h>
+
 inline char *_(const char *msgid) { return gettext(msgid); }
 inline const char *_(const char *msgid, const char *msgctxt) {
   /* The separator between msgctxt and msgid in a .mo file.  */

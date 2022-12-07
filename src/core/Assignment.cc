@@ -24,10 +24,12 @@
  *
  */
 
-#include "Assignment.h"
-#include "Annotation.h"
-#include "Expression.h"
 #include <sstream>
+
+#include "customizer/Annotation.h"
+
+#include "Assignment.h"
+#include "Expression.h"
 
 void Assignment::addAnnotations(AnnotationList *annotations)
 {

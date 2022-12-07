@@ -24,21 +24,26 @@
  *
  */
 
-#include "module.h"
-#include "node.h"
-#include "PolySet.h"
-#include "Children.h"
-#include "Polygon2d.h"
-#include "Builtins.h"
-#include "Parameters.h"
-#include "printutils.h"
-#include "calc.h"
-#include "degree_trig.h"
 #include <sstream>
 #include <cassert>
 #include <cmath>
+
 #include <boost/assign/std/vector.hpp>
+
+#include "utils/printutils.h"
+#include "utils/calc.h"
+#include "utils/degree_trig.h"
+
+#include <geometry/Polygon2d.h>
+#include <geometry/PolySet.h>
+
+#include "module.h"
+#include "node.h"
+#include "Children.h"
+#include "Builtins.h"
+#include "Parameters.h"
 #include "ModuleInstantiation.h"
+
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 #define F_MINIMUM 0.01

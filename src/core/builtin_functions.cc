@@ -31,12 +31,21 @@
 #include <cmath>
 #include <sstream>
 #include <ctime>
+
 #include <limits>
 #include <algorithm>
 #include <random>
 #include <array>
 
-#include "boost-utils.h"
+#include <utils/printutils.h>
+#include <utils/boost-utils.h>
+#include <utils/degree_trig.h>
+
+// hash double
+#include <geometry/linalg.h>
+
+#include <io/import.h>
+#include <io/fileutils.h>
 
 #include "function.h"
 #include "Arguments.h"
@@ -44,16 +53,9 @@
 #include "expression/FunctionCall.h"
 #include "expression/Lookup.h"
 #include "Builtins.h"
-#include "printutils.h"
 #include "UserModule.h"
-#include "degree_trig.h"
 #include "FreetypeRenderer.h"
 #include "Parameters.h"
-#include "import.h"
-#include "fileutils.h"
-
-// hash double
-#include "linalg.h"
 
 #if defined __WIN32__ || defined _MSC_VER
 #include <process.h>

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include "Geometry.h"
-#include "linalg.h"
+
+#include "geometry/Geometry.h"
+#include "geometry/linalg.h"
 #include "enums.h"
 
 class CSGNode

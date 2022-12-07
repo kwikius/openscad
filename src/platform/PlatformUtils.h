@@ -3,6 +3,7 @@
 #include <string>
 
 #include <boost/filesystem.hpp>
+
 namespace fs = boost::filesystem;
 
 #define STACK_BUFFER_SIZE (128 * 1024)

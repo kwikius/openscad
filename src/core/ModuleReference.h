@@ -13,7 +13,6 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "Assignment.h"
 #include "ValuePtr.h"
 
-
 class Context;
 class Expression;
 class Value;

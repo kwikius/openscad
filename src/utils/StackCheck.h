@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cstdlib>
-#include "PlatformUtils.h"
+
+#include <platform/PlatformUtils.h>
 
 class StackCheck
 {

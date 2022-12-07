@@ -1,7 +1,4 @@
 
-#include "CommentParser.h"
-#include "expression/Literal.h"
-#include "Annotation.h"
 #include <string>
 #include <vector>
 #include <boost/range/adaptor/reversed.hpp>
@@ -9,6 +6,11 @@
 // #2291 and https://stackoverflow.com/questions/12530406/is-gcc-4-8-or-earlier-buggy-about-regular-expressions
 // therefore, we use boost::regex
 #include <boost/regex.hpp>
+
+#include <core/expression/Literal.h>
+
+#include "Annotation.h"
+#include "CommentParser.h"
 
 struct GroupInfo {
   std::string commentString;

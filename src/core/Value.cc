@@ -36,16 +36,18 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <glib.h>
 #include <boost/lexical_cast.hpp>
 
+#include <double-conversion/double-conversion.h>
+#include <double-conversion/utils.h>
+#include <double-conversion/ieee.h>
+
+#include <utils/printutils.h>
+#include <utils/boost-utils.h>
+#include <utils/StackCheck.h>
+
 #include "Value.h"
 #include "Context.h"
 #include "Expression.h"
 #include "EvaluationSession.h"
-#include "printutils.h"
-#include "StackCheck.h"
-#include "boost-utils.h"
-#include "double-conversion/double-conversion.h"
-#include "double-conversion/utils.h"
-#include "double-conversion/ieee.h"
 
 namespace fs = boost::filesystem;
 

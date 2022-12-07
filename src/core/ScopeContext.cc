@@ -1,10 +1,14 @@
-#include "ScopeContext.h"
+
+#include <cmath>
+
+#include <utils/printutils.h>
+
 #include "Expression.h"
 #include "Parameters.h"
-#include "printutils.h"
 #include "SourceFileCache.h"
 #include "UserModule.h"
-#include <cmath>
+
+#include "ScopeContext.h"
 
 // Experimental code. See issue #399
 #if 0

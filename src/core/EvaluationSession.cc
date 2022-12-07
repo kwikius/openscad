@@ -23,10 +23,10 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+#include <utils/printutils.h>
 
 #include "ContextFrame.h"
 #include "EvaluationSession.h"
-#include "printutils.h"
 
 size_t EvaluationSession::push_frame(ContextFrame *frame)
 {

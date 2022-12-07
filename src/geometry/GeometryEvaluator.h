@@ -6,8 +6,9 @@
 #include <vector>
 #include <map>
 
-#include "NodeVisitor.h"
-#include "enums.h"
+#include <core/NodeVisitor.h>
+#include <core/enums.h>
+
 #include "Geometry.h"
 
 class GeometryEvaluator : public NodeVisitor

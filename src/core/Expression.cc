@@ -33,17 +33,17 @@
 #include <forward_list>
 #include <variant>
 
-#include "boost-utils.h"
 #include <boost/assign/std/vector.hpp>
+
+#include <utils/boost-utils.h>
+#include <utils/printutils.h>
+#include <utils/exceptions.h>
+#include <utils/compiler_specific.h>
+#include <utils/StackCheck.h>
 
 #include "Parameters.h"
 #include "Arguments.h"
-#include "printutils.h"
-#include "StackCheck.h"
-#include "exceptions.h"
 #include "expression/expressions.h"
-
-#include "compiler_specific.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 

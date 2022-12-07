@@ -4,13 +4,14 @@ Copyright (C) Andy Little (kwikius@yahoo.com) 10/10/2022  initial revision
 Copyright (C) Andy Little (kwikius@yahoo.com) 12/12/2022  fix https://github.com/kwikius/openscad/issues/2
 https://github.com/openscad/openscad/blob/master/COPYING
 */
+#include <set>
 
-#include "printutils.h"
+#include <utils/printutils.h>
+
 #include "ModuleReference.h"
-#include "Value.h"
 #include "Context.h"
 #include "Expression.h"
-#include <set>
+
 
 Value ModuleReference::operator==(const ModuleReference& other) const {
   return this->getUniqueID() == other.getUniqueID();

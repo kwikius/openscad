@@ -3,7 +3,7 @@
 #include <string>
 #include <boost/optional.hpp>
 
-#include "AST.h"
+#include <core/Location.h>
 
 class PolySet *import_stl(const std::string& filename, const Location& loc);
 

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+
 #include <boost/optional.hpp>
 
 #include "ContextMemoryManager.h"

@@ -3,9 +3,10 @@
 %{
     #include <sstream>
     #include <string>
-    #include "expression/expressions.h"
 
-    #include "printutils.h"
+    #include <core/expression/expressions.h>
+    #include <core/utils/printutils.h>
+
     #include "CommentParser.h"
 
     #ifdef _MSC_VER

@@ -1,16 +1,18 @@
 #pragma once
 
+#include <sstream>
+
+#include <boost/cast.hpp>
+#include <boost/logic/tribool.hpp>
 #include <boost/filesystem.hpp>
+
 #include "printutils.h"
+
 namespace fs = boost::filesystem;
 
 fs::path boostfs_normalize(const fs::path& path);
 fs::path boostfs_uncomplete(fs::path const p, fs::path const base);
 
-#include <boost/cast.hpp>
-#include <sstream>
-
-#include <boost/logic/tribool.hpp>
 BOOST_TRIBOOL_THIRD_STATE(unknown)
 
 /* Convert number types but print WARNING for failures during

@@ -1,7 +1,10 @@
-#include "parsersettings.h"
-#include <boost/filesystem.hpp>
+
+
 #include <boost/algorithm/string.hpp>
-#include "PlatformUtils.h"
+
+#include <platform/PlatformUtils.h>
+
+#include "parsersettings.h"
 
 namespace fs = boost::filesystem;
 

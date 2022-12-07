@@ -24,17 +24,19 @@
  *
  */
 
+#include <boost/assign/std/vector.hpp>
+
+#include <utils/printutils.h>
+
 #include "Children.h"
 #include "module.h"
 #include "ModuleInstantiation.h"
 #include "Parameters.h"
-#include "printutils.h"
 #include "Builtins.h"
-
-#include "TextNode.h"
 #include "FreetypeRenderer.h"
 
-#include <boost/assign/std/vector.hpp>
+#include "TextNode.h"
+
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 static std::shared_ptr<AbstractNode> builtin_text(const ModuleInstantiation *inst, Arguments arguments, Children children)

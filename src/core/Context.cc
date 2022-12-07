@@ -23,11 +23,13 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+#include <boost/filesystem.hpp>
+
+#include <utils/printutils.h>
 
 #include "Context.h"
 #include "function.h"
-#include "printutils.h"
-#include <boost/filesystem.hpp>
+
 namespace fs = boost::filesystem;
 
 Context::Context(EvaluationSession *session) :

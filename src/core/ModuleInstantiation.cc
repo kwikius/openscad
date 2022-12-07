@@ -4,15 +4,15 @@ Copyright (C) Andy Little (kwikius@yahoo.com) 10/10/2022  initial revision modul
 https://github.com/openscad/openscad/blob/master/COPYING
 */
 
-
-#include "ModuleInstantiation.h"
-#include "module.h"
-#include "Context.h"
-#include "exceptions.h"
-#include "printutils.h"
 #include <boost/filesystem.hpp>
 
-#include "compiler_specific.h"
+#include <utils/exceptions.h>
+#include <utils/printutils.h>
+#include <utils/compiler_specific.h>
+
+#include "module.h"
+#include "Context.h"
+#include "ModuleInstantiation.h"
 
 namespace fs = boost::filesystem;
 

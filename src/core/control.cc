@@ -24,6 +24,8 @@
  *
  */
 
+#include <cstdint>
+
 #include "module.h"
 #include "ModuleInstantiation.h"
 #include "node.h"
@@ -32,8 +34,7 @@
 #include "expression/expressions.h"
 #include "Builtins.h"
 #include "Parameters.h"
-#include "printutils.h"
-#include <cstdint>
+#include "utils/printutils.h"
 
 static std::shared_ptr<AbstractNode> lazyUnionNode(const ModuleInstantiation *inst)
 {

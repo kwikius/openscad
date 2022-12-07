@@ -2,8 +2,10 @@
 
 #include <stdexcept>
 #include <sstream>
-#include "AST.h"
-#include "printutils.h"
+
+#include <core/Location.h>
+
+#include <utils/printutils.h>
 
 class EvaluationException : public std::runtime_error
 {

@@ -1,10 +1,11 @@
-#include "NodeDumper.h"
-#include "State.h"
-#include "ModuleInstantiation.h"
+
 #include <string>
 #include <sstream>
 #include <boost/regex.hpp>
 
+#include "NodeDumper.h"
+#include "State.h"
+#include "ModuleInstantiation.h"
 
 void GroupNodeChecker::incChildCount(int groupNodeIndex) {
   auto search = this->groupChildCounts.find(groupNodeIndex);

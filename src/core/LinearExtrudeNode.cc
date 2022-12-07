@@ -24,23 +24,26 @@
  *
  */
 
-#include "LinearExtrudeNode.h"
+#include <cmath>
+#include <sstream>
+#include <boost/assign/std/vector.hpp>
+#include <boost/filesystem.hpp>
+
+#include <handle_dep.h>
+
+#include <utils/printutils.h>
+#include <io/fileutils.h>
 
 #include "module.h"
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Parameters.h"
-#include "printutils.h"
-#include "fileutils.h"
 #include "Builtins.h"
-#include "handle_dep.h"
+#include "LinearExtrudeNode.h"
 
-#include <cmath>
-#include <sstream>
-#include <boost/assign/std/vector.hpp>
 using namespace boost::assign; // bring 'operator+=()' into scope
 
-#include <boost/filesystem.hpp>
+
 namespace fs = boost::filesystem;
 
 /*

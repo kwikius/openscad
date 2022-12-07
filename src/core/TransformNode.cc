@@ -24,18 +24,23 @@
  *
  */
 
-#include "TransformNode.h"
+#include <sstream>
+#include <vector>
+#include <cassert>
+
+#include <boost/assign/std/vector.hpp>
+
+#include <utils/printutils.h>
+#include <utils/degree_trig.h>
+
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Builtins.h"
 #include "Value.h"
 #include "Parameters.h"
-#include "printutils.h"
-#include "degree_trig.h"
-#include <sstream>
-#include <vector>
-#include <cassert>
-#include <boost/assign/std/vector.hpp>
+
+#include "TransformNode.h"
+
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 enum class transform_type_e {

@@ -7,10 +7,11 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <stack>
 #include <algorithm>
 
+#include <Feature.h>
+
 #include "../ModuleReference.h"
 #include "../LocalScope.h"
 #include "../UserModule.h"
-#include "../Feature.h"
 
 #include "ModuleLiteral.h"
 #include "Literal.h"

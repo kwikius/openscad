@@ -4,8 +4,8 @@
 #include <list>
 #include <vector>
 #include <cstddef>
+
 #include "NodeVisitor.h"
-#include "memory.h"
 #include "CSGNode.h"
 
 class CSGTreeEvaluator : public NodeVisitor
@@ -26,23 +26,23 @@ public:
   Response visit(State& state, const class RenderNode& node) override;
   Response visit(State& state, const class CgalAdvNode& node) override;
 
-  shared_ptr<class CSGNode> buildCSGTree(const AbstractNode& node);
+  std::shared_ptr<class CSGNode> buildCSGTree(const AbstractNode& node);
 
-  const shared_ptr<CSGNode>& getRootNode() const {
+  const std::shared_ptr<CSGNode>& getRootNode() const {
     return this->rootNode;
   }
-  const std::vector<shared_ptr<CSGNode>>& getHighlightNodes() const {
+  const std::vector<std::shared_ptr<CSGNode>>& getHighlightNodes() const {
     return this->highlightNodes;
   }
-  const std::vector<shared_ptr<CSGNode>>& getBackgroundNodes() const {
+  const std::vector<std::shared_ptr<CSGNode>>& getBackgroundNodes() const {
     return this->backgroundNodes;
   }
 
 private:
   void addToParent(const State& state, const AbstractNode& node);
   void applyToChildren(State& state, const AbstractNode& node, OpenSCADOperator op);
-  shared_ptr<CSGNode> evaluateCSGNodeFromGeometry(State& state,
-                                                  const shared_ptr<const class Geometry>& geom,
+  std::shared_ptr<CSGNode> evaluateCSGNodeFromGeometry(State& state,
+                                                  const std::shared_ptr<const class Geometry>& geom,
                                                   const class ModuleInstantiation *modinst,
                                                     const AbstractNode& node);
   void applyBackgroundAndHighlight(State& state, const AbstractNode& node);
@@ -53,8 +53,8 @@ private:
 protected:
   const Tree& tree;
   class GeometryEvaluator *geomevaluator;
-  shared_ptr<CSGNode> rootNode;
-  std::vector<shared_ptr<CSGNode>> highlightNodes;
-  std::vector<shared_ptr<CSGNode>> backgroundNodes;
-  std::map<int, shared_ptr<CSGNode>> stored_term; // The term evaluated from each node index
+  std::shared_ptr<CSGNode> rootNode;
+  std::vector<std::shared_ptr<CSGNode>> highlightNodes;
+  std::vector<std::shared_ptr<CSGNode>> backgroundNodes;
+  std::map<int, std::shared_ptr<CSGNode>> stored_term; // The term evaluated from each node index
 };

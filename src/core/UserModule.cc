@@ -24,16 +24,20 @@
  *
  */
 
-#include "UserModule.h"
+#include <sstream>
+
+#include <utils/exceptions.h>
+#include <utils/printutils.h>
+#include <utils/compiler_specific.h>
+#include <utils/StackCheck.h>
+
 #include "ModuleInstantiation.h"
 #include "node.h"
-#include "exceptions.h"
-#include "StackCheck.h"
+
 #include "ScopeContext.h"
 #include "Expression.h"
-#include "printutils.h"
-#include "compiler_specific.h"
-#include <sstream>
+
+#include "UserModule.h"
 
 std::vector<std::string> StaticModuleNameStack::stack;
 

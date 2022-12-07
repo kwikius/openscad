@@ -1,13 +1,13 @@
 #pragma once
+#include <vector>
+#include <string>
+
+#include <utils/boost-utils.h>
 
 #include "Geometry.h"
 #include "linalg.h"
 #include "GeometryUtils.h"
 #include "Polygon2d.h"
-#include "boost-utils.h"
-
-#include <vector>
-#include <string>
 
 class PolySet : public Geometry
 {

@@ -1,7 +1,8 @@
 #pragma once
 
+#include <geometry/linalg.h>
+
 #include "node.h"
-#include "linalg.h"
 
 class TransformNode : public AbstractNode
 {

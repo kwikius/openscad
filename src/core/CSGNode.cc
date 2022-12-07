@@ -24,16 +24,14 @@
  *
  */
 
-#include "CSGNode.h"
-#include "Geometry.h"
-#include "linalg.h"
-
 #include <numeric>
 #include <sstream>
 #include <stack>
 #include <tuple>
 
 #include <boost/range/iterator_range.hpp>
+
+#include "CSGNode.h"
 
 /*!
    \class CSGNode

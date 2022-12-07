@@ -28,7 +28,6 @@
 #include <iostream>
 #include <algorithm>
 
-#include "Polygon2d.h"
 #include "DrawingCallback.h"
 
 DrawingCallback::DrawingCallback(unsigned long fn, double size) :

@@ -24,32 +24,38 @@
  *
  */
 
-#include "module.h"
-#include "ModuleInstantiation.h"
-#include "node.h"
-#include "PolySet.h"
-#include "Builtins.h"
-#include "Children.h"
-#include "Parameters.h"
-#include "printutils.h"
-#include "fileutils.h"
-#include "handle_dep.h"
-#include "ext/lodepng/lodepng.h"
-
 #include <cstdint>
 #include <sstream>
 #include <fstream>
 #include <unordered_map>
+
 #include <boost/functional/hash.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/assign/std/vector.hpp>
+#include <boost/filesystem.hpp>
+
+#include <handle_dep.h>
+
+#include <ext/lodepng/lodepng.h>
+
+#include <utils/printutils.h>
+
+#include <io/fileutils.h>
+
+#include <geometry/PolySet.h>
+
+#include "module.h"
+#include "ModuleInstantiation.h"
+#include "node.h"
+#include "Parameters.h"
+#include "Builtins.h"
+#include "Children.h"
+
 using namespace boost::assign; // bring 'operator+=()' into scope
 
-#include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
-
 
 typedef struct img_data_t
 {

@@ -23,20 +23,24 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+
+#include <utils/printutils.h>
+#include <utils/exceptions.h>
+
+#include "StatCache.h"
+#include "FontCache.h"
+#include <sys/stat.h>
 
 #include "SourceFile.h"
 #include "SourceFileCache.h"
 #include "node.h"
-#include "printutils.h"
-#include "exceptions.h"
+
 #include "ScopeContext.h"
 #include "parsersettings.h"
-#include "StatCache.h"
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
+
 namespace fs = boost::filesystem;
-#include "FontCache.h"
-#include <sys/stat.h>
 
 SourceFile::SourceFile(const std::string& path, const std::string& filename)
   : ASTNode(Location::NONE), is_handling_dependencies(false), path(path), filename(filename)

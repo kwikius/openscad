@@ -1,7 +1,8 @@
 #pragma once
 
+#include <geometry/Geometry.h>
+
 #include "cgal.h"
-#include "Geometry.h"
 
 class CGAL_Nef_polyhedron : public Geometry
 {

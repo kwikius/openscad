@@ -27,10 +27,11 @@
 // Trigonometry function taking degrees, accurate for 30, 45, 60 and 90, etc.
 //
 #define _USE_MATH_DEFINES
+
 #include <cmath>
 #include <limits>
 
-#include "degree_trig.h"
+#include <geometry/degree_trig.h>
 
 static inline double rad2deg(double x)
 {

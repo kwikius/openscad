@@ -2,7 +2,8 @@
 
 #include <functional>
 #include <string>
-#include "Feature.h"
+
+#include <Feature.h>
 
 class AbstractNode;
 class Arguments;

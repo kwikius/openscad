@@ -24,20 +24,25 @@
  *
  */
 
+
+#include <cctype>
+#include <sstream>
+#include <iterator>
+#include <unordered_map>
+
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/assign/std/vector.hpp>
+#include <boost/assign/list_of.hpp>
+
+#include <utils/printutils.h>
+
 #include "ColorNode.h"
 #include "module.h"
 #include "ModuleInstantiation.h"
 #include "Builtins.h"
 #include "Children.h"
 #include "Parameters.h"
-#include "printutils.h"
-#include <cctype>
-#include <sstream>
-#include <iterator>
-#include <unordered_map>
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/assign/std/vector.hpp>
-#include <boost/assign/list_of.hpp>
+
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 // Colors extracted from https://drafts.csswg.org/css-color/ on 2015-08-02

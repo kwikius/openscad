@@ -25,13 +25,15 @@
  */
 #pragma once
 
+#include <hb.h>
+#include <ft2build.h>
+
 #include <string>
 #include <vector>
 #include <ostream>
 
 #include "Parameters.h"
-#include <hb.h>
-#include <ft2build.h>
+
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 

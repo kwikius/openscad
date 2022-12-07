@@ -6,10 +6,10 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <typeinfo>
 #include <boost/regex.hpp>
 
-#include "MemberLookup.h"
-#include "../Context.h"
+#include <utils/printutils.h>
 
-#include "../../utils/printutils.h"
+#include "../Context.h"
+#include "MemberLookup.h"
 
 MemberLookup::MemberLookup(Expression *expr, const std::string& member, const Location& loc)
   : Expression(loc), expr(expr), member(member) {}

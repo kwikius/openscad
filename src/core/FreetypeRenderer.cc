@@ -32,12 +32,13 @@
 
 #include <fontconfig/fontconfig.h>
 
-#include "printutils.h"
+#include <FontCache.h>
 
-#include "FontCache.h"
+#include <utils/printutils.h>
+#include <utils/calc.h>
+
 #include "DrawingCallback.h"
 #include "FreetypeRenderer.h"
-#include "calc.h"
 
 #include FT_OUTLINE_H
 
