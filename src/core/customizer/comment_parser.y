@@ -3,9 +3,11 @@
 %{
     #include <sstream>
     #include <string>
-    #include "Expression.h"
+    #include "expression/expressions.h"
+
     #include "printutils.h"
     #include "CommentParser.h"
+
     #ifdef _MSC_VER
     #define strdup _strdup
     #endif

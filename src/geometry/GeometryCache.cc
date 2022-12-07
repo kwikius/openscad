@@ -11,7 +11,7 @@
 
 GeometryCache *GeometryCache::inst = nullptr;
 
-shared_ptr<const Geometry> GeometryCache::get(const std::string& id) const
+std::shared_ptr<const Geometry> GeometryCache::get(const std::string& id) const
 {
   const auto& geom = this->cache[id]->geom;
 #ifdef DEBUG

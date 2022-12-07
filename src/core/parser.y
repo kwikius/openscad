@@ -52,12 +52,8 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "ModuleInstantiation.h"
 #include "Assignment.h"
 #include "expression/expressions.h"
-#include "ModuleLiteral.h"
-#include "MemberLookup.h"
 #include "function.h"
 #include "printutils.h"
-
-//namespace fs = boost::filesystem;
 
 #define YYMAXDEPTH 20000
 #define LOC(loc) Location(loc.first_line, loc.first_column, loc.last_line, loc.last_column, sourcefile())
@@ -215,7 +211,7 @@ statement
         | TOK_FUNCTION TOK_ID '(' parameters ')' '=' expr ';'
             {
               scope_stack.top()->addFunction(
-                make_shared<UserFunction>($2, *$4, std::shared_ptr<Expression>($7), LOCD("function", @$))
+                std::make_shared<UserFunction>($2, *$4, std::shared_ptr<Expression>($7), LOCD("function", @$))
               );
               free($2);
               delete $4;

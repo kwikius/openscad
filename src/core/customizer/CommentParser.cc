@@ -1,5 +1,6 @@
+
 #include "CommentParser.h"
-#include "Expression.h"
+#include "expression/Literal.h"
 #include "Annotation.h"
 #include <string>
 #include <vector>
@@ -282,7 +283,7 @@ void CommentParser::collectParameters(const std::string& fulltext, SourceFile *r
     AnnotationList *annotationList = new AnnotationList();
 
     // Extracting the parameter comment
-    shared_ptr<Expression> params;
+    std::shared_ptr<Expression> params;
     std::string comment = getComment(fulltext, firstLine);
     if (comment.length() > 0) { // don't parse what doesn't exist, so we don't get bogus errors from the parser
       // getting the node for parameter annotation
