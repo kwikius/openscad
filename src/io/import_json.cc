@@ -25,11 +25,13 @@
  */
 
 #include <fstream>
-#include <json.hpp>
 
-#include "Value.h"
-#include "printutils.h"
-#include "EvaluationSession.h"
+#include <utils/printutils.h>
+
+#include <core/Value.h>
+#include <core/EvaluationSession.h>
+
+#include <ext/json/json.hpp>
 
 using json = nlohmann::json;
 

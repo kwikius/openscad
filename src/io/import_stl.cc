@@ -1,13 +1,16 @@
-#include "import.h"
-#include "PolySet.h"
-#include "printutils.h"
-#include "AST.h"
+
 
 #include <fstream>
 #include <boost/predef.h>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include <geometry/PolySet.h>
+#include <utils/printutils.h>
+#include <core/AST.h>
+
+#include "import.h"
 
 #if !defined(BOOST_ENDIAN_BIG_BYTE_AVAILABLE) && !defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
 #error Byte order undefined or unknown. Currently only BOOST_ENDIAN_BIG_BYTE and BOOST_ENDIAN_LITTLE_BYTE are supported.

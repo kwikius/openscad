@@ -447,20 +447,6 @@ target_include_directories(openscadGUI PRIVATE
 
 target_include_directories(openscadIO PRIVATE
   "src"
-  "src/core"
-  "src/core/customizer"
-  "src/ext/json"
-  "src/ext/lexertl/include"
-  "src/ext/libtess2/Include"
-  "src/geometry"
-  "src/geometry/cgal"
-  "src/glview"
-  "src/glview/preview"
-  "src/glview/cgal"
-  "src/gui"
-  "src/io"
-  "src/platform"
-  "src/utils"
 )
 
 target_include_directories(openscadCORE PRIVATE

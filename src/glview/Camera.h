@@ -15,11 +15,12 @@
    projection, Perspective and Orthogonal.
 
  */
-
-#include "linalg.h"
-#include "ScopeContext.h"
 #include <vector>
+
 #include <Eigen/Geometry>
+
+#include <geometry/linalg.h>
+#include <core/ScopeContext.h>
 
 class Camera
 {

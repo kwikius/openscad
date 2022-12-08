@@ -34,9 +34,10 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <utils/degree_trig.h>
+#include <utils/calc.h>
+
 #include "path.h"
-#include "degree_trig.h"
-#include "calc.h"
 #include "util.h"
 
 namespace libsvg {

@@ -1,10 +1,14 @@
-#include "imageutils.h"
-#include "ext/lodepng/lodepng.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
 #include <iterator>
 #include <algorithm>
+
+#include "imageutils.h"
+
+#include <ext/lodepng/lodepng.h>
+
 
 bool write_png(std::ostream& output, unsigned char *pixels, int width, int height)
 {

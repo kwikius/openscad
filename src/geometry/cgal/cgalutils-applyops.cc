@@ -7,12 +7,7 @@
 #include <queue>
 #include <unordered_set>
 
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/normal_vector_newell_3.h>
-#include <CGAL/Handle_hash_function.h>
-#include <CGAL/config.h>
-#include <CGAL/version.h>
-#include <CGAL/convex_hull_3.h>
+
 
 #include <Feature.h>
 
@@ -25,9 +20,17 @@
 #include <core/progress.h>
 #include <core/node.h>
 
+#include "cgal.h"
+
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/normal_vector_newell_3.h>
+#include <CGAL/Handle_hash_function.h>
+#include <CGAL/config.h>
+#include <CGAL/version.h>
+#include <CGAL/convex_hull_3.h>
+
 #include "CGALHybridPolyhedron.h"
 
-#include "cgal.h"
 #include "cgalutils.h"
 
 namespace CGALUtils {

@@ -1,7 +1,7 @@
 #pragma once
-
-#include <json.hpp>
 #include <variant>
+
+#include <ext/json/json.hpp>
 
 #include "ParameterSet.h"
 

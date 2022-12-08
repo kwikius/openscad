@@ -46,7 +46,7 @@ static bool in_defs = false;
 static shapes_list_t stack;
 static shapes_list_t *shape_list;
 
-using shapes_defs_list_t = std::map<std::string, shared_ptr<shape>>;
+using shapes_defs_list_t = std::map<std::string, std::shared_ptr<shape>>;
 
 #if SVG_DEBUG
 static std::string dump_stack() {
@@ -98,7 +98,7 @@ void processNode(xmlTextReaderPtr reader, shapes_defs_list_t *defs_lookup_list, 
         in_defs = true;
       }
 
-      auto s = shared_ptr<shape>(shape::create_from_name(name));
+      auto s = std::shared_ptr<shape>(shape::create_from_name(name));
       if (s) {
         attr_map_t attrs = read_attributes(reader);
         if (!stack.empty()) {
@@ -159,7 +159,7 @@ void processNode(xmlTextReaderPtr reader, shapes_defs_list_t *defs_lookup_list, 
   {
     attr_map_t attrs;
     attrs["text"] = reinterpret_cast<const char *>(value);
-    auto s = shared_ptr<shape>(shape::create_from_name("data"));
+    auto s = std::shared_ptr<shape>(shape::create_from_name("data"));
     if (!stack.empty()) {
       stack.back()->add_child(s.get());
     }

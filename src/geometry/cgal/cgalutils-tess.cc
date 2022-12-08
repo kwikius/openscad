@@ -1,9 +1,10 @@
 
 #include <utils/printutils.h>
 
+#include "cgal.h"
 #include "cgalutils.h"
 
-//#include "cgal.h"
+
 //#include "tess.h"
 
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>

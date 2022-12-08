@@ -25,11 +25,13 @@
  *
  */
 
+#include "cgal.h"
+
 #include "IndexedMesh.h"
 
 #ifdef ENABLE_CGAL
 
-#include "cgal.h"
+
 #include "cgalutils.h"
 #include "CGAL_Nef_polyhedron.h"
 #include "CGALHybridPolyhedron.h"

@@ -1,7 +1,10 @@
-#include <ApplicationServices/ApplicationServices.h>
-#include <iostream>
-#include "imageutils.h"
+
 #include <cassert>
+#include <iostream>
+
+#include <ApplicationServices/ApplicationServices.h>
+
+#include "imageutils.h"
 
 CGDataConsumerCallbacks dc_callbacks;
 

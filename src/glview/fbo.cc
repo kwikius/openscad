@@ -1,7 +1,10 @@
-#include "fbo.h"
-#include "system-gl.h"
+
 #include <cstdio>
 #include <iostream>
+
+#include "fbo.h"
+#include "system-gl.h"
+
 using namespace std;
 
 fbo_t *fbo_new()

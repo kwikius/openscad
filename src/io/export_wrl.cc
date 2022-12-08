@@ -27,7 +27,7 @@
 
 #ifdef ENABLE_CGAL
 
-#include "IndexedMesh.h"
+#include <geometry/IndexedMesh.h>
 
 void export_wrl(const std::shared_ptr<const Geometry>& geom, std::ostream& output)
 {

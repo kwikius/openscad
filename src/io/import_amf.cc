@@ -23,21 +23,22 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
-#include "PolySet.h"
-#include "printutils.h"
-#include "AST.h"
-
-#ifdef ENABLE_CGAL
-#include "cgalutils.h"
-#endif
-
 #include <sys/types.h>
 #include <map>
 #include <fstream>
 #include <cassert>
 #include <libxml/xmlreader.h>
 #include <boost/filesystem.hpp>
+
+#include <utils/printutils.h>
+
+#include <geometry/PolySet.h>
+
+#include <core/AST.h>
+
+#ifdef ENABLE_CGAL
+#include <geometry/cgal/cgalutils.h>
+#endif
 
 static const std::string text_node("#text");
 static const std::string object("/amf/object");

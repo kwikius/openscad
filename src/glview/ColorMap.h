@@ -3,11 +3,13 @@
 #include <map>
 #include <string>
 #include <list>
-#include "linalg.h"
 
-#include "memory.h"
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
+
+#include <geometry/linalg.h>
+
+//#include "memory.h"
 
 namespace fs = boost::filesystem;
 

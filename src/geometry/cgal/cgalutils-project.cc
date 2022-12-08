@@ -6,13 +6,6 @@
 #include <map>
 #include <queue>
 
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/normal_vector_newell_3.h>
-#include <CGAL/Handle_hash_function.h>
-#include <CGAL/config.h>
-#include <CGAL/version.h>
-#include <CGAL/convex_hull_3.h>
-
 #include <utils/printutils.h>
 #include <utils/svg.h>
 
@@ -21,6 +14,12 @@
 #include <geometry/PolySetUtils.h>
 
 #include "cgal.h"
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/normal_vector_newell_3.h>
+#include <CGAL/Handle_hash_function.h>
+#include <CGAL/config.h>
+#include <CGAL/version.h>
+#include <CGAL/convex_hull_3.h>
 #include "cgalutils.h"
 
 static void add_outline_to_poly(CGAL_Nef_polyhedron2::Explorer& explorer,

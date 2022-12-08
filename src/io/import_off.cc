@@ -1,10 +1,15 @@
-#include "import.h"
-#include "PolySet.h"
-#include "printutils.h"
-#include "AST.h"
+
+
+#include <utils/printutils.h>
+
+#include <geometry/PolySet.h>
+
+#include <core/AST.h>
+
 #ifdef ENABLE_CGAL
-#include "cgalutils.h"
+#include <geometry/cgal/cgalutils.h>
 #endif
+#include "import.h"
 
 PolySet *import_off(const std::string& filename, const Location& loc)
 {

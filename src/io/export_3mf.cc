@@ -28,6 +28,7 @@
 
 #include <geometry/PolySet.h>
 #include <geometry/PolySetUtils.h>
+#include <geometry/cgal/cgal.h>
 #include <geometry/cgal/CGALHybridPolyhedron.h>
 
 #include "export.h"

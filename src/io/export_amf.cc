@@ -28,8 +28,8 @@
 
 #ifdef ENABLE_CGAL
 
-#include <geometry/cgal/CGAL_Nef_polyhedron.h>
 #include <geometry/cgal/cgal.h>
+#include <geometry/cgal/CGAL_Nef_polyhedron.h>
 #include <geometry/cgal/cgalutils.h>
 
 #define QUOTE(x__) # x__

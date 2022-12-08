@@ -25,7 +25,7 @@
  */
 
 #include <iostream>
-#include <json.hpp>
+#include <ext/json/json.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 #include <core/customizer/ParameterObject.h>

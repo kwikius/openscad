@@ -6,14 +6,6 @@
 #include <map>
 #include <queue>
 
-#include <CGAL/Aff_transformation_3.h>
-#include <CGAL/normal_vector_newell_3.h>
-#include <CGAL/Handle_hash_function.h>
-#include <CGAL/Surface_mesh.h>
-#include <CGAL/config.h>
-#include <CGAL/version.h>
-#include <CGAL/convex_hull_3.h>
-
 #include <utils/printutils.h>
 #include <utils/degree_trig.h>
 
@@ -26,6 +18,13 @@
 #include <core/node.h>
 
 #include "cgal.h"
+#include <CGAL/Aff_transformation_3.h>
+#include <CGAL/normal_vector_newell_3.h>
+#include <CGAL/Handle_hash_function.h>
+#include <CGAL/Surface_mesh.h>
+#include <CGAL/config.h>
+#include <CGAL/version.h>
+#include <CGAL/convex_hull_3.h>
 #include "CGALHybridPolyhedron.h"
 #include "cgalutils.h"
 

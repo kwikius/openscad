@@ -24,14 +24,15 @@
  *
  */
 
-#include "export.h"
 #include <utils/printutils.h>
 #include <geometry/Geometry.h>
 
+#include "export.h"
+
 #ifdef ENABLE_CGAL
+#include <geometry/cgal/cgal.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h> // for dumping .nef3
 #include <geometry/cgal/CGAL_Nef_polyhedron.h>
-#include <geometry/cgal/cgal.h>
 #include <geometry/cgal/cgalutils.h>
 
 void export_nefdbg(std::shared_ptr<Geometry const> const & geom, std::ostream& output)

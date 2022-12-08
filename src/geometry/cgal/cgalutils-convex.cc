@@ -3,10 +3,10 @@
 #include <queue>
 #include <unordered_set>
 
+#include "cgal.h"
 #include <CGAL/Plane_3.h>
 #include <CGAL/Surface_mesh.h>
 
-#include "cgal.h"
 #include "cgalutils.h"
 
 namespace CGALUtils {

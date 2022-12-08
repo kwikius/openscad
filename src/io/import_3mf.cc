@@ -24,11 +24,14 @@
  *
  */
 
-#include "PolySet.h"
-#include "Geometry.h"
-#include "printutils.h"
-#include "version_helper.h"
-#include "AST.h"
+#include <utils/printutils.h>
+
+#include <geometry/PolySet.h>
+#include <geometry/Geometry.h>
+
+#include <utils/version_helper.h>
+
+#include <core/AST.h>
 
 #ifdef ENABLE_LIB3MF
 #ifndef LIB3MF_API_2
@@ -51,7 +54,7 @@ const std::string get_lib3mf_version() {
 }
 
 #ifdef ENABLE_CGAL
-#include "cgalutils.h"
+#include <geometry/cgal/cgalutils.h>
 #endif
 
 typedef std::list<std::shared_ptr<PolySet>> polysets_t;

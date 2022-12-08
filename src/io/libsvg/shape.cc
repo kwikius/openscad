@@ -47,8 +47,8 @@
 #include "use.h"
 
 #include "transformation.h"
-#include "degree_trig.h"
-#include "calc.h"
+#include <utils/degree_trig.h>
+#include <utils/calc.h>
 
 namespace libsvg {
 
