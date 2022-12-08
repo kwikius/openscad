@@ -11,7 +11,7 @@
 #ifndef NULLGL
 
 #ifdef ENABLE_CGAL
-#include <glview/CGALRenderer.h>
+#include <glview/cgal/CGALRenderer.h>
 
 static void setupCamera(Camera& cam, const BoundingBox& bbox)
 {
@@ -51,7 +51,7 @@ bool export_png(const std::shared_ptr<const Geometry>& root_geom,
 #include <glview/preview/OpenCSGRenderer.h>
 #include <opencsg.h>
 #endif
-#include "ThrownTogetherRenderer.h"
+#include <glview/preview/ThrownTogetherRenderer.h>
 
 std::unique_ptr<OffscreenView> prepare_preview(Tree& tree, const ViewOptions& options, Camera& camera)
 {

@@ -28,9 +28,10 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+
 #include "calc.h"
-#include "Grid.h"
 #include "degree_trig.h"
+#include <geometry/Grid.h>
 
 // Linear interpolate.  Can replace with std::lerp in C++20
 double Calc::lerp(double a, double b, double t) {

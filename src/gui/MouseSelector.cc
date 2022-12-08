@@ -1,4 +1,4 @@
-#include "system-gl.h"
+#include <glview/system-gl.h>
 #include "MouseSelector.h"
 
 #include <QOpenGLFramebufferObject>

@@ -24,8 +24,8 @@
  *
  */
 #include "OffscreenContext.h"
-#include "printutils.h"
-#include "imageutils.h"
+#include <utils/printutils.h>
+#include <io/imageutils.h>
 #include "system-gl.h"
 #include "fbo.h"
 

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <QStandardItemModel>
+
+#include <utils/printutils.h>
+
 #include "qtgettext.h"
 #include "ui_ErrorLog.h"
-#include "printutils.h"
-#include <QStandardItemModel>
 
 enum errorLog_column {
   group = 0, file, lineNo, message

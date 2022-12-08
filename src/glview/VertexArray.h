@@ -7,9 +7,9 @@
 #include <boost/functional/hash.hpp>
 
 #include "system-gl.h"
-#include "printutils.h"
-#include "linalg.h"
-#include "Feature.h"
+#include <utils/printutils.h>
+#include <geometry/linalg.h>
+#include <Feature.h>
 
 #define GL_ERROR_CHECK() \
   do { \

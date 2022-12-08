@@ -45,15 +45,14 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <sstream>
 
 #include <boost/filesystem.hpp>
-#include "boost-utils.h"
-
-#include "SourceFile.h"
-#include "UserModule.h"
-#include "ModuleInstantiation.h"
-#include "Assignment.h"
-#include "expression/expressions.h"
-#include "function.h"
-#include "printutils.h"
+#include <utils/boost-utils.h>
+#include <utils/printutils.h>
+#include <core/SourceFile.h>
+#include <core/UserModule.h>
+#include <core/ModuleInstantiation.h>
+#include <core/Assignment.h>
+#include <core/expression/expressions.h>
+#include <core/function.h>
 
 #define YYMAXDEPTH 20000
 #define LOC(loc) Location(loc.first_line, loc.first_column, loc.last_line, loc.last_column, sourcefile())

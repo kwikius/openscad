@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "fbo.h"
-#include "system-gl.h"
+#include <glview/system-gl.h>
 
 using namespace std;
 

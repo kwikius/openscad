@@ -10,7 +10,7 @@
 
 #include "GeometryUtils.h"
 #include "ClipperUtils.h"
-#include "RoofNode.h"
+#include <core/RoofNode.h>
 #include "roof_vd.h"
 
 #define RAISE_ROOF_EXCEPTION(message) \

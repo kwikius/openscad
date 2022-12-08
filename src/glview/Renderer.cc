@@ -1,13 +1,14 @@
-#include "Renderer.h"
-#include "PolySet.h"
-#include "Polygon2d.h"
-#include "ColorMap.h"
-#include "printutils.h"
-#include "PlatformUtils.h"
-#include "system-gl.h"
 
-#include <Eigen/LU>
 #include <fstream>
+
+#include "Renderer.h"
+#include <geometry/PolySet.h>
+#include <geometry/Polygon2d.h>
+#include "ColorMap.h"
+#include <utils/printutils.h>
+#include <platform/PlatformUtils.h>
+#include "system-gl.h"
+#include <Eigen/LU>
 
 #ifndef NULLGL
 

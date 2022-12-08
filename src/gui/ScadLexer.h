@@ -39,9 +39,9 @@ private:
 
 /// See original attempt at https://github.com/openscad/openscad/tree/lexertl/src
 
-#include "lexertl/dot.hpp"
-#include "lexertl/generator.hpp"
-#include "lexertl/lookup.hpp"
+#include <ext/lexertl/include/lexertl/dot.hpp>
+#include <ext/lexertl/include/lexertl/generator.hpp>
+#include <ext/lexertl/include/lexertl/lookup.hpp>
 
 #include <Qsci/qscilexercustom.h>
 #include <Qsci/qsciscintilla.h>

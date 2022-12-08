@@ -30,9 +30,9 @@
 #include <QFileDialog>
 #include <QDesktopServices>
 
-#include "version.h"
+#include <version.h>
 #include "UIUtils.h"
-#include "PlatformUtils.h"
+#include <platform/PlatformUtils.h>
 #include "QSettingsCached.h"
 
 #include <boost/property_tree/ptree.hpp>

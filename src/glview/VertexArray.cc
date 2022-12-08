@@ -7,7 +7,7 @@
 #include <functional>
 #include "VertexArray.h"
 
-#include "printutils.h"
+#include <utils/printutils.h>
 
 void addAttributeValues(IAttributeData&) {}
 

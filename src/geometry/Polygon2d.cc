@@ -1,6 +1,6 @@
-#include "Polygon2d.h"
-#include "printutils.h"
 
+#include <utils/printutils.h>
+#include <geometry/Polygon2d.h>
 
 BoundingBox Outline2d::getBoundingBox() const {
   BoundingBox bbox;

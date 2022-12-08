@@ -31,7 +31,7 @@
 
 #include "InputDriverManager.h"
 #include "JoystickInputDriver.h"
-#include "printutils.h"
+#include <utils/printutils.h>
 
 #include <unistd.h>
 #include <linux/input.h>

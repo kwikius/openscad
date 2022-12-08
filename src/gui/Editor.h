@@ -6,8 +6,8 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 #include <QTextEdit>
-#include "IndicatorData.h"
-#include "parameter/ParameterWidget.h"
+#include <core/IndicatorData.h>
+#include <gui/parameter/ParameterWidget.h>
 
 class EditorInterface : public QWidget
 {

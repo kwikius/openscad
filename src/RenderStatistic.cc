@@ -23,16 +23,16 @@
  *
  */
 
-#include <json.hpp>
+#include <ext/json/json.hpp>
 
-#include "printutils.h"
-#include "GeometryCache.h"
-#include "CGALCache.h"
-#include "PolySet.h"
-#include "Polygon2d.h"
+#include <utils/printutils.h>
+#include <geometry/GeometryCache.h>
+#include <geometry/cgal/CGALCache.h>
+#include <geometry/PolySet.h>
+#include <geometry/Polygon2d.h>
 #ifdef ENABLE_CGAL
-#include "CGAL_Nef_polyhedron.h"
-#include "CGALHybridPolyhedron.h"
+#include <geometry/cgal/CGAL_Nef_polyhedron.h>
+#include <geometry/cgal/CGALHybridPolyhedron.h>
 #endif // ENABLE_CGAL
 
 #include "RenderStatistic.h"

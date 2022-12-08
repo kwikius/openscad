@@ -30,7 +30,7 @@
 #include <QMouseEvent>
 #include <QString>
 #include <vector>
-#include "printutils.h"
+#include <utils/printutils.h>
 #include "qtgettext.h" // IWYU pragma: keep
 #include "ui_Console.h"
 

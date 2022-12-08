@@ -11,11 +11,11 @@
 #include <CGAL/Partition_traits_2.h>
 
 #include <boost/shared_ptr.hpp>
+#include <core/RoofNode.h>
 
-#include "GeometryUtils.h"
-#include "ClipperUtils.h"
-#include "RoofNode.h"
-#include "roof_ss.h"
+#include <geometry/GeometryUtils.h>
+#include <geometry/ClipperUtils.h>
+#include <geometry/roof_ss.h>
 
 #define RAISE_ROOF_EXCEPTION(message) \
   throw RoofNode::roof_exception((boost::format("%s line %d: %s") % __FILE__ % __LINE__ % (message)).str());

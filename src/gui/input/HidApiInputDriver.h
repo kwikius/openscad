@@ -29,7 +29,7 @@
 #include <utility>
 #include <hidapi.h>
 
-#include "input/InputDriver.h"
+#include "InputDriver.h"
 
 class HidApiInputDriver : public InputDriver
 {

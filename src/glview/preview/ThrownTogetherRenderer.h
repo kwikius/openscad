@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Renderer.h"
-#include "CSGNode.h"
-
-#include "VBORenderer.h"
+#include <core/CSGNode.h>
+#include <glview/Renderer.h>
+#include <glview/VBORenderer.h>
 
 class TTRVertexState : public VertexState
 {
@@ -44,16 +43,16 @@ public:
 class ThrownTogetherRenderer : public VBORenderer
 {
 public:
-  ThrownTogetherRenderer(shared_ptr<class CSGProducts> root_products,
-                         shared_ptr<CSGProducts> highlight_products,
-                         shared_ptr<CSGProducts> background_products);
+  ThrownTogetherRenderer(std::shared_ptr<class CSGProducts> root_products,
+                         std::shared_ptr<CSGProducts> highlight_products,
+                         std::shared_ptr<CSGProducts> background_products);
   virtual ~ThrownTogetherRenderer();
   void prepare(bool showfaces, bool showedges, const shaderinfo_t *shaderinfo = nullptr) override;
   void draw(bool showfaces, bool showedges, const shaderinfo_t *shaderinfo = nullptr) const override;
 
   BoundingBox getBoundingBox() const override;
 private:
-  void renderCSGProducts(const shared_ptr<CSGProducts>& products, bool showedges = false,
+  void renderCSGProducts(const std::shared_ptr<CSGProducts>& products, bool showedges = false,
                          const Renderer::shaderinfo_t *shaderinfo = nullptr,
                          bool highlight_mode = false, bool background_mode = false,
                          bool fberror = false) const;
@@ -71,9 +70,9 @@ private:
                                    bool background_mode, bool fberror, OpenSCADOperator type) const;
 
   VertexStates vertex_states;
-  shared_ptr<CSGProducts> root_products;
-  shared_ptr<CSGProducts> highlight_products;
-  shared_ptr<CSGProducts> background_products;
+  std::shared_ptr<CSGProducts> root_products;
+  std::shared_ptr<CSGProducts> highlight_products;
+  std::shared_ptr<CSGProducts> background_products;
   GLuint vertices_vbo;
   GLuint elements_vbo;
 };

@@ -33,14 +33,14 @@
 #include <QSettings>
 #include <QTextDocument>
 #include <boost/algorithm/string.hpp>
-#include "GeometryCache.h"
+#include <geometry/GeometryCache.h>
 #include "AutoUpdater.h"
-#include "Feature.h"
+#include <Feature.h>
 #ifdef ENABLE_CGAL
-#include "CGALCache.h"
+#include <geometry/cgal/CGALCache.h>
 #endif
-#include "ColorMap.h"
-#include "RenderSettings.h"
+#include <glview/ColorMap.h>
+#include <glview/RenderSettings.h>
 #include "QSettingsCached.h"
 #include "SettingsWriter.h"
 #include "OctoPrint.h"

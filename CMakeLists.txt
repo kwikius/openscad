@@ -427,22 +427,23 @@ target_include_directories(openscadCGAL PRIVATE
   "src"
 )
 
+#  "src/core"
+#  "src/core/customizer"
+#  "src/ext/json"
+#  "src/ext/lexertl/include"
+#  "src/ext/libtess2/Include"
+#  "src/geometry"
+#  "src/geometry/cgal"
+#  "src/glview"
+#  "src/glview/preview"
+#  "src/glview/cgal"
+#  "src/gui"
+#  "src/io"
+#  "src/platform"
+#  "src/utils"
+
 target_include_directories(openscadGUI PRIVATE
   "src"
-  "src/core"
-  "src/core/customizer"
-  "src/ext/json"
-  "src/ext/lexertl/include"
-  "src/ext/libtess2/Include"
-  "src/geometry"
-  "src/geometry/cgal"
-  "src/glview"
-  "src/glview/preview"
-  "src/glview/cgal"
-  "src/gui"
-  "src/io"
-  "src/platform"
-  "src/utils"
 )
 
 target_include_directories(openscadIO PRIVATE
@@ -455,20 +456,6 @@ target_include_directories(openscadCORE PRIVATE
 
 target_include_directories(${openscadEXECUTABLE} PRIVATE
   "src"
-  "src/core"
-  "src/core/customizer"
-  "src/ext/json"
-  "src/ext/lexertl/include"
-  "src/ext/libtess2/Include"
-  "src/geometry"
-  "src/geometry/cgal"
-  "src/glview"
-  "src/glview/preview"
-  "src/glview/cgal"
-  "src/gui"
-  "src/io"
-  "src/platform"
-  "src/utils"
 )
 
 FLEX_TARGET(openscad_lexer src/core/lexer.l ${OPENSCAD_LIB_OUTPUT_DIR}/lexer.cxx DEFINES_FILE ${OPENSCAD_LIB_OUTPUT_DIR}/lexer.hxx COMPILE_FLAGS ${WINCOMPAT})

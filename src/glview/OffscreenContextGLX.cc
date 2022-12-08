@@ -36,7 +36,7 @@
  */
 
 #include "OffscreenContext.h"
-#include "printutils.h"
+#include <utils/printutils.h>
 #include "fbo.h"
 
 #include <GL/gl.h>

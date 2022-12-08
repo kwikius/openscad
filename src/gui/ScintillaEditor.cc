@@ -11,7 +11,7 @@
 
 #include "ScintillaEditor.h"
 #include "Preferences.h"
-#include "PlatformUtils.h"
+#include <platform/PlatformUtils.h>
 #include "Settings.h"
 #include "ScadLexer.h"
 

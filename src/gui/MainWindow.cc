@@ -25,45 +25,49 @@
  */
 #include <iostream>
 
-#include "boost-utils.h"
+#include <openscad.h>
+#include <utils/printutils.h>
+#include <utils/boost-utils.h>
 
-#include "BuiltinContext.h"
-#include "CommentParser.h"
-#include "openscad.h"
-#include "GeometryCache.h"
-#include "SourceFileCache.h"
+#include <core/BuiltinContext.h>
+#include <core/customizer/CommentParser.h>
+#include <core/SourceFileCache.h>
+#include <core/parsersettings.h>
+
+#include <geometry/GeometryCache.h>
+
+#include <glview/RenderSettings.h>
+
+#include <core/node.h>
+#include <core/CSGNode.h>
+#include <core/Expression.h>
+#include <core/ScopeContext.h>
+#include <core/progress.h>
+
+#include <io/dxfdim.h>
+
 #include "MainWindow.h"
 #include "OpenSCADApp.h"
-#include "parsersettings.h"
-#include "RenderSettings.h"
 #include "Preferences.h"
-#include "printutils.h"
-#include "node.h"
-#include "CSGNode.h"
-
-#include "Expression.h"
-#include "ScopeContext.h"
-#include "progress.h"
-#include "dxfdim.h"
 #include "Settings.h"
 #include "AboutDialog.h"
 #include "FontListDialog.h"
 #include "LibraryInfoDialog.h"
 #include "ScintillaEditor.h"
 #ifdef ENABLE_OPENCSG
-#include "CSGTreeEvaluator.h"
-#include "OpenCSGRenderer.h"
+#include <core/CSGTreeEvaluator.h>
+#include <glview/preview/OpenCSGRenderer.h>
 #include <opencsg.h>
 #endif
 #include "ProgressWidget.h"
-#include "ThrownTogetherRenderer.h"
-#include "CSGTreeNormalizer.h"
+#include <glview/preview/ThrownTogetherRenderer.h>
+#include <glview/preview/CSGTreeNormalizer.h>
 #include "QGLView.h"
 #include "MouseSelector.h"
 #ifdef Q_OS_MAC
 #include "CocoaUtils.h"
 #endif
-#include "PlatformUtils.h"
+#include <platform/PlatformUtils.h>
 #ifdef OPENSCAD_UPDATER
 #include "AutoUpdater.h"
 #endif
@@ -104,19 +108,21 @@
 
 #include <fstream>
 
+#include <cstdio>
+#include <memory>
 #include <algorithm>
 #include <boost/version.hpp>
 #include <sys/stat.h>
 
 #ifdef ENABLE_CGAL
 
-#include "cgal.h"
-#include "cgalutils.h"
-#include "CGALCache.h"
-#include "GeometryEvaluator.h"
-#include "CGALRenderer.h"
-#include "CGAL_Nef_polyhedron.h"
-#include "CGALHybridPolyhedron.h"
+#include <geometry/cgal/cgal.h>
+#include <geometry/cgal/cgalutils.h>
+#include <geometry/cgal/CGALCache.h>
+#include <geometry/GeometryEvaluator.h>
+#include <glview/cgal/CGALRenderer.h>
+#include <geometry/cgal/CGAL_Nef_polyhedron.h>
+#include <geometry/cgal/CGALHybridPolyhedron.h>
 #include "CGALWorker.h"
 
 #endif // ENABLE_CGAL
@@ -124,8 +130,7 @@
 #include "PrintInitDialog.h"
 #include "input/InputDriverEvent.h"
 #include "input/InputDriverManager.h"
-#include <cstdio>
-#include <memory>
+
 #include <QtNetwork>
 
 #include "qt-obsolete.h" // IWYU pragma: keep
@@ -1321,7 +1326,7 @@ void MainWindow::compileCSG()
       }
     }
 
-    const std::vector<shared_ptr<CSGNode>>& highlight_terms = csgrenderer.getHighlightNodes();
+    const std::vector<std::shared_ptr<CSGNode>>& highlight_terms = csgrenderer.getHighlightNodes();
     if (highlight_terms.size() > 0) {
       LOG(message_group::None, Location::NONE, "", "Compiling highlights (%1$d CSG Trees)...", highlight_terms.size());
       this->processEvents();
@@ -2436,7 +2441,7 @@ void MainWindow::actionCheckValidity()
   }
 
   bool valid = false;
-  if (auto hybrid = dynamic_pointer_cast<const CGALHybridPolyhedron>(this->root_geom)) {
+  if (auto hybrid = std::dynamic_pointer_cast<const CGALHybridPolyhedron>(this->root_geom)) {
     valid = hybrid->isValid();
   } else if (auto N = CGALUtils::getNefPolyhedronFromGeometry(this->root_geom)) {
     valid = N->p3 ? const_cast<CGAL_Nef_polyhedron3&>(*N->p3).is_valid() : false;

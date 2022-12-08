@@ -6,7 +6,7 @@
 #ifdef ENABLE_OPENCSG
 #include <opencsg.h>
 #endif
-#include "CSGNode.h"
+#include <core/CSGNode.h>
 #include "VertexArray.h"
 #include <unordered_map>
 #include <boost/functional/hash.hpp>

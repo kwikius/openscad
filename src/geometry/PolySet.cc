@@ -23,13 +23,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
-#include "PolySet.h"
-#include "PolySetUtils.h"
-#include "linalg.h"
-#include "printutils.h"
-#include "Grid.h"
 #include <Eigen/LU>
+#include <utils/printutils.h>
+#include <geometry/PolySet.h>
+#include <geometry/PolySetUtils.h>
+#include <geometry/linalg.h>
+#include <geometry/Grid.h>
 
 /*! /class PolySet
 

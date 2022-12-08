@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Editor.h"
-#include "export.h"
-#include "RenderStatistic.h"
+#include <io/export.h>
+#include <RenderStatistic.h>
 #include "TabManager.h"
-#include "Tree.h"
+#include <core/Tree.h>
 #include "UIUtils.h"
 #include "qtgettext.h" // IWYU pragma: keep
 #include "ui_MainWindow.h"
@@ -51,7 +51,7 @@ public:
   TabManager *tabManager;
 
 #ifdef ENABLE_CGAL
-  shared_ptr<const class Geometry> root_geom;
+  std::shared_ptr<const class Geometry> root_geom;
   class CGALRenderer *cgalRenderer;
 #endif
 #ifdef ENABLE_OPENCSG
@@ -343,11 +343,11 @@ private:
   static QElapsedTimer *progressThrottle;
   QWidget *lastFocus; // keep track of active copyable widget (Editor|Console) for global menu action Edit->Copy
 
-  shared_ptr<class CSGNode> csgRoot; // Result of the CSGTreeEvaluator
-  shared_ptr<CSGNode> normalizedRoot; // Normalized CSG tree
-  shared_ptr<class CSGProducts> root_products;
-  shared_ptr<CSGProducts> highlights_products;
-  shared_ptr<CSGProducts> background_products;
+  std::shared_ptr<class CSGNode> csgRoot; // Result of the CSGTreeEvaluator
+  std::shared_ptr<CSGNode> normalizedRoot; // Normalized CSG tree
+  std::shared_ptr<class CSGProducts> root_products;
+  std::shared_ptr<CSGProducts> highlights_products;
+  std::shared_ptr<CSGProducts> background_products;
 
   char const *afterCompileSlot;
   bool procevents;

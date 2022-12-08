@@ -26,10 +26,10 @@
 
 #include <QWidget>
 #include "ButtonConfigWidget.h"
-#include "Settings.h"
-#include "input/InputDriverManager.h"
-#include "SettingsWriter.h"
-#include "IgnoreWheelWhenNotFocused.h"
+#include <gui/Settings.h>
+#include "InputDriverManager.h"
+#include <gui/SettingsWriter.h>
+#include <gui/IgnoreWheelWhenNotFocused.h>
 
 ButtonConfigWidget::ButtonConfigWidget(QWidget *parent) : QWidget(parent)
 {

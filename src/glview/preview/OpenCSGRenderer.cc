@@ -23,12 +23,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
-#include "system-gl.h"
-#include "memory.h"
+#include <memory>
+#include <Feature.h>
+#include <glview/system-gl.h>
+#include <geometry/PolySet.h>
 #include "OpenCSGRenderer.h"
-#include "PolySet.h"
-#include "Feature.h"
 
 #ifdef ENABLE_OPENCSG
 
@@ -119,7 +118,7 @@ void OpenCSGRenderer::draw(bool /*showfaces*/, bool showedges, const shaderinfo_
 OpenCSGPrim *OpenCSGRenderer::createCSGPrimitive(const CSGChainObject& csgobj, OpenCSG::Operation operation, bool highlight_mode, bool background_mode, OpenSCADOperator type) const
 {
   OpenCSGPrim *prim = new OpenCSGPrim(operation, csgobj.leaf->geom->getConvexity(), *this);
-  std::shared_ptr<const PolySet> ps = dynamic_pointer_cast<const PolySet>(csgobj.leaf->geom);
+  std::shared_ptr<const PolySet> ps = std::dynamic_pointer_cast<const PolySet>(csgobj.leaf->geom);
   if (ps) {
     prim->geom = ps;
   }

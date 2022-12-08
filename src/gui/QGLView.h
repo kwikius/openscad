@@ -1,13 +1,13 @@
 #pragma once
 
-#include "system-gl.h"
+#include <glview/system-gl.h>
 #include <QtGlobal>
 #include <QOpenGLWidget>
 #include <QLabel>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include "GLView.h"
+#include <glview/GLView.h>
 
 class QGLView : public QOpenGLWidget, public GLView
 {

@@ -8,7 +8,7 @@
 #include <geometry/Reindexer.h>
 
 #ifdef ENABLE_CGAL
-#include "cgalutils.h"
+#include <geometry/cgal/cgalutils.h>
 #endif
 
 #include "PolySetUtils.h"

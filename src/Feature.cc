@@ -6,11 +6,11 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 
-#include "Feature.h"
-#include "printutils.h"
+#include <Feature.h>
+#include <utils/printutils.h>
 
 #ifdef ENABLE_CGAL
-#include "cgal.h" // for FAST_CSG_KERNEL_IS_LAZY
+#include <geometry/cgal/cgal.h> // for FAST_CSG_KERNEL_IS_LAZY
 #endif
 
 /**

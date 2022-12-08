@@ -1,38 +1,42 @@
-#include "GeometryEvaluator.h"
-#include "Tree.h"
-#include "GeometryCache.h"
-#include "CGALCache.h"
-#include "Polygon2d.h"
-#include "ModuleInstantiation.h"
-#include "State.h"
-#include "OffsetNode.h"
-#include "TransformNode.h"
-#include "LinearExtrudeNode.h"
-#include "RoofNode.h"
-#include "roof_ss.h"
-#include "roof_vd.h"
-#include "RotateExtrudeNode.h"
-#include "CgalAdvNode.h"
-#include "ProjectionNode.h"
-#include "CsgOpNode.h"
-#include "TextNode.h"
-#include "CGALHybridPolyhedron.h"
-#include "cgalutils.h"
-#include "RenderNode.h"
-#include "ClipperUtils.h"
-#include "PolySetUtils.h"
-#include "PolySet.h"
-#include "calc.h"
-#include "printutils.h"
-#include "calc.h"
-#include "DxfData.h"
-#include "degree_trig.h"
+
 #include <ciso646> // C alternative tokens (xor)
 #include <algorithm>
-#include "boost-utils.h"
 
 #include <CGAL/convex_hull_2.h>
 #include <CGAL/Point_2.h>
+
+#include <utils/calc.h>
+#include <utils/printutils.h>
+#include <utils/degree_trig.h>
+#include <utils/boost-utils.h>
+
+#include <core/Tree.h>
+#include <core/ModuleInstantiation.h>
+#include <core/State.h>
+#include <core/OffsetNode.h>
+#include <core/TransformNode.h>
+#include <core/LinearExtrudeNode.h>
+#include <core/RoofNode.h>
+#include <core/RotateExtrudeNode.h>
+#include <core/CgalAdvNode.h>
+#include <core/ProjectionNode.h>
+#include <core/CsgOpNode.h>
+#include <core/TextNode.h>
+#include <core/RenderNode.h>
+
+#include <io/DxfData.h>
+
+#include <geometry/GeometryEvaluator.h>
+#include <geometry/GeometryCache.h>
+#include <geometry/cgal/CGALCache.h>
+#include <geometry/Polygon2d.h>
+#include <geometry/roof_ss.h>
+#include <geometry/roof_vd.h>
+#include <geometry/cgal/CGALHybridPolyhedron.h>
+#include <geometry/cgal/cgalutils.h>
+#include <geometry/ClipperUtils.h>
+#include <geometry/PolySetUtils.h>
+#include <geometry/PolySet.h>
 
 GeometryEvaluator::GeometryEvaluator(const class Tree& tree) :
   tree(tree)

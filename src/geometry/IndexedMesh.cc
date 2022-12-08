@@ -25,18 +25,15 @@
  *
  */
 
-#include "cgal.h"
-
-#include "IndexedMesh.h"
+#include <geometry/cgal/cgal.h>
+#include <geometry/IndexedMesh.h>
 
 #ifdef ENABLE_CGAL
 
-
-#include "cgalutils.h"
-#include "CGAL_Nef_polyhedron.h"
-#include "CGALHybridPolyhedron.h"
-
-#include "PolySet.h"
+#include <geometry/cgal/cgalutils.h>
+#include <geometry/cgal/CGAL_Nef_polyhedron.h>
+#include <geometry/cgal/CGALHybridPolyhedron.h>
+#include <geometry/PolySet.h>
 
 IndexedMesh::IndexedMesh()
   : numfaces(0)

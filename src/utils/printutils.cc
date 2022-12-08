@@ -7,7 +7,6 @@
 #include <boost/filesystem.hpp>
 #include "exceptions.h"
 
-
 namespace fs = boost::filesystem;
 
 std::set<std::string> printedDeprecations;

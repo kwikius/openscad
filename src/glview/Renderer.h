@@ -1,9 +1,11 @@
 #pragma once
 
-#include "linalg.h"
+#include <geometry/linalg.h>
+
+#include <core/enums.h>
+#include <geometry/PolySet.h>
+
 #include "ColorMap.h"
-#include "enums.h"
-#include "PolySet.h"
 
 #ifdef _MSC_VER // NULL
 #include <cstdlib>

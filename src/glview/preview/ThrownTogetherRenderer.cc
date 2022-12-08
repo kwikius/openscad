@@ -26,14 +26,13 @@
 
 #include "ThrownTogetherRenderer.h"
 #include "Feature.h"
-#include "PolySet.h"
-#include "printutils.h"
+#include <geometry/PolySet.h>
+#include <utils/printutils.h>
+#include <glview/system-gl.h>
 
-#include "system-gl.h"
-
-ThrownTogetherRenderer::ThrownTogetherRenderer(shared_ptr<CSGProducts> root_products,
-                                               shared_ptr<CSGProducts> highlight_products,
-                                               shared_ptr<CSGProducts> background_products)
+ThrownTogetherRenderer::ThrownTogetherRenderer(std::shared_ptr<CSGProducts> root_products,
+                                               std::shared_ptr<CSGProducts> highlight_products,
+                                               std::shared_ptr<CSGProducts> background_products)
   : root_products(root_products), highlight_products(highlight_products), background_products(background_products),
   vertices_vbo(0), elements_vbo(0)
 {

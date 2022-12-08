@@ -30,8 +30,8 @@
 #include <QString>
 #include <QtNetwork>
 
-#include "printutils.h"
-#include "PlatformUtils.h"
+#include <utils/printutils.h>
+#include <platform/PlatformUtils.h>
 #include "NetworkSignal.h"
 
 class NetworkException : public std::exception

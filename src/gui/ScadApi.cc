@@ -3,9 +3,9 @@
 #include <QRegularExpression>
 
 #include "ScadApi.h"
-#include "Builtins.h"
+#include <core/Builtins.h>
+#include <core/parsersettings.h>
 #include "ScintillaEditor.h"
-#include "parsersettings.h"
 
 namespace {
 

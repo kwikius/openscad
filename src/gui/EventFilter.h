@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QFileOpenEvent>
+
 #include "OpenSCADApp.h"
 #include "LaunchingScreen.h"
 

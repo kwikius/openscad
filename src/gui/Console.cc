@@ -24,15 +24,18 @@
  *
  */
 
+
 #include <QMenu>
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QRegularExpression>
 #include <QString>
+
+#include <utils/printutils.h>
+
 #include "Console.h"
 #include "MainWindow.h"
-#include "printutils.h"
 #include "Preferences.h"
 #include "UIUtils.h"
 

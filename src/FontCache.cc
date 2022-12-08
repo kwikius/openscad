@@ -30,9 +30,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include "FontCache.h"
-#include "PlatformUtils.h"
-#include "printutils.h"
-#include "version_helper.h"
+#include <platform/PlatformUtils.h>
+#include <utils/printutils.h>
+#include <utils/version_helper.h>
 
 extern std::vector<std::string> librarypath;
 

@@ -26,8 +26,8 @@
 
 #include "Settings.h"
 #include "OctoPrint.h"
-#include "printutils.h"
-#include "PlatformUtils.h"
+#include <utils/printutils.h>
+#include <platform/PlatformUtils.h>
 
 OctoPrint::OctoPrint()
 {

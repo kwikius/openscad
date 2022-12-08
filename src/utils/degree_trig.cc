@@ -31,7 +31,7 @@
 #include <cmath>
 #include <limits>
 
-#include <geometry/degree_trig.h>
+#include "degree_trig.h"
 
 static inline double rad2deg(double x)
 {

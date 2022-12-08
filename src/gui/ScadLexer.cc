@@ -91,13 +91,13 @@ QStringList ScadLexer::autoCompletionWordSeparators() const
 #include <Qsci/qscilexercustom.h>
 #include <Qsci/qsciscintilla.h>
 
-#include "lexertl/generator.hpp"
-#include "lexertl/lookup.hpp"
+#include <ext/lexertl/include/lexertl/generator.hpp>
+#include <ext/lexertl/include/lexertl/lookup.hpp>
 
 //#define DEBUG_LEXERTL   1
 
 #if DEBUG_LEXERTL
-#include "lexertl/debug.hpp"
+#include <ext/lexertl/include/lexertl/debug.hpp>
 #include <fstream>
 #include <iostream>
 #endif
@@ -119,8 +119,8 @@ void Lex::default_rules()
 
   //include and use have a unique syntax
   rules_.push("INITIAL", "use", ekeyword, "PATH");
-  rules_.push("INITIAL", "include", ekeyword, "PATH");  
-  rules_.push("PATH", ".|\n", etext, "INITIAL"); //leave this state; "use" and "include" can also be used as variable names 
+  rules_.push("INITIAL", "include", ekeyword, "PATH");
+  rules_.push("PATH", ".|\n", etext, "INITIAL"); //leave this state; "use" and "include" can also be used as variable names
   rules_.push("PATH", "[ \t\r\n]*<[^>]*>", eQuotedString, "INITIAL");
 
   std::string transformations("translate rotate scale linear_extrude "
@@ -280,13 +280,13 @@ void ScadLexer2::fold(int start, int end)
         levelCurrent--;
       }
     }
-    
+
 
     bool prevStyleIsComment = (prevStyle == Comment);
     bool currStyleIsComment = (currStyle == Comment);
     bool isStartOfComment = (!prevStyleIsComment) && (currStyleIsComment);
     bool isEndOfComment   = (prevStyleIsComment) && (!currStyleIsComment);
-    
+
     if (isStartOfComment) {
       levelCurrent++;
     }

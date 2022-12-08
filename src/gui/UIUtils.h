@@ -28,6 +28,7 @@
 #include <QStringList>
 #include <QFileInfoList>
 #include <boost/filesystem.hpp>
+
 namespace fs = boost::filesystem;
 
 namespace UIUtils {

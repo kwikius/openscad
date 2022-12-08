@@ -1,11 +1,14 @@
-#include "OffscreenView.h"
-#include "system-gl.h"
+
 #include <cmath>
 #include <cstdio>
 #include <string>
 #include <cstdlib>
 #include <sstream>
-#include "printutils.h"
+
+#include <utils/printutils.h>
+
+#include "OffscreenView.h"
+#include "system-gl.h"
 
 OffscreenView::OffscreenView(int width, int height)
 {

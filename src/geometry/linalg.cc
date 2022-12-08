@@ -1,5 +1,8 @@
-#include "linalg.h"
+
 #include <cmath>
+
+#include <geometry/linalg.h>
+
 
 // FIXME: We can achieve better pruning by either:
 // o Recalculate the box based on the transformed object

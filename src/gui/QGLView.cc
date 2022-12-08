@@ -27,8 +27,8 @@
 #include "qtgettext.h"
 #include "QGLView.h"
 #include "Preferences.h"
-#include "Renderer.h"
-#include "degree_trig.h"
+#include <glview/Renderer.h>
+#include <utils/degree_trig.h>
 
 #include <QApplication>
 #include <QWheelEvent>
@@ -50,7 +50,7 @@
 #  include <opencsg.h>
 #endif
 
-#include "qt-obsolete.h" 
+#include "qt-obsolete.h"
 
 QGLView::QGLView(QWidget *parent) : QOpenGLWidget(parent)
 {

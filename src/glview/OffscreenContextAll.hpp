@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <ostream>
-#include "imageutils.h"
+#include <io/imageutils.h>
 
 void bind_offscreen_context(OffscreenContext *ctx)
 {

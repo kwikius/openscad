@@ -2,9 +2,9 @@
 #include "system-gl.h"
 #include "ColorMap.h"
 #include "RenderSettings.h"
-#include "printutils.h"
+#include <utils/printutils.h>
 #include "Renderer.h"
-#include "degree_trig.h"
+#include <utils/degree_trig.h>
 #include <cmath>
 #include <cstdio>
 #ifdef _WIN32
@@ -137,16 +137,16 @@ void GLView::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    //draw screen aligned quad with color gradient 
-    glBegin(GL_QUADS);  
-    glColor3f(bgcol[0], bgcol[1], bgcol[2]);  
+    //draw screen aligned quad with color gradient
+    glBegin(GL_QUADS);
+    glColor3f(bgcol[0], bgcol[1], bgcol[2]);
     glVertex2f(-1.0f, +1.0f);
     glVertex2f(+1.0f, +1.0f);
 
-    glColor3f(bgstopcol[0], bgstopcol[1], bgstopcol[2]);  
+    glColor3f(bgstopcol[0], bgstopcol[1], bgstopcol[2]);
     glVertex2f(+1.0f, -1.0f);
     glVertex2f(-1.0f, -1.0f);
-    glEnd();  
+    glEnd();
     glEnable(GL_DEPTH_TEST);
   }
 

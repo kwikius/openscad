@@ -1,12 +1,12 @@
-#include "GeometryUtils.h"
-#include "ext/libtess2/Include/tesselator.h"
-#include "printutils.h"
-#include "Reindexer.h"
-#include <boost/lexical_cast.hpp>
-#include <unordered_map>
-#include <cmath>
 
+#include <cmath>
+#include <unordered_map>
+#include <boost/lexical_cast.hpp>
 #include <boost/functional/hash.hpp>
+#include <utils/printutils.h>
+#include <ext/libtess2/Include/tesselator.h>
+#include <geometry/GeometryUtils.h>
+#include <geometry/Reindexer.h>
 
 static void *stdAlloc(void *userData, unsigned int size) {
   TESS_NOTUSED(userData);

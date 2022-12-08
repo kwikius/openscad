@@ -30,17 +30,18 @@
 
 %{
 
-#include <glib.h>
-#include "handle_dep.h"
-#include "printutils.h"
-#include "parsersettings.h"
-#include "Assignment.h"
-#include "parser.hxx"
-#include "SourceFile.h"
 #include <assert.h>
+#include <glib.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <handle_dep.h>
+#include <utils/printutils.h>
+#include <core/parsersettings.h>
+#include <core/Assignment.h>
+#include <core/SourceFile.h>
 //#include "boost-utils.h"
+#include "parser.hxx"
+
 namespace fs = boost::filesystem;
 
 //isatty for visual c++ and mingw-cross-env
@@ -97,7 +98,7 @@ extern YYLTYPE parserlloc;
             (loc).last_line++; \
             (loc).last_column = 1; \
         } \
-    } 
+    }
 
 #ifdef DEBUG
 #define YY_USER_ACTION parserlloc.last_column += yyleng; \
@@ -352,7 +353,7 @@ void includefile(const Location& loc)
   }
 
   loc_stack.push_back(parserlloc);
-  LOCATION_INIT(parserlloc);  
+  LOCATION_INIT(parserlloc);
   openfiles.push_back(yyin);
   openfilenames.push_back(fullname);
   filename.clear();
