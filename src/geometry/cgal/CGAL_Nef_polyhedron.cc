@@ -1,8 +1,11 @@
-#include "cgal.h"
+
+#include <utils/printutils.h>
+#include <utils/svg.h>
+
 #include "CGAL_Nef_polyhedron.h"
+
+#include "cgal.h"
 #include "cgalutils.h"
-#include "printutils.h"
-#include "svg.h"
 
 CGAL_Nef_polyhedron::CGAL_Nef_polyhedron(const CGAL_Nef_polyhedron3 *p)
 {

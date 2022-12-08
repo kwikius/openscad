@@ -28,8 +28,9 @@
 #include <json.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#include <core/customizer/ParameterObject.h>
+
 #include "export.h"
-#include "ParameterObject.h"
 
 using json = nlohmann::json;
 

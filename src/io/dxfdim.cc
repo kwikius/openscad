@@ -24,24 +24,30 @@
  *
  */
 
-#include "dxfdim.h"
-#include "Value.h"
-#include "function.h"
-#include "DxfData.h"
-#include "Builtins.h"
-#include "Parameters.h"
-#include "printutils.h"
-#include "fileutils.h"
-#include "handle_dep.h"
-#include "degree_trig.h"
-
 #include <cmath>
 #include <sstream>
 #include <cstdint>
 
 #include <boost/filesystem.hpp>
+
+#include <handle_dep.h>
+
+#include <utils/printutils.h>
+#include <utils/degree_trig.h>
+
+#include <io/fileutils.h>
+
+#include <core/Value.h>
+#include <core/function.h>
+#include <core/Builtins.h>
+#include <core/Parameters.h>
+
+#include "DxfData.h"
+#include "dxfdim.h"
+
 std::unordered_map<std::string, double> dxf_dim_cache;
 std::unordered_map<std::string, std::vector<double>> dxf_cross_cache;
+
 namespace fs = boost::filesystem;
 
 Value builtin_dxf_dim(Arguments arguments, const Location& loc)

@@ -1,12 +1,17 @@
-#include "PolySetUtils.h"
-#include "PolySet.h"
-#include "Polygon2d.h"
-#include "printutils.h"
-#include "GeometryUtils.h"
-#include "Reindexer.h"
+
+
+
+#include <geometry/PolySet.h>
+#include <geometry/Polygon2d.h>
+#include <utils/printutils.h>
+#include <geometry/GeometryUtils.h>
+#include <geometry/Reindexer.h>
+
 #ifdef ENABLE_CGAL
 #include "cgalutils.h"
 #endif
+
+#include "PolySetUtils.h"
 
 namespace PolySetUtils {
 

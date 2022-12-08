@@ -24,17 +24,19 @@
  *
  */
 
-#include "export.h"
-#include "PolySet.h"
-#include "printutils.h"
-#include "Geometry.h"
-
 #include <fstream>
 
 #ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
 #endif
+
+#include <utils/printutils.h>
+
+#include <geometry/PolySet.h>
+#include <geometry/Geometry.h>
+
+#include "export.h"
 
 #define QUOTE(x__) # x__
 #define QUOTED(x__) QUOTE(x__)
@@ -48,7 +50,8 @@ bool canPreview(const FileFormat format) {
           format == FileFormat::PNG);
 }
 
-void exportFile(const std::shared_ptr<const Geometry>& root_geom, std::ostream& output, const ExportInfo& exportInfo)
+void exportFile(const std::shared_ptr<const Geometry>& root_geom,
+   std::ostream& output, const ExportInfo& exportInfo)
 {
   switch (exportInfo.format) {
   case FileFormat::ASCIISTL:

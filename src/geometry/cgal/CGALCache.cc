@@ -1,7 +1,10 @@
-#include "CGALCache.h"
-#include "printutils.h"
+
+#include <utils/printutils.h>
+
 #include "CGAL_Nef_polyhedron.h"
 #include "CGALHybridPolyhedron.h"
+
+#include "CGALCache.h"
 
 CGALCache *CGALCache::inst = nullptr;
 

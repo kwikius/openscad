@@ -1,5 +1,7 @@
-#include "hash.h"
+
 #include <boost/functional/hash.hpp>
+
+#include "hash.h"
 
 namespace std {
 std::size_t hash<Vector3f>::operator()(const Vector3f& s) const {

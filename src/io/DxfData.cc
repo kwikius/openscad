@@ -27,27 +27,28 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include "DxfData.h"
-#include "Grid.h"
-#include "printutils.h"
-#include "calc.h"
-
 #include <fstream>
 #include <cassert>
 #include <unordered_map>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <sstream>
 #include <map>
 
-#include "Value.h"
-#include "boost-utils.h"
-#include "Polygon2d.h"
-#include "printutils.h"
-#include "degree_trig.h"
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 
+#include <utils/printutils.h>
+#include <utils/calc.h>
+#include <utils/degree_trig.h>
+#include <utils/boost-utils.h>
+
+#include <core/Value.h>
+
+#include <geometry/Polygon2d.h>
+#include <geometry/Grid.h>
+
+#include "DxfData.h"
 
 namespace fs = boost::filesystem;
 

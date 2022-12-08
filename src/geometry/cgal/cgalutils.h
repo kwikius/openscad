@@ -1,11 +1,13 @@
 #pragma once
 
-#include "cgal.h"
-#include "PolySet.h"
-#include "CGAL_Nef_polyhedron.h"
-#include "enums.h"
-
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+
+#include <geometry/PolySet.h>
+#include <geometry/cgal/CGAL_Nef_polyhedron.h>
+
+#include <core/enums.h>
+
+#include "cgal.h"
 
 typedef CGAL::Epick K;
 typedef CGAL::Point_3<K> Vertex3K;

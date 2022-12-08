@@ -4,7 +4,8 @@
 #include <functional>
 #include <vector>
 #include <algorithm>
-#include "hash.h" // IWYU pragma: keep
+
+#include <utils/hash.h> // IWYU pragma: keep
 
 /*!
    Reindexes a collection of elements of type T.

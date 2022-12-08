@@ -1,13 +1,16 @@
 #pragma once
 
-#include "linalg.h"
-#include "hash.h"
-#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include <cstdint> // int64_t
 #include <unordered_map>
 #include <utility>
+
+#include <boost/functional/hash.hpp>
+
+#include <utils/hash.h>
+
+#include "linalg.h"
 
 //const double GRID_COARSE = 0.001;
 //const double GRID_FINE   = 0.000001;

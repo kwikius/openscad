@@ -1,7 +1,8 @@
 #pragma once
 
-#include "linalg.h"
 #include <vector>
+
+#include <geometry/linalg.h>
 
 typedef std::vector<Vector3d> Polygon;
 typedef std::vector<Polygon> Polygons;

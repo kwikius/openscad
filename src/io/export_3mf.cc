@@ -24,11 +24,13 @@
  *
  */
 
+#include <utils/printutils.h>
+
+#include <geometry/PolySet.h>
+#include <geometry/PolySetUtils.h>
+#include <geometry/cgal/CGALHybridPolyhedron.h>
+
 #include "export.h"
-#include "PolySet.h"
-#include "PolySetUtils.h"
-#include "printutils.h"
-#include "CGALHybridPolyhedron.h"
 
 #ifdef ENABLE_LIB3MF
 
@@ -53,9 +55,9 @@ using namespace NMR;
 
 #ifdef ENABLE_CGAL
 
-#include "cgal.h"
-#include "cgalutils.h"
-#include "CGAL_Nef_polyhedron.h"
+#include <geometry/cgal/cgal.h>
+#include <geometry/cgal/cgalutils.h>
+#include <geometry/cgal/CGAL_Nef_polyhedron.h>
 
 static void export_3mf_error(const std::string& msg, PLib3MFModel *& model)
 {

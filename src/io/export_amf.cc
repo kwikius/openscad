@@ -27,9 +27,10 @@
 #include "export.h"
 
 #ifdef ENABLE_CGAL
-#include "cgal.h"
-#include "cgalutils.h"
-#include "CGAL_Nef_polyhedron.h"
+
+#include <geometry/cgal/CGAL_Nef_polyhedron.h>
+#include <geometry/cgal/cgal.h>
+#include <geometry/cgal/cgalutils.h>
 
 #define QUOTE(x__) # x__
 #define QUOTED(x__) QUOTE(x__)

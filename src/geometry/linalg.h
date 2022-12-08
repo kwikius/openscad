@@ -1,10 +1,11 @@
 #pragma once
 
+#include <cstdint>
+#include <vector>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
-#include <cstdint>
-#include <vector>
 
 using Eigen::Vector2d;
 using Eigen::Vector3d;

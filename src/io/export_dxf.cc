@@ -24,8 +24,9 @@
  *
  */
 
+#include <geometry/PolySet.h>
+
 #include "export.h"
-#include "PolySet.h"
 
 /*!
     Saves the current Polygon2d as DXF to the given absolute filename.

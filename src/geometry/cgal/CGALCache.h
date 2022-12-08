@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Cache.h"
+#include <Cache.h>
 
 class Geometry;
 
 /*!
  */
-class CGALCache
-{
+class CGALCache{
 public:
   CGALCache(size_t limit = 100 *1024 *1024);
 

@@ -3,31 +3,31 @@
 
 #ifdef ENABLE_CGAL
 
-#include "cgal.h"
-#include "cgalutils.h"
-#include "PolySet.h"
-#include "printutils.h"
-#include "Polygon2d.h"
-#include "PolySetUtils.h"
-#include "node.h"
-#include "degree_trig.h"
+#include <map>
+#include <queue>
 
 #include <CGAL/Aff_transformation_3.h>
 #include <CGAL/normal_vector_newell_3.h>
 #include <CGAL/Handle_hash_function.h>
 #include <CGAL/Surface_mesh.h>
-
 #include <CGAL/config.h>
 #include <CGAL/version.h>
-
 #include <CGAL/convex_hull_3.h>
 
-#include "Reindexer.h"
-#include "GeometryUtils.h"
-#include "CGALHybridPolyhedron.h"
+#include <utils/printutils.h>
+#include <utils/degree_trig.h>
 
-#include <map>
-#include <queue>
+#include <geometry/PolySet.h>
+#include <geometry/Polygon2d.h>
+#include <geometry/PolySetUtils.h>
+#include <geometry/Reindexer.h>
+#include <geometry/GeometryUtils.h>
+
+#include <core/node.h>
+
+#include "cgal.h"
+#include "CGALHybridPolyhedron.h"
+#include "cgalutils.h"
 
 static CGAL_Nef_polyhedron *createNefPolyhedronFromPolySet(const PolySet& ps)
 {

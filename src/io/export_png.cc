@@ -1,14 +1,17 @@
-#include "export.h"
-#include "printutils.h"
-#include "OffscreenView.h"
-#include "CsgInfo.h"
+
 #include <cstdio>
-#include "RenderSettings.h"
+
+#include <utils/printutils.h>
+#include <glview/OffscreenView.h>
+#include <glview/CsgInfo.h>
+#include <glview/RenderSettings.h>
+
+#include "export.h"
 
 #ifndef NULLGL
 
 #ifdef ENABLE_CGAL
-#include "CGALRenderer.h"
+#include <glview/CGALRenderer.h>
 
 static void setupCamera(Camera& cam, const BoundingBox& bbox)
 {
@@ -45,7 +48,7 @@ bool export_png(const std::shared_ptr<const Geometry>& root_geom,
 }
 
 #ifdef ENABLE_OPENCSG
-#include "OpenCSGRenderer.h"
+#include <glview/preview/OpenCSGRenderer.h>
 #include <opencsg.h>
 #endif
 #include "ThrownTogetherRenderer.h"

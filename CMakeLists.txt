@@ -425,15 +425,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON) # (does not propagate down to subdirectories)
 
 target_include_directories(openscadCGAL PRIVATE
   "src"
-  "src/core"
-  "src/core/customizer"
-  "src/geometry"
-  "src/geometry/cgal"
-  "src/platform"
-  "src/io"
-  "src/utils"
-  "src/glview"
-  "src/glview/cgal"
 )
 
 target_include_directories(openscadGUI PRIVATE

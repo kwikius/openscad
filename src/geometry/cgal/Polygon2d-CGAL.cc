@@ -2,14 +2,16 @@
 #include <iostream>
 #include <list>
 
-#include "Polygon2d.h"
-#include "PolySet.h"
-#include "printutils.h"
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 #include <CGAL/Triangulation_face_base_with_info_2.h>
 #include <CGAL/Polygon_2.h>
 #include <CGAL/exceptions.h>
+
+#include <geometry/Polygon2d.h>
+#include <geometry/PolySet.h>
+
+#include <utils/printutils.h>
 
 namespace Polygon2DCGAL {
 

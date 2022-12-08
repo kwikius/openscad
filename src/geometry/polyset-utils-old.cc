@@ -1,8 +1,3 @@
-#include "cgal.h"
-#include "PolySetUtils.h"
-#include "PolySet.h"
-#include "Polygon2d.h"
-#include "printutils.h"
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
@@ -11,6 +6,14 @@
 #include <CGAL/Delaunay_mesh_face_base_2.h>
 #include <CGAL/Delaunay_mesh_criteria_2.h>
 #include <CGAL/Mesh_2/Face_badness.h>
+
+#include <geometry/PolySetUtils.h>
+#include <geometry/PolySet.h>
+#include <geometry/Polygon2d.h>
+
+#include <utils/printutils.h>
+
+#include "cgal.h"
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Triangulation_vertex_base_2<K> Vb;

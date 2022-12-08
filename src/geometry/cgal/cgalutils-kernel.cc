@@ -1,7 +1,9 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
-#include "cgalutils.h"
+
 #include <CGAL/Cartesian_converter.h>
 #include <CGAL/gmpxx.h>
+
+#include "cgalutils.h"
 
 namespace CGALUtils {
 

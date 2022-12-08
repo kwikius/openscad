@@ -1,13 +1,15 @@
 #ifdef ENABLE_CGAL
 
-#include "cgalutils.h"
-#include "PolySet.h"
-#include "printutils.h"
-#include "Grid.h"
-
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
 #include <boost/range/adaptor/reversed.hpp>
+
+#include <geometry/PolySet.h>
+#include <geometry/Grid.h>
+
+#include <utils/printutils.h>
+
+#include "cgalutils.h"
 
 #undef GEN_SURFACE_DEBUG
 namespace /* anonymous */ {

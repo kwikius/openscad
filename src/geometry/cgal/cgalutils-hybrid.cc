@@ -1,6 +1,4 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
-#include "cgalutils.h"
-#include "CGALHybridPolyhedron.h"
 
 
 #include <CGAL/boost/graph/helpers.h>
@@ -9,8 +7,12 @@
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/convex_hull_3.h>
 
+#include <geometry/PolySetUtils.h>
+
 #include "CGAL_Nef_polyhedron.h"
-#include "PolySetUtils.h"
+#include "CGALHybridPolyhedron.h"
+
+#include "cgalutils.h"
 
 namespace CGALUtils {
 

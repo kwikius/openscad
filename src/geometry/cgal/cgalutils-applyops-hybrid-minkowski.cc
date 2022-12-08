@@ -7,22 +7,24 @@
 #include <queue>
 #include <unordered_set>
 
-#include "cgal.h"
-#include "cgalutils.h"
-#include "PolySet.h"
-#include "printutils.h"
-#include "CGALHybridPolyhedron.h"
-#include "node.h"
-
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/normal_vector_newell_3.h>
 #include <CGAL/Handle_hash_function.h>
 #include <CGAL/Surface_mesh.h>
-
 #include <CGAL/config.h>
 #include <CGAL/version.h>
-
 #include <CGAL/convex_hull_3.h>
+
+#include <geometry/PolySet.h>
+
+#include <utils/printutils.h>
+
+#include <core/node.h>
+
+#include "CGALHybridPolyhedron.h"
+
+#include "cgal.h"
+#include "cgalutils.h"
 
 namespace CGALUtils {
 

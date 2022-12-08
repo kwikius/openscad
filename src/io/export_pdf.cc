@@ -1,10 +1,12 @@
-#include "export.h"
-#include "PolySet.h"
-#include "printutils.h"
-#include "version_helper.h"
 
 #include <string>
 #include <cmath>
+
+#include <geometry/PolySet.h>
+#include <utils/printutils.h>
+#include <utils/version_helper.h>
+
+#include "export.h"
 
 #ifdef ENABLE_CAIRO
 

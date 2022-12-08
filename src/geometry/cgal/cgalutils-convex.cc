@@ -1,11 +1,13 @@
 #ifdef ENABLE_CGAL
 
-#include "cgal.h"
-#include "cgalutils.h"
-#include <CGAL/Plane_3.h>
-#include <CGAL/Surface_mesh.h>
 #include <queue>
 #include <unordered_set>
+
+#include <CGAL/Plane_3.h>
+#include <CGAL/Surface_mesh.h>
+
+#include "cgal.h"
+#include "cgalutils.h"
 
 namespace CGALUtils {
 
