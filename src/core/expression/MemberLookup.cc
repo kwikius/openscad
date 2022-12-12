@@ -57,12 +57,9 @@ Value MemberLookup::evaluate(const std::shared_ptr<const Context>& context) cons
   case Value::Type::MODULE:{
 
      auto const & modRef = v.toModuleReference();
-     // TODO modref to modref, contexts and transform args
      std::shared_ptr<const Context> module_lookup_context = modRef.getContext();
      ModuleReference const * pModRef = &modRef;
      AssignmentList arguments;
-     //LOG(message_group::Trace, loc, context->documentRoot(),
-      // "lkp %1$s.%2$s", pModRef->getModuleName(), this->member );
      for (;;){
 
       AssignmentList argsTemp;
@@ -73,10 +70,7 @@ Value MemberLookup::evaluate(const std::shared_ptr<const Context>& context) cons
          argsTemp
       )){
          arguments = argsTemp;
-         // setTo(modRef.getModuleName(),argsOut);
-       //  module_lookup_context = pModRef->getContext();
       }else{
-      // setTo(old_name,old_args);
          return Value::undefined.clone();
       }
 
@@ -86,7 +80,6 @@ Value MemberLookup::evaluate(const std::shared_ptr<const Context>& context) cons
          auto user_module = dynamic_cast<const UserModule*>(iModule->module);
          // iModule->module  :  AbstractModule *  ==  UserModule * | BuiltinModule *
          if ( user_module){
-
             // push on static stack, pop at end of method!
             StaticModuleNameStack name{pModRef->getModuleName()};
             ContextHandle<UserModuleContext> module_context{

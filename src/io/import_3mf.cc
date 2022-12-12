@@ -31,7 +31,7 @@
 
 #include <utils/version_helper.h>
 
-#include <core/AST.h>
+#include <core/Location.h>
 
 #ifdef ENABLE_LIB3MF
 #ifndef LIB3MF_API_2

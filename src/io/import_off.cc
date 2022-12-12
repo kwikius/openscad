@@ -4,7 +4,7 @@
 
 #include <geometry/PolySet.h>
 
-#include <core/AST.h>
+#include <core/Location.h>
 
 #ifdef ENABLE_CGAL
 #include <geometry/cgal/cgalutils.h>
