@@ -19,7 +19,9 @@ public:
     Greater,
     GreaterEqual,
     Equal,
-    NotEqual
+    NotEqual,
+    Translate,
+    Rotate
   };
 
   BinaryOp(Expression *left, Op op, Expression *right, const Location& loc);

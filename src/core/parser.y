@@ -132,6 +132,8 @@ bool fileEnded=false;
 %token TOK_UNDEF
 
 %token LE GE EQ NEQ AND OR
+%token OP_TRANSLATE
+%token OP_ROTATE
 
 %nonassoc NO_ELSE
 %nonassoc TOK_ELSE
@@ -512,6 +514,14 @@ multiplication
         | multiplication '%' unary
             {
               $$ = new BinaryOp($1, BinaryOp::Op::Modulo, $3, LOCD("modulo", @$));
+            }
+         | multiplication OP_TRANSLATE unary
+            {
+              $$ = new BinaryOp($1, BinaryOp::Op::Multiply, $3, LOCD("translate", @$));
+            }
+         | multiplication OP_ROTATE unary
+            {
+              $$ = new BinaryOp($1, BinaryOp::Op::Divide, $3, LOCD("rotate", @$));
             }
 		;
 

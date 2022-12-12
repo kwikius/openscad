@@ -273,6 +273,8 @@ use[ \t\r\n]*"<"		{ BEGIN(cond_use); LOCATION_COUNT_LINES(parserlloc, yytext); }
                         }
 "$"?[a-zA-Z0-9_]+       { parserlval.text = strdup(yytext); return TOK_ID; }
 
+"->"  return OP_TRANSLATE;
+"^>"  return OP_ROTATE;
 "<="	return LE;
 ">="	return GE;
 "=="	return EQ;
