@@ -517,11 +517,11 @@ multiplication
             }
          | multiplication OP_TRANSLATE unary
             {
-              $$ = new BinaryOp($1, BinaryOp::Op::Multiply, $3, LOCD("translate", @$));
+              $$ = new BinaryOp($1, BinaryOp::Op::Translate, $3, LOCD("translate", @$));
             }
          | multiplication OP_ROTATE unary
             {
-              $$ = new BinaryOp($1, BinaryOp::Op::Divide, $3, LOCD("rotate", @$));
+              $$ = new BinaryOp($1, BinaryOp::Op::Rotate, $3, LOCD("rotate", @$));
             }
 		;
 
