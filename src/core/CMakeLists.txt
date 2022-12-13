@@ -16,6 +16,7 @@ set(CORE_LIB_SOURCES
   CSGTreeEvaluator.cc
   EvaluationSession.cc
   Expression.cc
+  expression/BinaryOp.cc
   expression/ValueWrapper.cc
   expression/ModuleLiteral.cc
   expression/MemberLookup.cc
