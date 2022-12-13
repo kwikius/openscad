@@ -77,7 +77,8 @@ static void NOINLINE print_trace(const ModuleInstantiation *mod, const std::shar
   LOG(message_group::Trace, mod->location(), context->documentRoot(), "called by '%1$s'", mod->name());
 }
 
-std::shared_ptr<AbstractNode> ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) const
+std::shared_ptr<AbstractNode>
+ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) const
 {
    std::string const old_name = this->modname;
    AssignmentList const old_args = this->arguments;
@@ -125,10 +126,10 @@ std::shared_ptr<AbstractNode> ModuleInstantiation::evaluate(const std::shared_pt
         setTo(old_name,old_args);
         return nullptr;
       }
-      boost::optional<InstantiableModule> module = module_lookup_context->lookup_module(this->name(), this->loc);
-      if (module) {
+      boost::optional<InstantiableModule> maybe_module = module_lookup_context->lookup_module(this->name(), this->loc);
+      if (maybe_module) {
         try{
-          auto node = module->module->instantiate(module->defining_context, this, context);
+          auto node = maybe_module->module->instantiate(maybe_module->defining_context, this, context);
           setTo(old_name,old_args);
           return node;
         } catch (EvaluationException& e) {
