@@ -29,7 +29,7 @@
 #include <utils/printutils.h>
 
 #include "Children.h"
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Parameters.h"
 #include "Builtins.h"

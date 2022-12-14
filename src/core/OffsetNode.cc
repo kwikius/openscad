@@ -26,7 +26,7 @@
 
 #include "OffsetNode.h"
 
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Parameters.h"

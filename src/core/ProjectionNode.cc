@@ -25,7 +25,7 @@
  */
 
 #include "ProjectionNode.h"
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Parameters.h"
@@ -35,7 +35,8 @@
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign; // bring 'operator+=()' into scope
 
-static std::shared_ptr<AbstractNode> builtin_projection(const ModuleInstantiation *inst, Arguments arguments, Children children)
+static std::shared_ptr<AbstractNode>
+builtin_projection(const ModuleInstantiation *inst, Arguments arguments, Children children)
 {
   auto node = std::make_shared<ProjectionNode>(inst);
 

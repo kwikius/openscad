@@ -27,23 +27,26 @@
 #include "Arguments.h"
 #include "Children.h"
 #include "Context.h"
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 
-BuiltinModule::BuiltinModule(std::shared_ptr<AbstractNode>(*instantiate)(const class ModuleInstantiation *, const std::shared_ptr<const Context>&), const Feature *feature) :
+BuiltinModule::BuiltinModule(fnContextInstantiate fnInstantiate, const Feature *feature) :
   AbstractModule(feature),
-  do_instantiate(instantiate)
+  do_instantiate(fnInstantiate)
 {}
 
-BuiltinModule::BuiltinModule(std::shared_ptr<AbstractNode>(*instantiate)(const class ModuleInstantiation *, Arguments, Children), const Feature *feature) :
-  AbstractModule(feature)
-{
-  do_instantiate = [instantiate](const class ModuleInstantiation *inst, const std::shared_ptr<const Context>& context) {
-      return instantiate(inst, Arguments(inst->arguments, context), Children(&inst->scope, context));
-    };
-}
+BuiltinModule::BuiltinModule(fnArgsChildrenInstantiate fnInstantiate, const Feature *feature) :
+  AbstractModule(feature),
+  do_instantiate(
+     [fnInstantiate](ModInst const *inst, contextPtr const & context) {
+        return fnInstantiate(inst, Arguments(inst->arguments, context), Children(&inst->scope, context));
+     }
+  )
+{}
 
-std::shared_ptr<AbstractNode> BuiltinModule::instantiate(const std::shared_ptr<const Context>& defining_context, const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context) const
+std::shared_ptr<AbstractNode>
+BuiltinModule::instantiate(contextPtr const & defining_context,
+   ModInst const *inst, contextPtr const & context) const
 {
   return do_instantiate(inst, context);
 }

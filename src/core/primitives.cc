@@ -37,7 +37,7 @@
 #include <geometry/Polygon2d.h>
 #include <geometry/PolySet.h>
 
-#include "module.h"
+#include "BuiltinModule.h"
 #include "node.h"
 #include "Children.h"
 #include "Builtins.h"

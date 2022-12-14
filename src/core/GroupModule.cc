@@ -24,6 +24,7 @@
  *
  */
 
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "node.h"
 #include "Builtins.h"

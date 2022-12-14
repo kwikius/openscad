@@ -7,7 +7,7 @@
 
 #include "ContextMemoryManager.h"
 #include "function.h"
-#include "module.h"
+#include "InstantiableModule.h"
 #include "Value.h"
 
 class ContextFrame;

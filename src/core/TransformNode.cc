@@ -33,6 +33,7 @@
 #include <utils/printutils.h>
 #include <utils/degree_trig.h>
 
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Builtins.h"

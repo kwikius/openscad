@@ -10,7 +10,8 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <utils/printutils.h>
 #include <utils/compiler_specific.h>
 
-#include "module.h"
+#include "AbstractModule.h"
+#include "InstantiableModule.h"
 #include "Context.h"
 #include "ModuleInstantiation.h"
 

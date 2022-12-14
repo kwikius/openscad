@@ -1,6 +1,7 @@
 
 #include <sstream>
 #include <boost/algorithm/string.hpp>
+#include <utils/printutils.h>
 
 #include <core/Assignment.h>
 #include <core/SourceFile.h>

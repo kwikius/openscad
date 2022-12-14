@@ -46,7 +46,7 @@
 
 #include <geometry/PolySet.h>
 
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "node.h"
 #include "Parameters.h"

@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Builtins.h"
 #include "Parameters.h"

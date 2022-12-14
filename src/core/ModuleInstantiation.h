@@ -7,8 +7,6 @@
 #include "Assignment.h"
 #include "LocalScope.h"
 
-typedef std::vector<class ModuleInstantiation *> ModuleInstantiationList;
-
 /**
 * @brief object representing the required information for instantiation of a module
 * or a module reference into the AST tree.

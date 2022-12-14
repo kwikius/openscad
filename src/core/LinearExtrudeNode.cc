@@ -34,7 +34,7 @@
 #include <utils/printutils.h>
 #include <io/fileutils.h>
 
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Parameters.h"

@@ -26,7 +26,7 @@ set(CORE_LIB_SOURCES
   LinearExtrudeNode.cc
   LocalScope.cc
   ScopeContext.cc
-  module.cc
+  BuiltinModule.cc
   node.cc
   NodeDumper.cc
   OffsetNode.cc

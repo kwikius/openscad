@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "module.h"
+#include "AbstractModule.h"
+#include "Assignment.h"
 #include "LocalScope.h"
 
 class StaticModuleNameStack

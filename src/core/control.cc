@@ -26,7 +26,7 @@
 
 #include <cstdint>
 
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "node.h"
 #include "Arguments.h"

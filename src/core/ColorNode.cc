@@ -37,7 +37,7 @@
 #include <utils/printutils.h>
 
 #include "ColorNode.h"
-#include "module.h"
+#include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Builtins.h"
 #include "Children.h"
