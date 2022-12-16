@@ -17,8 +17,12 @@ class Context;
 class Expression;
 class Value;
 
+void ResetModuleReferenceUniqueID();
+
 class ModuleReference{
+   friend void ResetModuleReferenceUniqueID();
 public:
+
   ModuleReference(std::shared_ptr<const Context> context_in,
                   std::shared_ptr<AssignmentList> literal_params_in,
                   std::string const & module_name_in,

@@ -294,7 +294,8 @@ Response CSGTreeEvaluator::visit(State& state, const CgalAdvNode& node)
 /*!
    Adds ourself to out parent's list of traversed children.
    Call this for _every_ node which affects output during traversal.
-    Usually, this should be called from the postfix stage, but for some nodes, we defer traversal letting other components (e.g. CGAL) render the subgraph, and we'll then call this from prefix and prune further traversal.
+    Usually, this should be called from the postfix stage, but for some nodes, we defer traversal letting other components
+  (e.g. CGAL) render the subgraph, and we'll then call this from prefix and prune further traversal.
  */
 void CSGTreeEvaluator::addToParent(const State& state, const AbstractNode& node)
 {

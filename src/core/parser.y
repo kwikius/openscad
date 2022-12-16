@@ -50,6 +50,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <core/SourceFile.h>
 #include <core/UserModule.h>
 #include <core/ModuleInstantiation.h>
+#include <core/ModuleReference.h>
 #include <core/Assignment.h>
 #include <core/expression/expressions.h>
 #include <core/function.h>
@@ -132,8 +133,9 @@ bool fileEnded=false;
 %token TOK_UNDEF
 
 %token LE GE EQ NEQ AND OR
-%token OP_TRANSLATE
-%token OP_ROTATE
+
+%left OP_TRANSLATE
+%left OP_ROTATE
 
 %nonassoc NO_ELSE
 %nonassoc TOK_ELSE
@@ -862,6 +864,9 @@ bool parse(SourceFile *&file, const std::string& text, const std::string &filena
   }
 
   parsingMainFile = mainFilePath == filepath;
+  if (parsingMainFile){
+    ResetModuleReferenceUniqueID();
+  }
   fs::path parser_sourcefile = fs::path(filepath).generic_string();
   lexer_set_parser_sourcefile(parser_sourcefile);
 

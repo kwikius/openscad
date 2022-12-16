@@ -25,15 +25,24 @@ public:
    {
       return feature != nullptr;
    }
+
    virtual bool is_enabled() const
    {
       return (feature == nullptr) || feature->is_enabled();
    }
+
+   /**
+    * @brief Instantiate the module into the AST.
+    * @param defining_context The context where the module was defined.
+    * @param inst The instantiation holding args and children if any.
+    * @param context context where the module was instantiated.
+   **/
    virtual abstractNodePtr instantiate(
       contextPtr const & defining_context,
       ModInst const *inst,
       contextPtr const & context
    ) const = 0;
+
 private:
    const Feature *feature;
 };

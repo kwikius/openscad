@@ -19,7 +19,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 extern std::stack<LocalScope *> scope_stack;
 
-int64_t ModuleReference::next_id = 0;
+
 
 Expression* MakeModuleLiteral(
    const std::string& moduleName,
@@ -37,10 +37,15 @@ Expression* MakeModuleLiteral(
 }
 
 namespace {
-  int32_t anonymousModuleNameCount = 0U;
+  int32_t anonymousModuleNameCount = 0;
   char itoaArr[50] = {0};
 
   std::stack<std::string> anonModuleStack;
+}
+
+void ResetAnonymousModuleNameCount()
+{
+   anonymousModuleNameCount = 0;
 }
 std::string generateAnonymousModuleName()
 {

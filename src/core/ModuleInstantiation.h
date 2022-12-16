@@ -11,13 +11,18 @@
 * @brief object representing the required information for instantiation of a module
 * or a module reference into the AST tree.
 * The module is either represented as a name or as an expression returning a module literal
+* TODO the module to instantiate represented as an abstract module_expression
+* - module_expression
+*    - module_name
+*    - module_literal
+*    - module_operation
 */
 class ModuleInstantiation : public ASTNode
 {
 public:
   /**
-   * @brief constructor used when the instantiation uses an expression returning a module literal
-   * @param expr The expression resolving to the module_literal to be instantiated
+   * @brief constructor used when the instantiation uses a module_expression
+   * @param expr The module_expression to be instantiated
    * @param args The arguments to the instantiation
    * @param loc The sourcefile location
   */
@@ -26,7 +31,7 @@ public:
 
  /**
    * @brief constructor used when the instantiation uses a name representing a module or module_reference
-   * @param name The name of the odule or module_reference to be instantiated
+   * @param name The name of the module or module_reference to be instantiated
    * @param args The arguments to the instantiation
    * @param loc The sourcefile location
   */

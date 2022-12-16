@@ -30,11 +30,18 @@
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 
+/**
+ * @brief in this form the module is passed arguments in the ModuleInstantiation
+ * passed to the instantiate member function, but the module expects no children
+**/
 BuiltinModule::BuiltinModule(fnContextInstantiate fnInstantiate, const Feature *feature) :
   AbstractModule(feature),
   do_instantiate(fnInstantiate)
 {}
-
+/**
+ * @brief in this form the module is passed children in the
+ *  ModuleInstantiation passed to the instantiate function
+**/
 BuiltinModule::BuiltinModule(fnArgsChildrenInstantiate fnInstantiate, const Feature *feature) :
   AbstractModule(feature),
   do_instantiate(
@@ -43,7 +50,11 @@ BuiltinModule::BuiltinModule(fnArgsChildrenInstantiate fnInstantiate, const Feat
      }
   )
 {}
-
+/**
+* @brief The overridden instantiate function for BuiltinModule
+* @param inst. The ModuleInstantiation holds the arguments, if any and child modules, if any.
+* @param context. The context in which the instantiation took place
+**/
 std::shared_ptr<AbstractNode>
 BuiltinModule::instantiate(contextPtr const & defining_context,
    ModInst const *inst, contextPtr const & context) const
