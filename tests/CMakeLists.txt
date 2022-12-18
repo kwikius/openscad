@@ -952,6 +952,11 @@ experimental_tests(throwntogethertest_module_literal_extrusion3d)
 experimental_tests(throwntogethertest_module_literal_extrusions3d)
 experimental_tests(dxfpngtest_module_literal_extrusions2d)
 experimental_tests(svgpngtest_module_literal_extrusions2d)
+experimental_tests(cgalpngtest_module_expression)
+experimental_tests(opencsgtest_module_expression)
+experimental_tests(throwntogethertest_module_expression)
+experimental_tests(csgpngtest_module_expression)
+experimental_tests(dumptest-examples_module_expression)
 
 ##############################
 # Define test configurations #
