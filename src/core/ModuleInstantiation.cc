@@ -14,8 +14,10 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "InstantiableModule.h"
 #include "Context.h"
 #include "ModuleInstantiation.h"
+#include "Value.h"
 #include <core/expression/ModuleLiteral.h>
 #include <core/expression/BinaryOp.h>
+
 
 namespace fs = boost::filesystem;
 
@@ -26,8 +28,6 @@ ModuleInstantiation::~ModuleInstantiation()
 IfElseModuleInstantiation::~IfElseModuleInstantiation()
 {
 }
-
-
 
 void ModuleInstantiation::print(std::ostream& stream, const std::string& indent, const bool inlined) const
 {
@@ -84,15 +84,29 @@ static void NOINLINE print_trace(const ModuleInstantiation *mod, const std::shar
 
 namespace{
 
-   bool getModInst(ModuleInstantiation* modInst,
+   /**
+   *  @brief expand a module expression into a module instantaiation using an existing moduleInstantatiation
+      @param modInst The existing ModuleInstantiation that has been called on the ModuleExpression.
+      @param expr The moduleExpression to expand
+      @param context The context of the instantiation, which may be modified during the expansion
+      @returns true if the Module expression was exapanded successfully else false
+   **/
+   bool evalModuleExpr(ModuleInstantiation* modInst,
       std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context);
 
 
+     /**
+   *  @brief expand a module expression into a module instantiation using an new moduleInstantatiation
+      @param expr The moduleExpression to expand
+      @param context The context of the instantiation, which may be modified during the expansion
+      @returns shared_ptr to the new ModuleInstantation if the Module expression was exapanded successfully
+      else empty shared_ptr
+   **/
    std::shared_ptr<ModuleInstantiation>
-   getModInst(std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context)
+   evalModuleExpr(std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context)
    {
       auto modInst = std::make_shared<ModuleInstantiation>("",AssignmentList(),expr->location());
-      bool res = getModInst(modInst.get(),expr,context);
+      bool res = evalModuleExpr(modInst.get(),expr,context);
       if ( res){
          return modInst;
       }else{
@@ -100,97 +114,89 @@ namespace{
       }
    }
 
-   bool getModInst(ModuleInstantiation* modInst,
+   bool evalModuleExpr(ModuleInstantiation* modInst,
       std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context)
    {
-        if ( auto bin_op = std::dynamic_pointer_cast<BinaryOp>(expr)){
-          using Op = BinaryOp::Op;
-          switch ( bin_op->getOpID()) {
-            case Op::Translate:
-            case Op::Rotate:{
-                  // TODO could also check that modInst args is empty
-                  // and modInst has no child modules
-                  // the arg is checked to e a numeric 3d vect
-                  // later in the builtin_translate etc fun
-                  auto arg_expr = bin_op->getRight();
-                  auto arg = std::make_shared<Assignment>("",arg_expr,arg_expr->location() );
-                  modInst->arguments.emplace_back(arg);
-                  std::shared_ptr<const Context> child_context = context;
-                  auto childModInst = getModInst(bin_op->getLeft(),child_context);
-                  modInst->setName(
-                     (bin_op->getOpID() == Op::Translate)
-                    ?"translate"
-                    :"rotate"
-                  );
-                  modInst->scope.addModuleInst(childModInst);
-                  return true;
-            }
+      if ( auto bin_op = std::dynamic_pointer_cast<BinaryOp>(expr)){
+       using Op = BinaryOp::Op;
+       switch ( bin_op->getOpID()) {
+         case Op::Translate:
+         case Op::Rotate:{
+               // TODO check that modInst args is empty
+               // and modInst has no child modules
+               // the arg is already checked later in the builtin_translate etc fun
+               auto arg_expr = bin_op->getRight();
+               auto arg = std::make_shared<Assignment>("",arg_expr,arg_expr->location() );
+               modInst->arguments.emplace_back(arg);
+               std::shared_ptr<const Context> child_context = context;
+               auto childModInst = evalModuleExpr(bin_op->getLeft(),child_context);
+               modInst->setName(
+                  (bin_op->getOpID() == Op::Translate)
+                 ?"translate"
+                 :"rotate"
+               );
+               modInst->scope.addModuleInst(childModInst);
+               return true;
+         }
 /*
 TODO
-            case Group:
-            case Union:
-            case Intersection:
-            case Difference: {
-                 lhsModInst = getModInst(bin_op->left);
-                 rhsModInst = getModInst(bin_op->right);
-                 assert(lhsModInst && rhsModInst);
-                 modInst.name = op.name;
-                 modInst.scope.addModInst(lhsModInst);
-                 modInst.scope.addModInst(rhsModInst);
-                 return true;
-            }
+         case Group:
+         case Union:
+         case Intersection:
+         case Difference: {
+              lhsModInst = evalModuleExpr(bin_op->left);
+              rhsModInst = evalModuleExpr(bin_op->right);
+              assert(lhsModInst && rhsModInst);
+              modInst.name = op.name;
+              modInst.scope.addModInst(lhsModInst);
+              modInst.scope.addModInst(rhsModInst);
+              return true;
+         }
 */
-            default:{
-              LOG(message_group::Warning, modInst->location(), context->documentRoot(),"invalid op");
-              return false;
-           }
-         }
-       }else{
-        // if ( auto mod_lit = std::dynamic_pointer_cast<ModuleLiteral>(expr)){
-               auto const value = expr->evaluate(context);
-               switch(value.type()){
-                  case Value::Type::MODULE:{
-                     auto const & modRef = value.toModuleReference();
-                     AssignmentList argsOut;
-                     if (modRef.transformToInstantiationArgs(
-                        modInst->arguments,
-                        modInst->location(),
-                        context,
-                        argsOut
-                     )){
-                        modInst->setName(modRef.getModuleName());
-                        modInst->arguments = argsOut;
-                        context = modRef.getContext();
-                     }else{
-                        return false;
-                     }
+         default:{
+           LOG(message_group::Warning, modInst->location(), context->documentRoot(),"invalid op");
+           return false;
+        }
+      }
+    }else{
+            auto const value = expr->evaluate(context);
+            switch(value.type()){
+               case Value::Type::MODULE:{
+                  auto const & modRef = value.toModuleReference();
+                  AssignmentList argsOut;
+                  if (modRef.transformToInstantiationArgs(
+                     modInst->arguments,
+                     modInst->location(),
+                     context,
+                     argsOut
+                  )){
+                     modInst->setName(modRef.getModuleName());
+                     modInst->arguments = argsOut;
+                     context = modRef.getContext();
+                  }else{
+                     return false;
                   }
-                  break;
-                  default:
-                     LOG(message_group::Warning, modInst->location(), context->documentRoot(),
-                     "ModuleInstantiation: invalid id expression" );
-                  return false;
                }
-            return true;
-         }
-       //}
+               break;
+               default:
+                  LOG(message_group::Warning, modInst->location(), context->documentRoot(),
+                  "ModuleInstantiation: invalid id expression" );
+               return false;
+            }
+         return true;
+      }
    }
 }// ~namespace
 
 std::shared_ptr<AbstractNode>
 ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) const
 {
+   // save all the parts that may be modified
+   // restore them after the evaluation, thus preserving "constness" of the ModuleInstantiation
    std::string const old_name = this->modname;
    AssignmentList const old_args = this->arguments;
-   // TODO save and restore LocalScope->moduleInstantiations
-   std::vector<std::shared_ptr<ModuleInstantiation>> old_children = this->scope.moduleInstantiations;
-   // later TODO LocalScope -> AbstractScope
-   // ModInstScope : AbstractScope  // only child module instantiations
-   //  FileScope : AbstractScope    //
-   // ModuleDefinitionScope : AbstractScope
-   // BuiltinModuleScope  : AbstractScope
-   // I think module instantiationScope need only child instantiations
-
+   std::vector<std::shared_ptr<ModuleInstantiation> > const old_children = this->scope.moduleInstantiations;
+   //TODO LocalScope -> AbstractScope
    auto setTo = [this](std::string const & name , AssignmentList const & args){
      const_cast<ModuleInstantiation*>(this)->modname = name;
      const_cast<ModuleInstantiation*>(this)->arguments = args;
@@ -204,36 +210,10 @@ ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) cons
 
    std::shared_ptr<const Context> module_lookup_context = context;
    if ( id_expr) {
-      bool res = getModInst(const_cast<ModuleInstantiation*>(this),id_expr,module_lookup_context);
+      bool res = evalModuleExpr(const_cast<ModuleInstantiation*>(this),id_expr,module_lookup_context);
       if ( ! res){
          return nullptr;
       }
-/*
-      auto const value = id_expr->evaluate(context);
-      switch(value.type()){
-         case Value::Type::MODULE:{
-            auto const & modRef = value.toModuleReference();
-            AssignmentList argsOut;
-            if (modRef.transformToInstantiationArgs(
-               this->arguments,
-               this->loc,
-               context,
-               argsOut
-            )){
-               setTo(modRef.getModuleName(),argsOut);
-               module_lookup_context = modRef.getContext();
-            }else{
-               restore();
-               return nullptr;
-            }
-         }
-         break;
-         default:
-            LOG(message_group::Warning, this->loc, context->documentRoot(),
-            "ModuleInstantiation: invalid id expression" );
-         return nullptr;
-      }
-*/
    }
 
    int32_t loopcount = 0;

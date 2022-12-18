@@ -1,7 +1,8 @@
 #pragma once
 
 #include "node.h"
-#include "Value.h"
+#include "Filename.h"
+
 
 class LinearExtrudeNode : public AbstractPolyNode
 {

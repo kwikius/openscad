@@ -23,6 +23,7 @@
 #include <core/CsgOpNode.h>
 #include <core/TextNode.h>
 #include <core/RenderNode.h>
+#include <core/Value.h>
 
 #include <io/DxfData.h>
 

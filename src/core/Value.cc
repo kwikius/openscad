@@ -48,6 +48,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "Context.h"
 #include "Expression.h"
 #include "EvaluationSession.h"
+#include "Filename.h"
 
 namespace fs = boost::filesystem;
 

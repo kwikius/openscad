@@ -3,11 +3,12 @@
 #include <cassert>
 #include <utils/printutils.h>
 #include <utils/exceptions.h>
+#include <core/Value.h>
 #include <core/Context.h>
 #include <core/expression/BinaryOp.h>
 
 BinaryOp::BinaryOp(Expression *left, BinaryOp::Op op, Expression *right, const Location& loc) :
-  Expression(loc), op(op), left(left), right(right)
+  Expression(Id::BinaryOp,loc), op(op), left(left), right(right)
 {
 }
 

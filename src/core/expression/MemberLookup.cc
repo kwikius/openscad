@@ -18,7 +18,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <core/ScopeContext.h>
 
 MemberLookup::MemberLookup(Expression *expr, const std::string& member, const Location& loc)
-  : Expression(loc), expr(expr), member(member) {}
+  : Expression(Id::MemberLookup,loc), expr(expr), member(member) {}
 
 Value MemberLookup::evaluate(const std::shared_ptr<const Context>& context) const
 {

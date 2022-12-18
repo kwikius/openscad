@@ -67,7 +67,7 @@ std::string popAnonymousModuleName()
 
 ModuleLiteral::ModuleLiteral(const std::string& mod_name, const AssignmentList &literal_params,
                          const AssignmentList& mod_args, const Location& loc )
-: Expression(loc),module_name(mod_name),module_literal_parameters(literal_params),module_arguments(mod_args)
+: Expression(Id::ModuleLiteral,loc),module_name(mod_name),module_literal_parameters(literal_params),module_arguments(mod_args)
 {};
 
 Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) const

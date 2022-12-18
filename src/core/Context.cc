@@ -29,6 +29,7 @@
 
 #include "Context.h"
 #include "function.h"
+#include  "Value.h"
 
 namespace fs = boost::filesystem;
 

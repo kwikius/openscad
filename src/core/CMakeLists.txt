@@ -55,6 +55,7 @@ set(CORE_LIB_SOURCES
   StatCache.cc
   UserModule.cc
   Tree.cc
+  ValueMap.cc
 )
 
 add_library(openscadCORE ${CORE_LIB_SOURCES})

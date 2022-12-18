@@ -52,6 +52,7 @@
 #include "Parameters.h"
 #include "Builtins.h"
 #include "Children.h"
+#include "Filename.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 

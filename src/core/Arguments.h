@@ -7,6 +7,8 @@
 #include "Assignment.h"
 #include "Context.h"
 
+#include "Value.h"
+
 struct Argument {
   boost::optional<std::string> name;
   Value value;

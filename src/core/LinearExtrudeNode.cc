@@ -40,6 +40,7 @@
 #include "Parameters.h"
 #include "Builtins.h"
 #include "LinearExtrudeNode.h"
+#include "Value.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 

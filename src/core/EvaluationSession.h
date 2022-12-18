@@ -8,8 +8,8 @@
 #include "ContextMemoryManager.h"
 #include "function.h"
 #include "InstantiableModule.h"
-#include "Value.h"
 
+class Value;
 class ContextFrame;
 
 class EvaluationSession

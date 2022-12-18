@@ -27,6 +27,7 @@
 
 #include "ContextFrame.h"
 #include "EvaluationSession.h"
+#include "Value.h"
 
 size_t EvaluationSession::push_frame(ContextFrame *frame)
 {

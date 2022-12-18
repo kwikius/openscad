@@ -11,6 +11,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "ModuleReference.h"
 #include "Context.h"
 #include "Expression.h"
+#include "Value.h"
 
 void ResetAnonymousModuleNameCount();
 

@@ -9,10 +9,11 @@
 
 #include "AST.h"
 #include "Assignment.h"
-#include "Value.h"
 
+class Value;
 class Arguments;
 class FunctionCall;
+class Context;
 
 class BuiltinFunction
 {

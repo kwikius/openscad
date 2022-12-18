@@ -3,7 +3,7 @@
 #include <boost/optional.hpp>
 
 #include "node.h"
-#include "Value.h"
+#include "Filename.h"
 
 enum class ImportType {
   UNKNOWN,

@@ -1,8 +1,10 @@
 #pragma once
-#include "Value.h"
+
 #include <utility>
+#include <string>
 #include <unordered_map>
 
+class Value;
 // Wrapper for provide *futuristic* unordered_map features,
 // plus some functions specialized to our use case.
 class ValueMap
@@ -34,8 +36,5 @@ public:
 
   // Get value by name, without possibility of default-constructing a missing name
   //   return Value::undefined if key missing
-  const Value& get(const std::string& name) const {
-    auto result = map.find(name);
-    return result == map.end() ? Value::undefined : result->second;
-  }
+  const Value& get(const std::string& name) const;
 };

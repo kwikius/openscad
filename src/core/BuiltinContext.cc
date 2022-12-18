@@ -8,6 +8,7 @@
 #include "BuiltinContext.h"
 #include "Expression.h"
 #include "function.h"
+#include "Value.h"
 
 BuiltinContext::BuiltinContext(EvaluationSession *session) : Context(session)
 {

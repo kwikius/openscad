@@ -41,6 +41,7 @@
 #include <utils/compiler_specific.h>
 #include <utils/StackCheck.h>
 
+#include "Value.h"
 #include "Parameters.h"
 #include "Arguments.h"
 #include "expression/expressions.h"
@@ -52,12 +53,8 @@ Value Expression::checkUndef(Value&& val, const std::shared_ptr<const Context>& 
   return std::move(val);
 }
 
-bool Expression::isLiteral() const
-{
-  return false;
-}
-
-UnaryOp::UnaryOp(UnaryOp::Op op, Expression *expr, const Location& loc) : Expression(loc), op(op), expr(expr)
+UnaryOp::UnaryOp(UnaryOp::Op op, Expression *expr, const Location& loc)
+: Expression(Id::UnaryOp,loc), op(op), expr(expr)
 {
 }
 
@@ -92,10 +89,8 @@ void UnaryOp::print(std::ostream& stream, const std::string&) const
   stream << opString() << *this->expr;
 }
 
-
-
 TernaryOp::TernaryOp(Expression *cond, Expression *ifexpr, Expression *elseexpr, const Location& loc)
-  : Expression(loc), cond(cond), ifexpr(ifexpr), elseexpr(elseexpr)
+  : Expression(Id::TernaryOp,loc), cond(cond), ifexpr(ifexpr), elseexpr(elseexpr)
 {
 }
 
@@ -115,7 +110,7 @@ void TernaryOp::print(std::ostream& stream, const std::string&) const
 }
 
 ArrayLookup::ArrayLookup(Expression *array, Expression *index, const Location& loc)
-  : Expression(loc), array(array), index(index)
+  : Expression(Id::ArrayLookup,loc), array(array), index(index)
 {
 }
 
@@ -139,12 +134,12 @@ void Literal::print(std::ostream& stream, const std::string&) const
 }
 
 Range::Range(Expression *begin, Expression *end, const Location& loc)
-  : Expression(loc), begin(begin), end(end)
+  : Expression(Id::Range,loc), begin(begin), end(end)
 {
 }
 
 Range::Range(Expression *begin, Expression *step, Expression *end, const Location& loc)
-  : Expression(loc), begin(begin), step(step), end(end)
+  : Expression(Id::Range,loc), begin(begin), step(step), end(end)
 {
 }
 
@@ -212,7 +207,8 @@ bool Range::isLiteral() const {
          begin->isLiteral() && end->isLiteral();
 }
 
-Vector::Vector(const Location& loc) : Expression(loc), literal_flag(unknown)
+Vector::Vector(const Location& loc)
+: Expression(Id::Vector,loc), literal_flag(unknown)
 {
 }
 
@@ -265,7 +261,8 @@ void Vector::print(std::ostream& stream, const std::string&) const
   stream << "]";
 }
 
-Lookup::Lookup(const std::string& name, const Location& loc) : Expression(loc), name(name)
+Lookup::Lookup(const std::string& name, const Location& loc)
+: Expression(Id::Lookup,loc), name(name)
 {
 }
 
@@ -280,7 +277,7 @@ void Lookup::print(std::ostream& stream, const std::string&) const
 }
 
 FunctionDefinition::FunctionDefinition(Expression *expr, const AssignmentList& parameters, const Location& loc)
-  : Expression(loc), context(nullptr), parameters(parameters), expr(expr)
+  : Expression(Id::FunctionDefinition,loc), context(nullptr), parameters(parameters), expr(expr)
 {
 }
 
@@ -328,7 +325,7 @@ static void NOINLINE print_trace(const FunctionCall *val, const std::shared_ptr<
 }
 
 FunctionCall::FunctionCall(Expression *expr, const AssignmentList& args, const Location& loc)
-  : Expression(loc), expr(expr), arguments(args)
+  : Expression(Id::FunctionCall,loc), expr(expr), arguments(args)
 {
   if (typeid(*expr) == typeid(Lookup)) {
     isLookup = true;
@@ -344,7 +341,8 @@ FunctionCall::FunctionCall(Expression *expr, const AssignmentList& args, const L
   }
 }
 
-boost::optional<CallableFunction> FunctionCall::evaluate_function_expression(const std::shared_ptr<const Context>& context) const
+boost::optional<CallableFunction>
+FunctionCall::evaluate_function_expression(const std::shared_ptr<const Context>& context) const
 {
   if (isLookup) {
     return context->lookup_function(name, location());
@@ -501,7 +499,7 @@ Expression *FunctionCall::create(const std::string& funcname, const AssignmentLi
 }
 
 Assert::Assert(const AssignmentList& args, Expression *expr, const Location& loc)
-  : Expression(loc), arguments(args), expr(expr)
+  : Expression(Id::Assert,loc), arguments(args), expr(expr)
 {}
 
 void Assert::performAssert(const AssignmentList& arguments, const Location& location, const std::shared_ptr<const Context>& context)
@@ -542,7 +540,7 @@ void Assert::print(std::ostream& stream, const std::string&) const
 }
 
 Echo::Echo(const AssignmentList& args, Expression *expr, const Location& loc)
-  : Expression(loc), arguments(args), expr(expr)
+  : Expression(Id::Echo,loc), arguments(args), expr(expr)
 {}
 
 const Expression *Echo::evaluateStep(const std::shared_ptr<const Context>& context) const
@@ -565,19 +563,22 @@ void Echo::print(std::ostream& stream, const std::string&) const
 }
 
 Let::Let(const AssignmentList& args, Expression *expr, const Location& loc)
-  : Expression(loc), arguments(args), expr(expr)
+  : Expression(Id::Let,loc), arguments(args), expr(expr)
 {
 }
 
-void Let::doSequentialAssignment(const AssignmentList& assignments, const Location& location, ContextHandle<Context>& targetContext)
+void Let::doSequentialAssignment(const AssignmentList& assignments,
+   const Location& location, ContextHandle<Context>& targetContext)
 {
   std::set<std::string> seen;
   for (const auto& assignment : assignments) {
     Value value = assignment->getExpr()->evaluate(*targetContext);
     if (assignment->getName().empty()) {
-      LOG(message_group::Warning, location, targetContext->documentRoot(), "Assignment without variable name %1$s", value.toEchoStringNoThrow());
+      LOG(message_group::Warning, location, targetContext->documentRoot(),
+         "Assignment without variable name %1$s", value.toEchoStringNoThrow());
     } else if (seen.find(assignment->getName()) != seen.end()) {
-      LOG(message_group::Warning, location, targetContext->documentRoot(), "Ignoring duplicate variable assignment %1$s = %2$s", assignment->getName(), value.toEchoStringNoThrow());
+      LOG(message_group::Warning, location, targetContext->documentRoot(),
+         "Ignoring duplicate variable assignment %1$s = %2$s", assignment->getName(), value.toEchoStringNoThrow());
     } else {
       targetContext->set_variable(assignment->getName(), std::move(value));
       seen.insert(assignment->getName());
@@ -585,7 +586,9 @@ void Let::doSequentialAssignment(const AssignmentList& assignments, const Locati
   }
 }
 
-ContextHandle<Context> Let::sequentialAssignmentContext(const AssignmentList& assignments, const Location& location, const std::shared_ptr<const Context>& context)
+ContextHandle<Context>
+Let::sequentialAssignmentContext(const AssignmentList& assignments,
+   const Location& location, const std::shared_ptr<const Context>& context)
 {
   ContextHandle<Context> letContext{Context::create<Context>(context)};
   doSequentialAssignment(assignments, location, letContext);
@@ -609,7 +612,8 @@ void Let::print(std::ostream& stream, const std::string&) const
   stream << "let(" << this->arguments << ") " << *expr;
 }
 
-ListComprehension::ListComprehension(const Location& loc) : Expression(loc)
+ListComprehension::ListComprehension(const Location& loc)
+: Expression(Id::ListComprehension,loc)
 {
 }
 
@@ -689,7 +693,8 @@ LcFor::LcFor(const AssignmentList& args, Expression *expr, const Location& loc)
 {
 }
 
-static inline ContextHandle<Context> forContext(const std::shared_ptr<const Context>& context, const std::string& name, Value value)
+static inline ContextHandle<Context>
+forContext(const std::shared_ptr<const Context>& context, const std::string& name, Value value)
 {
   ContextHandle<Context> innerContext{Context::create<Context>(context)};
   innerContext->set_variable(name, std::move(value));
@@ -762,7 +767,9 @@ static void doForEach(
    }
 }
 
-void LcFor::forEach(const AssignmentList& assignments, const Location& loc, const std::shared_ptr<const Context>& context, std::function<void(const std::shared_ptr<const Context>&)> operation)
+void LcFor::forEach(const AssignmentList& assignments,
+   const Location& loc, const std::shared_ptr<const Context>& context,
+      std::function<void(const std::shared_ptr<const Context>&)> operation)
 {
   doForEach(assignments, loc, operation, 0, context);
 }
@@ -783,7 +790,8 @@ void LcFor::print(std::ostream& stream, const std::string&) const
   stream << "for(" << this->arguments << ") (" << *this->expr << ")";
 }
 
-LcForC::LcForC(const AssignmentList& args, const AssignmentList& incrargs, Expression *cond, Expression *expr, const Location& loc)
+LcForC::LcForC(const AssignmentList& args, const AssignmentList& incrargs, Expression *cond,
+    Expression *expr, const Location& loc)
   : ListComprehension(loc), arguments(args), incr_arguments(incrargs), cond(cond), expr(expr)
 {
 }
