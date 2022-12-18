@@ -54,6 +54,7 @@ public:
   ) const ;
   int64_t getUniqueID() const { return m_unique_id;}
 private:
+/*
   static bool processNamedArgs(
       std::shared_ptr<AssignmentList> const & paramsIn,
       std::shared_ptr<AssignmentList> const & Args,
@@ -62,6 +63,7 @@ private:
       std::shared_ptr<AssignmentList> const & paramsIn,
       std::shared_ptr<AssignmentList> const & Args,
       std::shared_ptr<AssignmentList> & paramsOut);
+*/
   static int64_t generate_unique_id() { ++ next_id; return next_id;}
   static int64_t next_id;
   std::shared_ptr<const Context> context;

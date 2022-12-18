@@ -300,7 +300,7 @@ private:
 std::ostream& operator<<(std::ostream& stream, const UndefType& u);
 
 /**
- *  Value class encapsulates a std::variant value which can represent any of the
+ *  @brief Value class encapsulates a std::variant value which can represent any of the
  *  value types existing in the SCAD language.
  * -- As part of a refactoring effort which began as PR #2881 and continued as PR #3102,
  *    Value and its constituent types have been made (nominally) "move only".

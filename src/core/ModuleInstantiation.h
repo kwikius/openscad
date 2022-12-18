@@ -45,7 +45,7 @@ public:
   virtual void print(std::ostream& stream, const std::string& indent, const bool inlined) const;
   void print(std::ostream& stream, const std::string& indent) const override { print(stream, indent, false); }
   /**
-   * @brief evaluate the instantiation. IOW instantiate it int the CSG treee
+   * @brief evaluate the instantiation. IOW instantiate it int the CSG tree
    */
   std::shared_ptr<AbstractNode> evaluate(const std::shared_ptr<const Context> context) const;
 
@@ -57,6 +57,9 @@ public:
   bool isBackground() const { return this->tag_background; }
   bool isHighlight() const { return this->tag_highlight; }
   bool isRoot() const { return this->tag_root; }
+
+  std::shared_ptr<Expression> const & getIdExpr() const { return id_expr;}
+  void setName(std::string const & name) { modname = name;}
 
   AssignmentList arguments;
   LocalScope scope;

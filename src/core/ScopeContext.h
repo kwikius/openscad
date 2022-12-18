@@ -38,7 +38,8 @@ public:
   std::vector<const std::shared_ptr<const Context> *> list_referenced_contexts() const override;
 
 protected:
-  UserModuleContext(const std::shared_ptr<const Context> parent, const UserModule *module, const Location& loc, Arguments arguments, Children children);
+  UserModuleContext(const std::shared_ptr<const Context> parent,
+    const UserModule *module, const Location& loc, Arguments arguments, Children children);
 
 private:
   Children children;
