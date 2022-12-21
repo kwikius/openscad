@@ -9,7 +9,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 bool ValueWrapper::isLiteral() const
 {
-    switch(value->type()){
+    switch(value.type()){
        case Value::Type::BOOL:
        case Value::Type::NUMBER:
        case Value::Type::STRING:
@@ -28,7 +28,7 @@ bool ValueWrapper::isLiteral() const
 
 void ValueWrapper::print(std::ostream& os, const std::string& indent) const
 {
-    os << indent << *this->value;
+    os << indent << this->value;
 }
 
 

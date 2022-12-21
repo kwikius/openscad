@@ -19,8 +19,6 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 extern std::stack<LocalScope *> scope_stack;
 
-
-
 Expression* MakeModuleLiteral(
    const std::string& moduleName,
    const AssignmentList& parameters,
@@ -67,7 +65,10 @@ std::string popAnonymousModuleName()
 
 ModuleLiteral::ModuleLiteral(const std::string& mod_name, const AssignmentList &literal_params,
                          const AssignmentList& mod_args, const Location& loc )
-: Expression(Id::ModuleLiteral,loc),module_name(mod_name),module_literal_parameters(literal_params),module_arguments(mod_args)
+: Expression(Id::ModuleLiteral,loc),
+module_name(mod_name),
+module_literal_parameters(literal_params),
+module_arguments(mod_args)
 {};
 
 Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) const
@@ -77,19 +78,17 @@ Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) con
 
    // put any evaluated default args in params_out
    for ( auto i = 0; i < params_in.size(); ++i){
-       auto const & param = params_in[i];
-       auto new_param = new Assignment(param->getName(),loc);
-       if ( static_cast<bool>(param->getExpr()) != false ){
+      auto const & param = params_in[i];
+      auto new_param = std::make_shared<Assignment>(param->getName(),loc);
+      if ( static_cast<bool>(param->getExpr()) == true ){
          new_param->setExpr(
-           std::shared_ptr<ValueWrapper>(
-               new ValueWrapper(
-                  std::shared_ptr<Value>(
-                     new Value(std::move(param->getExpr()->evaluate(context))))
-              ,loc)
-           )
+            std::make_shared<ValueWrapper>(
+               std::move(param->getExpr()->evaluate(context)),
+               location()
+            )
          );
-       }
-      params_out->push_back(std::shared_ptr<Assignment>(new_param));
+      }
+      params_out->emplace_back(new_param);
    }
    // if no module_literal_params evaluate here
    // or ...
@@ -102,18 +101,16 @@ Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) con
    // expr->contains(param_names)
    // if found dont evaluate the expression
 
-   AssignmentList outArgs = module_arguments;
-   if ( params_in.size() ==0){
-      for ( auto i = 0; i < outArgs.size(); ++i){
-          auto & arg = outArgs[i];
+   AssignmentList * outArgs = new AssignmentList{module_arguments};
+   if ( params_in.size() == 0){
+      for ( auto i = 0; i < outArgs->size(); ++i){
+          auto & arg = outArgs->at(i);
           //TODO if ! arg->getExpr().contains(params_in){...
           arg->setExpr(
-           std::shared_ptr<ValueWrapper>(
-               new ValueWrapper(
-                  std::shared_ptr<Value>(
-                     new Value(std::move(arg->getExpr()->evaluate(context))))
-              ,loc)
-           )
+            std::make_shared<ValueWrapper>(
+               std::move(arg->getExpr()->evaluate(context)),
+               location()
+            )
          );
       }
    }
@@ -121,9 +118,9 @@ Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) con
    return ModuleReferencePtr(
       ModuleReference(
          context,
-         std::unique_ptr<AssignmentList>(params_out),
+         std::move(std::unique_ptr<AssignmentList>{params_out}),
          this->module_name,
-         std::unique_ptr<AssignmentList>{new AssignmentList{outArgs}}
+         std::move(std::unique_ptr<AssignmentList>{outArgs})
       )
    );
 }

@@ -188,6 +188,9 @@ TODO
    }
 }// ~namespace
 
+/**
+*  ModuleInstantiation
+**/
 std::shared_ptr<AbstractNode>
 ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) const
 {

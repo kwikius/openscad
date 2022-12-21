@@ -30,7 +30,7 @@ public:
      Vector
   };
 
-  ~Expression() {}
+  virtual ~Expression() {}
   virtual bool isLiteral() const { return false;}
   Id getID() const { return m_id;}
   virtual Value evaluate(const std::shared_ptr<const Context>& context) const = 0;

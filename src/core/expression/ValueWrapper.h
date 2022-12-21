@@ -9,14 +9,17 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 class ValueWrapper : public Expression{
 public:
-  ValueWrapper( std::shared_ptr<Value> const & v, const Location& loc)
-    :Expression(Id::ValueWrapper,loc), value(v){}
+  ValueWrapper( Value v, const Location& loc)
+    :Expression(Id::ValueWrapper,loc), value(std::move(v)){}
 
   bool isLiteral() const override;
-  Value evaluate(const std::shared_ptr<const Context>& context) const override { return std::move(value->clone());}
+  Value evaluate(const std::shared_ptr<const Context>& context) const override
+  {
+    return std::move(value.clone());
+  }
   void print(std::ostream&, const std::string&) const override;
 private:
-  std::shared_ptr<Value> value;
+  Value value;
 };
 
 
