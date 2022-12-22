@@ -7,6 +7,12 @@
 class AbstractNode;
 class Context;
 
+/**
+* @brief repository for storage of ModuleInstantiations, UserModule definitions and values
+* Member of ModuleInstantiation, ScopeContext, UserModule, SourceFile,
+* LocalScopes are pushed and popped from a parser stack during parsing, and entities are added
+* as various entities are parsed.
+**/
 class LocalScope
 {
 public:

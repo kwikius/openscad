@@ -6,13 +6,13 @@
 #include "Arguments.h"
 #include "ContextFrame.h"
 
-/*
- * The parameters of a builtin function or module do not form a true Context;
- * it is a value map, but it doesn't have a parent context or child contexts,
+/**
+ * @brief The parameters of a builtin function or module do not form a true Context;
+ * it is a ValueMap, but it doesn't have a parent context or child contexts,
  * no function literals can capture it, and it has simpler memory management.
  * But special variables passed as parameters ARE accessible on the execution
  * stack. Thus, a Parameters is a ContextFrame, held by a ContextFrameHandle.
- */
+ **/
 class Parameters
 {
 private:

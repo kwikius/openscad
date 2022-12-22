@@ -17,7 +17,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "Literal.h"
 #include "ValueWrapper.h"
 
-extern std::stack<LocalScope *> scope_stack;
+//extern std::stack<LocalScope *> scope_stack;
 
 Expression* MakeModuleLiteral(
    const std::string& moduleName,
