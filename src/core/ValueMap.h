@@ -7,6 +7,10 @@
 class Value;
 // Wrapper for provide *futuristic* unordered_map features,
 // plus some functions specialized to our use case.
+/**
+* Brief Map names to Values. Used in a ContextFrame for lexical and config variables
+* interfaced as an unordered map
+**/
 class ValueMap
 {
   using map_t = std::unordered_map<std::string, Value>;

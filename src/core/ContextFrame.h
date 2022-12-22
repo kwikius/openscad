@@ -2,7 +2,11 @@
 
 #include "EvaluationSession.h"
 #include "ValueMap.h"
-
+/**
+ * @brief base class for Context
+ * holds a pointer to the Evaluation session
+ * as well as config variables and lexical variables
+ **/
 class ContextFrame
 {
 public:
@@ -18,6 +22,12 @@ public:
   virtual std::vector<const Value *> list_embedded_values() const;
   virtual size_t clear();
 
+  /**
+   * @brief add a variable to lexical or config variables
+   * dependendent on its name decoration
+   * @param name  The name to store the variable under.
+   * @param value The value to store.
+  **/
   virtual bool set_variable(const std::string& name, Value&& value);
 
   void apply_variables(const ValueMap& variables);

@@ -12,6 +12,9 @@
 class Value;
 class ContextFrame;
 
+/**
+*  @brief Context stack rooted in the Openscad root source file
+**/
 class EvaluationSession
 {
 public:
