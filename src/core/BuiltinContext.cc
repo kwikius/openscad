@@ -23,7 +23,8 @@ void BuiltinContext::init()
   this->set_variable("PI", M_PI);
 }
 
-boost::optional<CallableFunction> BuiltinContext::lookup_local_function(const std::string& name, const Location& loc) const
+boost::optional<CallableFunction>
+  BuiltinContext::lookup_local_function(const std::string& name, const Location& loc) const
 {
   const auto& search = Builtins::instance()->getFunctions().find(name);
   if (search != Builtins::instance()->getFunctions().end()) {
@@ -37,7 +38,8 @@ boost::optional<CallableFunction> BuiltinContext::lookup_local_function(const st
   return Context::lookup_local_function(name, loc);
 }
 
-boost::optional<InstantiableModule> BuiltinContext::lookup_local_module(const std::string& name, const Location& loc) const
+boost::optional<InstantiableModule>
+  BuiltinContext::lookup_local_module(const std::string& name, const Location& loc) const
 {
   const auto& search = Builtins::instance()->getModules().find(name);
   if (search != Builtins::instance()->getModules().end()) {
@@ -47,7 +49,8 @@ boost::optional<InstantiableModule> BuiltinContext::lookup_local_module(const st
     }
     std::string replacement = Builtins::instance()->instance()->isDeprecated(name);
     if (!replacement.empty()) {
-      LOG(message_group::Deprecated, loc, documentRoot(), "The %1$s() module will be removed in future releases. Use %2$s instead.", name, replacement);
+      LOG(message_group::Deprecated, loc, documentRoot(),
+       "The %1$s() module will be removed in future releases. Use %2$s instead.", name, replacement);
     }
     if (m->is_enabled()) {
       return InstantiableModule{get_shared_ptr(), m};
