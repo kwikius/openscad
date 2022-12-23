@@ -32,7 +32,8 @@ ContextFrame::ContextFrame(EvaluationSession *session) :
   evaluation_session(session)
 {}
 
-boost::optional<const Value&> ContextFrame::lookup_local_variable(const std::string& name) const
+boost::optional<const Value&>
+ContextFrame::lookup_local_variable(const std::string& name) const
 {
   if (is_config_variable(name)) {
     ValueMap::const_iterator result = config_variables.find(name);
@@ -48,7 +49,8 @@ boost::optional<const Value&> ContextFrame::lookup_local_variable(const std::str
   return boost::none;
 }
 
-boost::optional<CallableFunction> ContextFrame::lookup_local_function(const std::string& name, const Location& loc) const
+boost::optional<CallableFunction>
+ContextFrame::lookup_local_function(const std::string& name, const Location& loc) const
 {
   boost::optional<const Value&> value = lookup_local_variable(name);
   if (value && value->type() == Value::Type::FUNCTION) {
@@ -57,7 +59,8 @@ boost::optional<CallableFunction> ContextFrame::lookup_local_function(const std:
   return boost::none;
 }
 
-boost::optional<InstantiableModule> ContextFrame::lookup_local_module(const std::string& name, const Location& loc) const
+boost::optional<InstantiableModule>
+ContextFrame::lookup_local_module(const std::string& name, const Location& loc) const
 {
   return boost::none;
 }
