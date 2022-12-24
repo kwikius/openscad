@@ -12,12 +12,11 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "../ModuleReference.h"
 #include "../LocalScope.h"
 #include "../UserModule.h"
+#include <core/Context.h>
 
 #include "ModuleLiteral.h"
 #include "Literal.h"
 #include "ValueWrapper.h"
-
-//extern std::stack<LocalScope *> scope_stack;
 
 Expression* MakeModuleLiteral(
    const std::string& moduleName,
@@ -76,16 +75,23 @@ Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) con
    AssignmentList const & params_in = this->module_literal_parameters;
    AssignmentList * params_out = new AssignmentList;
 
+#define OPENSCAD_USE_VALUE_WRAPPER_PARAMS
+//#define OPENSCAD_USE_VALUE_WRAPPER_ARGS
+
    // put any evaluated default args in params_out
    for ( auto i = 0; i < params_in.size(); ++i){
       auto const & param = params_in[i];
       auto new_param = std::make_shared<Assignment>(param->getName(),loc);
       if ( static_cast<bool>(param->getExpr()) == true ){
          new_param->setExpr(
+#if defined OPENSCAD_USE_VALUE_WRAPPER_PARAMS
             std::make_shared<ValueWrapper>(
                std::move(param->getExpr()->evaluate(context)),
                location()
             )
+#else
+           param->getExpr()
+#endif
          );
       }
       params_out->emplace_back(new_param);
@@ -106,11 +112,18 @@ Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) con
       for ( auto i = 0; i < outArgs->size(); ++i){
           auto & arg = outArgs->at(i);
           //TODO if ! arg->getExpr().contains(params_in){...
+#if defined OPENSCAD_USE_VALUE_WRAPPER_ARGS
+         // ContextHandle new_context = Context::create<Context>(context);
+#endif
           arg->setExpr(
+#if defined OPENSCAD_USE_VALUE_WRAPPER_ARGS
             std::make_shared<ValueWrapper>(
                std::move(arg->getExpr()->evaluate(context)),
                location()
             )
+#else
+             arg->getExpr()
+#endif
          );
       }
    }

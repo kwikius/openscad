@@ -20,6 +20,8 @@ set(CORE_LIB_SOURCES
   expression/ValueWrapper.cc
   expression/ModuleLiteral.cc
   expression/MemberLookup.cc
+  expression/Literal.cc
+  expression/Vector.cc
   builtin_functions.cc
   function.cc
   ImportNode.cc

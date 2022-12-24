@@ -21,5 +21,3 @@ public:
 private:
   Value value;
 };
-
-
