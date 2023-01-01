@@ -14,7 +14,7 @@ class ContextFrame
 {
 public:
   ContextFrame(EvaluationSession *session);
-  virtual ~ContextFrame() {}
+  virtual ~ContextFrame() = default;
 
   ContextFrame(ContextFrame&& other) = default;
 
@@ -61,5 +61,4 @@ public:
   virtual std::string dumpFrame() const;
 #endif
 };
-
 

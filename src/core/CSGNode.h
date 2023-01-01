@@ -6,7 +6,10 @@
 
 #include "geometry/Geometry.h"
 #include "geometry/linalg.h"
+
 #include "enums.h"
+
+class Geometry;
 
 class CSGNode
 {
@@ -18,14 +21,14 @@ public:
   };
 
   CSGNode(Flag flags = FLAG_NONE) : flags(flags) {}
-  virtual ~CSGNode() {}
-  virtual std::string dump() const = 0;
-  virtual bool isEmptySet() { return false; }
+  virtual ~CSGNode() = default;
+  [[nodiscard]] virtual std::string dump() const = 0;
+  [[nodiscard]] virtual bool isEmptySet() const { return false; }
 
-  const BoundingBox& getBoundingBox() const { return this->bbox; }
-  unsigned int getFlags() const { return this->flags; }
-  bool isHighlight() const { return this->flags & FLAG_HIGHLIGHT; }
-  bool isBackground() const { return this->flags & FLAG_BACKGROUND; }
+  [[nodiscard]] const BoundingBox& getBoundingBox() const { return this->bbox; }
+  [[nodiscard]] unsigned int getFlags() const { return this->flags; }
+  [[nodiscard]] bool isHighlight() const { return this->flags & FLAG_HIGHLIGHT; }
+  [[nodiscard]] bool isBackground() const { return this->flags & FLAG_BACKGROUND; }
   void setHighlight(bool on) { on ? this->flags |= FLAG_HIGHLIGHT : this->flags &= ~FLAG_HIGHLIGHT; }
   void setBackground(bool on) { on ? this->flags |= FLAG_BACKGROUND : this->flags &= ~FLAG_BACKGROUND; }
 
@@ -44,23 +47,21 @@ protected:
 class CSGOperation : public CSGNode
 {
 public:
-  CSGOperation() {}
-  ~CSGOperation() {}
+  CSGOperation() = default;
   void initBoundingBox() override;
-  std::string dump() const override;
+  [[nodiscard]] std::string dump() const override;
 
   std::shared_ptr<CSGNode>& left() { return this->children[0]; }
   std::shared_ptr<CSGNode>& right() { return this->children[1]; }
-  const std::shared_ptr<CSGNode>& left() const { return this->children[0]; }
-  const std::shared_ptr<CSGNode>& right() const { return this->children[1]; }
-
-  OpenSCADOperator getType() const { return this->type; }
+   [[nodiscard]] const std::shared_ptr<CSGNode>& left() const { return this->children[0]; }
+   [[nodiscard]] const std::shared_ptr<CSGNode>& right() const { return this->children[1]; }
+   [[nodiscard]] OpenSCADOperator getType() const { return this->type; }
 
   static std::shared_ptr<CSGNode>
   createCSGNode(OpenSCADOperator type, std::shared_ptr<CSGNode> left, std::shared_ptr<CSGNode> right);
 
 private:
-  CSGOperation(OpenSCADOperator type, std::shared_ptr<CSGNode> left, std::shared_ptr<CSGNode> right);
+  CSGOperation(OpenSCADOperator type, std::shared_ptr<CSGNode> const & left, std::shared_ptr<CSGNode> const & right);
   OpenSCADOperator type;
   std::vector<std::shared_ptr<CSGNode>> children;
 };
@@ -80,7 +81,7 @@ struct CSGOperationDeleter {
         purge.emplace_back(std::move(op->right()));
         purge.emplace_back(std::move(op->left()));
       }
-    } while(!purge.empty());
+    } while (!purge.empty());
   }
 };
 
@@ -88,12 +89,12 @@ class CSGLeaf : public CSGNode
 {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  CSGLeaf(const std::shared_ptr<const class Geometry>& geom,
-    const Transform3d& matrix, const Color4f& color, const std::string& label, const int index);
+  CSGLeaf(const std::shared_ptr<const Geometry>& geom,
+    Transform3d matrix, Color4f color, std::string label, const int index);
   ~CSGLeaf() {}
   void initBoundingBox() override;
-  bool isEmptySet() override { return geom == nullptr || geom->isEmpty(); }
-  std::string dump() const override;
+  [[nodiscard]] bool isEmptySet() const override;
+  [[nodiscard]] std::string dump() const override;
   std::string label;
   std::shared_ptr<const Geometry> geom;
   Transform3d matrix;
@@ -122,11 +123,10 @@ public:
 class CSGProduct
 {
 public:
-  CSGProduct() {}
-  ~CSGProduct() {}
+  CSGProduct() = default;
 
-  std::string dump() const;
-  BoundingBox getBoundingBox(bool throwntogether = false) const;
+  [[nodiscard]] std::string dump() const;
+  [[nodiscard]] BoundingBox getBoundingBox(bool throwntogether = false) const;
 
   std::vector<CSGChainObject> intersections;
   std::vector<CSGChainObject> subtractions;
@@ -138,21 +138,21 @@ public:
   CSGProducts() {
     this->createProduct();
   }
-  ~CSGProducts() {}
 
   void import(std::shared_ptr<CSGNode> csgtree,
-  OpenSCADOperator type = OpenSCADOperator::UNION,
-   CSGNode::Flag flags = CSGNode::FLAG_NONE);
-  std::string dump() const;
-  BoundingBox getBoundingBox(bool throwntogether = false) const;
+      OpenSCADOperator type = OpenSCADOperator::UNION,
+      CSGNode::Flag flags = CSGNode::FLAG_NONE
+  );
+  [[nodiscard]] std::string dump() const;
+  [[nodiscard]] BoundingBox getBoundingBox(bool throwntogether = false) const;
 
   std::vector<CSGProduct> products;
 
-  size_t size() const;
+  [[nodiscard]] size_t size() const;
 
 private:
   void createProduct() {
-    this->products.push_back(CSGProduct());
+    this->products.emplace_back();
     this->currentproduct = &this->products.back();
     this->currentlist = &this->currentproduct->intersections;
   }

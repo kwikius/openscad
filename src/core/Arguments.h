@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ostream>
+#include <utility>
 #include <vector>
 #include <boost/optional.hpp>
 
@@ -13,9 +14,13 @@ struct Argument {
   boost::optional<std::string> name;
   Value value;
 
-  Argument(boost::optional<std::string> name, Value value) : name(name), value(std::move(value)) {}
+  Argument(boost::optional<std::string> name, Value value) : name(std::move(name)), value(std::move(value)) {
+  }
   Argument(Argument&& other) = default;
   Argument& operator=(Argument&& other) = default;
+  Argument(const Argument& other) = delete;
+  Argument& operator=(const Argument& other) = delete;
+  ~Argument() = default;
 
   const Value *operator->() const { return &value; }
   Value *operator->() { return &value; }
@@ -27,15 +32,18 @@ public:
   Arguments(const AssignmentList& argument_expressions, const std::shared_ptr<const Context>& context);
   Arguments(Arguments&& other) = default;
   Arguments& operator=(Arguments&& other) = default;
+  Arguments(const Arguments& other) = delete;
+  Arguments& operator=(const Arguments& other) = delete;
+  ~Arguments() = default;
 
 private:
   Arguments(EvaluationSession *session) : evaluation_session(session) {}
 
 public:
-  Arguments clone() const;
+  [[nodiscard]] Arguments clone() const;
 
-  EvaluationSession *session() const { return evaluation_session; }
-  const std::string& documentRoot() const { return evaluation_session->documentRoot(); }
+  [[nodiscard]] EvaluationSession *session() const { return evaluation_session; }
+  [[nodiscard]] const std::string& documentRoot() const { return evaluation_session->documentRoot(); }
 
 private:
   EvaluationSession *evaluation_session;

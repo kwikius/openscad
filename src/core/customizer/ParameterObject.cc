@@ -158,7 +158,8 @@ bool VectorParameter::importValue(boost::property_tree::ptree encodedValue, bool
 {
   std::vector<double> decoded;
 
-  std::string encoded = boost::algorithm::replace_all_copy(encodedValue.data(), " ", "");
+  // NOLINTBEGIN(*NewDeleteLeaks) LLVM bug https://github.com/llvm/llvm-project/issues/40486
+  std::string encoded = boost::algorithm::erase_all_copy(encodedValue.data(), " ");
   if (encoded.size() < 2 || encoded[0] != '[' || encoded[encoded.size() - 1] != ']') {
     return false;
   }
@@ -167,6 +168,7 @@ bool VectorParameter::importValue(boost::property_tree::ptree encodedValue, bool
 
   std::vector<std::string> items;
   boost::algorithm::split(items, encoded, boost::algorithm::is_any_of(","));
+  // NOLINTEND(*NewDeleteLeaks)
 
   for (const std::string& item : items) {
     std::stringstream stream(item);
@@ -308,11 +310,11 @@ struct EnumValues
   std::vector<EnumParameter::EnumItem> items;
   int defaultValueIndex;
 };
-static EnumValues parseEnumItems(const Expression *parameter, const std::string& defaultKey, EnumParameter::EnumValue defaultValue)
+static EnumValues parseEnumItems(const Expression *parameter, const std::string& defaultKey, const EnumParameter::EnumValue& defaultValue)
 {
   EnumValues output;
 
-  const Vector *expression = dynamic_cast<const Vector *>(parameter);
+  const auto *expression = dynamic_cast<const Vector *>(parameter);
   if (!expression) {
     return output;
   }
@@ -321,7 +323,7 @@ static EnumValues parseEnumItems(const Expression *parameter, const std::string&
   const auto& elements = expression->getChildren();
   for (const auto& elementPointer : elements) {
     EnumParameter::EnumItem item;
-    if (const Literal *element = dynamic_cast<const Literal *>(elementPointer.get())) {
+    if (const auto *element = dynamic_cast<const Literal *>(elementPointer.get())) {
       // string or number literal
       if (element->isDouble()) {
         if (elements.size() == 1) {
@@ -337,13 +339,13 @@ static EnumValues parseEnumItems(const Expression *parameter, const std::string&
       } else {
         return output;
       }
-    } else if (const Vector *element = dynamic_cast<const Vector *>(elementPointer.get())) {
+    } else if (const auto *element = dynamic_cast<const Vector *>(elementPointer.get())) {
       // [value, key] vector
       if (element->getChildren().size() != 2) {
         return output;
       }
 
-      const Literal *key = dynamic_cast<const Literal *>(element->getChildren()[1].get());
+      const auto *key = dynamic_cast<const Literal *>(element->getChildren()[1].get());
       if (!key) {
         return output;
       }
@@ -355,7 +357,7 @@ static EnumValues parseEnumItems(const Expression *parameter, const std::string&
         return output;
       }
 
-      const Literal *value = dynamic_cast<const Literal *>(element->getChildren()[0].get());
+      const auto *value = dynamic_cast<const Literal *>(element->getChildren()[0].get());
       if (!value) {
         return output;
       }
@@ -397,20 +399,20 @@ static NumericLimits parseNumericLimits(const Expression *parameter, const std::
 {
   NumericLimits output;
 
-  if (const Literal *step = dynamic_cast<const Literal *>(parameter)) {
+  if (const auto *step = dynamic_cast<const Literal *>(parameter)) {
     if (step->isDouble()) {
       output.step = step->toDouble();
     }
-  } else if (const Vector *maximum = dynamic_cast<const Vector *>(parameter)) {
+  } else if (const auto *maximum = dynamic_cast<const Vector *>(parameter)) {
     if (maximum->getChildren().size() == 1) {
-      const Literal *maximumChild = dynamic_cast<const Literal *>(maximum->getChildren()[0].get());
+      const auto *maximumChild = dynamic_cast<const Literal *>(maximum->getChildren()[0].get());
       if (maximumChild && maximumChild->isDouble()) {
         output.maximum = maximumChild->toDouble();
       }
     }
-  } else if (const Range *range = dynamic_cast<const Range *>(parameter)) {
-    const Literal *minimum = dynamic_cast<const Literal *>(range->getBegin());
-    const Literal *maximum = dynamic_cast<const Literal *>(range->getEnd());
+  } else if (const auto *range = dynamic_cast<const Range *>(parameter)) {
+    const auto *minimum = dynamic_cast<const Literal *>(range->getBegin());
+    const auto *maximum = dynamic_cast<const Literal *>(range->getEnd());
     if (
       minimum && minimum->isDouble()
       && maximum && maximum->isDouble()
@@ -418,7 +420,7 @@ static NumericLimits parseNumericLimits(const Expression *parameter, const std::
       output.minimum = minimum->toDouble();
       output.maximum = maximum->toDouble();
 
-      const Literal *step = dynamic_cast<const Literal *>(range->getStep());
+      const auto *step = dynamic_cast<const Literal *>(range->getStep());
       if (step && step->isDouble()) {
         output.step = step->toDouble();
       }
@@ -450,7 +452,7 @@ std::unique_ptr<ParameterObject> ParameterObject::fromAssignment(const Assignmen
   std::string description;
   const Annotation *descriptionAnnotation = assignment->annotation("Description");
   if (descriptionAnnotation) {
-    const Literal *expression = dynamic_cast<const Literal *>(descriptionAnnotation->getExpr().get());
+    const auto *expression = dynamic_cast<const Literal *>(descriptionAnnotation->getExpr().get());
     if (expression && expression->isString()) {
       description = expression->toString();
     }
@@ -459,7 +461,7 @@ std::unique_ptr<ParameterObject> ParameterObject::fromAssignment(const Assignmen
   std::string group = "Parameters";
   const Annotation *groupAnnotation = assignment->annotation("Group");
   if (groupAnnotation) {
-    const Literal *expression = dynamic_cast<const Literal *>(groupAnnotation->getExpr().get());
+    const auto *expression = dynamic_cast<const Literal *>(groupAnnotation->getExpr().get());
     if (expression && expression->isString()) {
       group = boost::algorithm::trim_copy(expression->toString());
 
@@ -468,7 +470,7 @@ std::unique_ptr<ParameterObject> ParameterObject::fromAssignment(const Assignmen
   }
 
   const Expression *valueExpression = assignment->getExpr().get();
-  if (const Literal *expression = dynamic_cast<const Literal *>(valueExpression)) {
+  if (const auto *expression = dynamic_cast<const Literal *>(valueExpression)) {
     if (expression->isBool()) {
       return std::make_unique<BoolParameter>(name, description, group, expression->toBool());
     }
@@ -492,7 +494,7 @@ std::unique_ptr<ParameterObject> ParameterObject::fromAssignment(const Assignmen
     if (expression->isString()) {
       std::string value = expression->toString();
       boost::optional<size_t> maximumSize = boost::none;
-      const Literal *maximumSizeExpression = dynamic_cast<const Literal *>(parameter);
+      const auto *maximumSizeExpression = dynamic_cast<const Literal *>(parameter);
       if (maximumSizeExpression && maximumSizeExpression->isDouble()) {
         maximumSize = (size_t)(maximumSizeExpression->toDouble());
       }
@@ -504,14 +506,14 @@ std::unique_ptr<ParameterObject> ParameterObject::fromAssignment(const Assignmen
       NumericLimits limits = parseNumericLimits(parameter, {value});
       return std::make_unique<NumberParameter>(name, description, group, value, limits.minimum, limits.maximum, limits.step);
     }
-  } else if (const Vector *expression = dynamic_cast<const Vector *>(valueExpression)) {
+  } else if (const auto *expression = dynamic_cast<const Vector *>(valueExpression)) {
     if (expression->getChildren().size() < 1 || expression->getChildren().size() > 4) {
       return nullptr;
     }
 
     std::vector<double> value;
     for (const auto& element : expression->getChildren()) {
-      const Literal *item = dynamic_cast<const Literal *>(element.get());
+      const auto *item = dynamic_cast<const Literal *>(element.get());
       if (!item) {
         return nullptr;
       }

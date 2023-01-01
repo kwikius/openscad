@@ -32,6 +32,9 @@
 
 #include <geometry/Polygon2d.h>
 
+class Polygon2d;
+class Geometry;
+
 class DrawingCallback
 {
 public:
@@ -56,8 +59,8 @@ private:
   double size;
 
   Outline2d outline;
-  class Polygon2d *polygon;
-  std::vector<const class Geometry *> polygons;
+  Polygon2d *polygon{nullptr};
+  std::vector<const Geometry *> polygons;
 
   void add_vertex(const Vector2d& v);
 };

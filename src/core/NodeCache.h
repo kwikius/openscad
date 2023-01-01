@@ -17,8 +17,7 @@
 class NodeCache
 {
 public:
-  NodeCache() { }
-  virtual ~NodeCache() { }
+  NodeCache() = default;
 
   bool contains(const AbstractNode& node) const {
     auto result = this->cache.find(node.index());

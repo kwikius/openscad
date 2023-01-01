@@ -41,7 +41,7 @@
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 static std::shared_ptr<AbstractNode>
-builtin_minkowski(const ModuleInstantiation *inst, Arguments arguments, Children children)
+builtin_minkowski(const ModuleInstantiation *inst, Arguments arguments, Children const & children)
 {
   auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::MINKOWSKI);
 
@@ -52,7 +52,8 @@ builtin_minkowski(const ModuleInstantiation *inst, Arguments arguments, Children
 }
 
 static std::shared_ptr<AbstractNode>
-builtin_hull(const ModuleInstantiation *inst, Arguments arguments, Children children)
+builtin_hull(const ModuleInstantiation *inst, Arguments arguments, Children const & children)
+
 {
   auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::HULL);
 
@@ -63,7 +64,7 @@ builtin_hull(const ModuleInstantiation *inst, Arguments arguments, Children chil
 }
 
 static std::shared_ptr<AbstractNode>
-builtin_fill(const ModuleInstantiation *inst, Arguments arguments, Children children)
+builtin_fill(const ModuleInstantiation *inst, Arguments arguments, Children const & children)
 {
   auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::FILL);
 
@@ -72,8 +73,9 @@ builtin_fill(const ModuleInstantiation *inst, Arguments arguments, Children chil
   return children.instantiate(node);
 }
 
+
 static std::shared_ptr<AbstractNode>
-builtin_resize(const ModuleInstantiation *inst, Arguments arguments, Children children)
+builtin_resize(const ModuleInstantiation *inst, Arguments arguments, Children const & children)
 {
   auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::RESIZE);
 

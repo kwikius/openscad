@@ -36,12 +36,12 @@ boost::optional<const Value&>
 ContextFrame::lookup_local_variable(const std::string& name) const
 {
   if (is_config_variable(name)) {
-    ValueMap::const_iterator result = config_variables.find(name);
+    auto result = config_variables.find(name);
     if (result != config_variables.end()) {
       return result->second;
     }
   } else {
-    ValueMap::const_iterator result = lexical_variables.find(name);
+    auto result = lexical_variables.find(name);
     if (result != lexical_variables.end()) {
       return result->second;
     }
@@ -58,6 +58,7 @@ ContextFrame::lookup_local_function(const std::string& name, const Location& loc
   }
   return boost::none;
 }
+
 
 boost::optional<InstantiableModule>
 ContextFrame::lookup_local_module(const std::string& name, const Location& loc) const

@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <string>
+#include <utility>
 #include <vector>
 #include <memory>
 
@@ -13,11 +14,11 @@ class Expression;
 class Assignment : public ASTNode{
 public:
   Assignment(std::string name, const Location& loc)
-    : ASTNode(loc), name(name), locOfOverwrite(Location::NONE) { }
+    : ASTNode(loc), name(std::move(name)), locOfOverwrite(Location::NONE) { }
   Assignment(std::string name,
              std::shared_ptr<Expression> expr = std::shared_ptr<Expression>(),
              const Location& loc = Location::NONE)
-    : ASTNode(loc), name(name), expr(expr), locOfOverwrite(Location::NONE){ }
+    : ASTNode(loc), name(std::move(name)), expr(std::move(expr)), locOfOverwrite(Location::NONE){ }
 
   void print(std::ostream& stream, const std::string& indent) const override;
   const std::string& getName() const { return name; }
@@ -49,8 +50,7 @@ std::shared_ptr<Assignment>
   return std::make_shared<Assignment>(args ...);
 }
 
-using AssignmentList = std::vector<std::shared_ptr<Assignment> > ;
-
-typedef std::unordered_map<std::string, const Expression *> AssignmentMap;
+using AssignmentList = std::vector<std::shared_ptr<Assignment>>;
+using AssignmentMap = std::unordered_map<std::string, const Expression *>;
 
 std::ostream& operator<<(std::ostream& stream, const AssignmentList& assignments);

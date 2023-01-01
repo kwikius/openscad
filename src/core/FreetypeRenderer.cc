@@ -41,11 +41,11 @@
 #include "FreetypeRenderer.h"
 
 #include FT_OUTLINE_H
-
+// NOLINTNEXTLINE(bugprone-macro-parentheses)
 #define SCRIPT_UNTAG(tag)   ((uint8_t)((tag) >> 24)) % ((uint8_t)((tag) >> 16)) % ((uint8_t)((tag) >> 8)) % ((uint8_t)(tag))
 
 static inline Vector2d get_scaled_vector(const FT_Vector *ft_vector, double scale) {
-  return Vector2d(ft_vector->x / scale, ft_vector->y / scale);
+  return {ft_vector->x / scale, ft_vector->y / scale};
 }
 
 const double FreetypeRenderer::scale = 1e5;
@@ -60,13 +60,9 @@ FreetypeRenderer::FreetypeRenderer()
   funcs.shift = 0;
 }
 
-FreetypeRenderer::~FreetypeRenderer()
-{
-}
-
 int FreetypeRenderer::outline_move_to_func(const FT_Vector *to, void *user)
 {
-  DrawingCallback *cb = reinterpret_cast<DrawingCallback *>(user);
+  auto *cb = reinterpret_cast<DrawingCallback *>(user);
 
   cb->move_to(get_scaled_vector(to, scale));
   return 0;
@@ -74,7 +70,7 @@ int FreetypeRenderer::outline_move_to_func(const FT_Vector *to, void *user)
 
 int FreetypeRenderer::outline_line_to_func(const FT_Vector *to, void *user)
 {
-  DrawingCallback *cb = reinterpret_cast<DrawingCallback *>(user);
+  auto *cb = reinterpret_cast<DrawingCallback *>(user);
 
   cb->line_to(get_scaled_vector(to, scale));
   return 0;
@@ -82,7 +78,7 @@ int FreetypeRenderer::outline_line_to_func(const FT_Vector *to, void *user)
 
 int FreetypeRenderer::outline_conic_to_func(const FT_Vector *c1, const FT_Vector *to, void *user)
 {
-  DrawingCallback *cb = reinterpret_cast<DrawingCallback *>(user);
+  auto *cb = reinterpret_cast<DrawingCallback *>(user);
 
   cb->curve_to(get_scaled_vector(c1, scale), get_scaled_vector(to, scale));
   return 0;
@@ -90,7 +86,7 @@ int FreetypeRenderer::outline_conic_to_func(const FT_Vector *c1, const FT_Vector
 
 int FreetypeRenderer::outline_cubic_to_func(const FT_Vector *c1, const FT_Vector *c2, const FT_Vector *to, void *user)
 {
-  DrawingCallback *cb = reinterpret_cast<DrawingCallback *>(user);
+  auto *cb = reinterpret_cast<DrawingCallback *>(user);
 
   cb->curve_to(get_scaled_vector(c1, scale), get_scaled_vector(c2, scale), get_scaled_vector(to, scale));
   return 0;
@@ -257,7 +253,7 @@ void FreetypeRenderer::Params::detect_properties()
   // by using a fraction of the number of full circle segments
   // the resolution will be better matching the detail level of
   // other objects.
-  auto text_segments = std::max(floor(segments / 8) + 1, 2.0);
+  auto text_segments = std::max(segments / 8 + 1, 2);
   set_segments(text_segments);
 }
 
@@ -322,7 +318,6 @@ void FreetypeRenderer::Params::set(Parameters& parameters)
 
 FreetypeRenderer::ShapeResults::ShapeResults(
   const FreetypeRenderer::Params& params)
-  : ok(false), hb_ft_font(nullptr), hb_buf(nullptr)
 {
   FT_Face face = params.get_font_face();
   if (face == nullptr) {
@@ -558,7 +553,7 @@ std::vector<const Geometry *> FreetypeRenderer::render(const FreetypeRenderer::P
   ShapeResults sr(params);
 
   if (!sr.ok) {
-    return std::vector<const Geometry *>();
+    return {};
   }
 
   DrawingCallback callback(params.segments, params.size);

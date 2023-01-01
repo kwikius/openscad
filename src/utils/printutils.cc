@@ -56,7 +56,7 @@ bool would_have_thrown()
 
 void print_messages_push()
 {
-  print_messages_stack.push_back(std::string());
+  print_messages_stack.emplace_back();
 }
 
 void print_messages_pop()

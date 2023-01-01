@@ -34,10 +34,11 @@
  * @brief in this form the module is passed arguments in the ModuleInstantiation
  * passed to the instantiate member function, but the module expects no children
 **/
-BuiltinModule::BuiltinModule(fnContextInstantiate fnInstantiate, const Feature *feature) :
-  AbstractModule(feature),
+BuiltinModule::BuiltinModule(fnContextInstantiate fnInstantiate, const Feature *feature)
+:AbstractModule(feature),
   do_instantiate(fnInstantiate)
 {}
+
 /**
  * @brief in this form the module is passed children in the
  *  ModuleInstantiation passed to the instantiate function
@@ -59,5 +60,5 @@ std::shared_ptr<AbstractNode>
 BuiltinModule::instantiate(contextPtr const & defining_context,
    ModInst const *inst, contextPtr const & context) const
 {
-  return do_instantiate(inst, context);
+   return do_instantiate(inst, context);
 }
