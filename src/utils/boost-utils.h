@@ -11,7 +11,7 @@
 namespace fs = boost::filesystem;
 
 fs::path boostfs_normalize(const fs::path& path);
-fs::path boostfs_uncomplete(fs::path const p, fs::path const base);
+fs::path boostfs_uncomplete(fs::path const & p, fs::path const & base);
 
 BOOST_TRIBOOL_THIRD_STATE(unknown)
 

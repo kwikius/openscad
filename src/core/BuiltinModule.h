@@ -18,7 +18,7 @@ public:
    using fnContextInstantiate =
       abstractNodePtr(*)(ModInst const *, contextPtr const &);
    using fnArgsChildrenInstantiate =
-      abstractNodePtr (*) (ModInst const *, Arguments, Children);
+      abstractNodePtr (*) (ModInst const *, Arguments, Children const & );
 
    BuiltinModule(fnContextInstantiate,Feature const *feature = nullptr);
    BuiltinModule(fnArgsChildrenInstantiate,Feature const *feature = nullptr);

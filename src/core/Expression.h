@@ -32,12 +32,8 @@ public:
   [[nodiscard]] virtual bool isLiteral() const { return false;}
   [[nodiscard]] Id getID() const { return m_id;}
   [[nodiscard]] virtual Value evaluate(const std::shared_ptr<const Context>& context) const = 0;
-  [[nodiscard]] virtual bool isLiteral() const;
-  [[nodiscard]] virtual Value evaluate(const std::shared_ptr<const Context>& context) const = 0;
-
   [[nodiscard]] Value checkUndef(Value&& val, const std::shared_ptr<const Context>& context) const;
 protected:
-    Expression(const Location& loc) : ASTNode(loc) {}
     Expression(Id id, const Location& loc) : ASTNode(loc), m_id(id) {}
  private :
      Id const m_id;

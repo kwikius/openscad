@@ -80,7 +80,6 @@ endif(CLANG_TIDY)
 
 #TODO sort HEADLESS
 
-<<<<<<< HEAD
 set(openscadEXECUTABLE OpenSCAD)
 set(openscadSTATIC_LIBS openscadCGAL openscadGUI openscadCORE openscadIO)
 set(openscadALLTARGETS ${openscadEXECUTABLE} ${openscadSTATIC_LIBS})
