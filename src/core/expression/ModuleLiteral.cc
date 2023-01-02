@@ -85,7 +85,7 @@ Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) con
       if ( static_cast<bool>(param->getExpr()) == true ){
          new_param->setExpr(
 #if defined OPENSCAD_USE_VALUE_WRAPPER_PARAMS
-            std::make_shared<ValueWrapper>(
+            std::make_shared<Literal>(
                std::move(param->getExpr()->evaluate(context)),
                location()
             )
@@ -117,7 +117,7 @@ Value ModuleLiteral::evaluate(const std::shared_ptr<const Context>& context) con
 #endif
           arg->setExpr(
 #if defined OPENSCAD_USE_VALUE_WRAPPER_ARGS
-            std::make_shared<ValueWrapper>(
+            std::make_shared<Literal>(
                std::move(arg->getExpr()->evaluate(context)),
                location()
             )
