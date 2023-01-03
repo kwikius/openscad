@@ -89,7 +89,7 @@ namespace{
       @param modInst The existing ModuleInstantiation that has been called on the ModuleExpression.
       @param expr The moduleExpression to expand
       @param context The context of the instantiation, which may be modified during the expansion
-      @returns true if the Module expression was exapanded successfully else false
+      @returns true if the Module expression was expanded successfully else false
    **/
    bool evalModuleExpr(ModuleInstantiation* modInst,
       std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context);
@@ -99,7 +99,7 @@ namespace{
    *  @brief expand a module expression into a module instantiation using an new moduleInstantatiation
       @param expr The moduleExpression to expand
       @param context The context of the instantiation, which may be modified during the expansion
-      @returns shared_ptr to the new ModuleInstantation if the Module expression was exapanded successfully
+      @returns shared_ptr to the new ModuleInstantation if the Module expression was expanded successfully
       else empty shared_ptr
    **/
    std::shared_ptr<ModuleInstantiation>
