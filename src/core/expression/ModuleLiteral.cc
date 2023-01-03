@@ -9,14 +9,14 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 #include <Feature.h>
 
-#include "../ModuleReference.h"
-#include "../LocalScope.h"
-#include "../UserModule.h"
 #include <core/Context.h>
+#include <core/ModuleReference.h>
+#include <core/LocalScope.h>
+#include <core/UserModule.h>
 
-#include "ModuleLiteral.h"
 #include "Literal.h"
-//#include "ValueWrapper.h"
+#include "ModuleLiteral.h"
+
 
 Expression* MakeModuleLiteral(
    const std::string& moduleName,
@@ -48,18 +48,6 @@ std::string generateAnonymousModuleName()
 {
    sprintf(itoaArr,"__&ML[%d]__",anonymousModuleNameCount++);
    return std::string(itoaArr);
-}
-
-void pushAnonymousModuleName(std::string const & name)
-{
-   anonModuleStack.push(name);
-}
-
-std::string popAnonymousModuleName()
-{
-   std::string name = anonModuleStack.top();
-   anonModuleStack.pop();
-   return name;
 }
 
 ModuleLiteral::ModuleLiteral(const std::string& mod_name, const AssignmentList &literal_params,

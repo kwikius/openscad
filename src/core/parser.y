@@ -98,6 +98,8 @@ bool fileEnded=false;
 };
 
 %union {
+  int  integer;
+  char character;
   char *text;
   double number;
   class Expression *expr;
@@ -106,7 +108,6 @@ bool fileEnded=false;
   class IfElseModuleInstantiation *ifelse;
   class Assignment *arg;
   AssignmentList *args;
-  std::list< std::shared_ptr<Expression> > *exprlist;
 }
 
 %token TOK_ERROR
@@ -144,6 +145,10 @@ bool fileEnded=false;
 %type <expr> call
 %type <expr> logic_or
 %type <expr> module_literal
+%type <expr> module_alias
+%type <expr> module_alias_args
+%type <expr> module_expression
+%type <character> modinst_decorator
 %type <expr> logic_and
 %type <expr> equality
 %type <expr> comparison
@@ -168,7 +173,6 @@ bool fileEnded=false;
 %type <args> parameters
 %type <args> parameter_list
 %type <args> braced_parameters_or_empty
-%type <args> braced_arguments_or_empty
 %type <arg> argument
 %type <arg> parameter
 %type <text> module_id
@@ -199,13 +203,12 @@ statement
         | assignment
         | TOK_MODULE TOK_ID '(' parameters ')'
             {
-              UserModule *newmodule = new UserModule($2, LOCD("module", @$));
+              auto newmodule = std::make_shared<UserModule>($2, LOCD("module", @$));
               newmodule->parameters = *$4;
-              auto top = scope_stack.top();
-              scope_stack.push(&newmodule->body);
-              top->addModule(std::shared_ptr<UserModule>(newmodule));
               free($2);
               delete $4;
+              scope_stack.top()->addModule(newmodule);
+              scope_stack.push(&newmodule->body);
             }
           statement
             {
@@ -238,27 +241,34 @@ assignment
             }
         ;
 
+modinst_decorator
+       : '!'
+         { $$ = '!';}
+       | '#'
+         { $$ = '#';}
+       | '%'
+         { $$ = '%';}
+       | '*'
+         { $$ = '*';}
+       ;
+
 module_instantiation
-        : '!' module_instantiation
-            {
-                $$ = $2;
-                if ($$) $$->tag_root = true;
-            }
-        | '#' module_instantiation
-            {
-                $$ = $2;
-                if ($$) $$->tag_highlight = true;
-            }
-        | '%' module_instantiation
-            {
-                $$ = $2;
-                if ($$) $$->tag_background = true;
-            }
-        | '*' module_instantiation
-            {
-                delete $2;
-                $$ = NULL;
-            }
+        : modinst_decorator module_instantiation
+         {
+             if ( $2 != nullptr) {
+                switch($1){
+                   case '!': $2->tag_root = true;break;
+                   case '#': $2->tag_highlight = true;break;
+                   case '%': $2->tag_background = true;break;
+                   case '*': delete $2; $2 = nullptr;
+                   default : {
+                      assert(false);
+                      break;
+                   }
+                }
+             }
+             $$ = $2;
+         }
         | single_module_instantiation
             {
                 $<inst>$ = $1;
@@ -381,27 +391,29 @@ braced_parameters_or_empty
        }
      ;
 
-braced_arguments_or_empty
-     :
-       {
-         $$ = new AssignmentList;
-       }
-     | '(' arguments ')'
-       {
-         $$ = $2;
-       }
-     ;
+module_expression
+       : module_literal
+       | module_alias
+       | module_alias_args
+       ;
 
+module_alias
+       : TOK_MODULE TOK_ID
+          {
+            $$ = MakeModuleLiteral($2, AssignmentList(), AssignmentList(), LOCD("moduleliteral", @$));
+            delete $2;
+          }
+       ;
+module_alias_args
+       : TOK_MODULE TOK_ID '(' arguments ')'
+         {
+           $$ = MakeModuleLiteral($2, AssignmentList(), *$4, LOCD("moduleliteral", @$));
+           free($2);
+           delete $4;
+         }
+       ;
 module_literal
-        :
-          TOK_MODULE TOK_ID braced_arguments_or_empty
-           {
-              AssignmentList params;
-              $$ = MakeModuleLiteral($2, params, *$3, LOCD("moduleliteral", @$));
-              free($2);
-              delete $3;
-           }
-       |   TOK_MODULE '(' parameters ')' 
+       :   TOK_MODULE '(' parameters ')'
            {
               std::string const modname = generateAnonymousModuleName();
               auto newmodule = std::make_shared<UserModule>(modname.c_str(), LOCD("anonmodule", @$));
@@ -546,7 +558,7 @@ unary
 
 exponent
        : call
-       | module_literal
+       | module_expression
        | call '^' unary
            {
               $$ = new BinaryOp($1, BinaryOp::Op::Exponent, $3, LOCD("exponent", @$));
