@@ -16,7 +16,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 #include "ModuleLiteral.h"
 #include "Literal.h"
-#include "ValueWrapper.h"
+//#include "ValueWrapper.h"
 
 Expression* MakeModuleLiteral(
    const std::string& moduleName,
