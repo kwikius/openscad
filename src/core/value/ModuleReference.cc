@@ -8,10 +8,11 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 #include <utils/printutils.h>
 
+#include <core/Context.h>
+#include <core/Expression.h>
+#include <core/Value.h>
+
 #include "ModuleReference.h"
-#include "Context.h"
-#include "Expression.h"
-#include "Value.h"
 
 void ResetAnonymousModuleNameCount();
 

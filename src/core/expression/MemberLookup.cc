@@ -9,7 +9,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <typeinfo>
 #include <boost/regex.hpp>
 #include <core/expression/MemberLookup.h>
-#include <core/ModuleReference.h>
+#include <core/value/ModuleReference.h>
 #include <core/Value.h>
 #include <core/Context.h>
 #include <core/UserModule.h>

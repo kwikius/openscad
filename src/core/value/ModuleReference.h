@@ -10,7 +10,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <iostream>
 #include <memory>
 
-#include "Assignment.h"
+#include <core/Assignment.h>
 #include "ValuePtr.h"
 
 class Context;
@@ -72,7 +72,5 @@ private:
   std::shared_ptr<AssignmentList> module_args;
   int64_t const m_unique_id;
 };
-
-using ModuleReferencePtr = ValuePtr<ModuleReference>;
 
 std::ostream& operator<<(std::ostream& stream, const ModuleReference& m);

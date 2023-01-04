@@ -36,100 +36,83 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <glib.h>
 #include <boost/lexical_cast.hpp>
 
-#include <double-conversion/double-conversion.h>
-#include <double-conversion/utils.h>
-#include <double-conversion/ieee.h>
-
 #include <utils/printutils.h>
 #include <utils/boost-utils.h>
 #include <utils/StackCheck.h>
 
-#include "Value.h"
 #include "Context.h"
 #include "Expression.h"
 #include "EvaluationSession.h"
 #include "Filename.h"
 
+#include <core/value/double_converter_params.h>
+#include "Value.h"
+
 namespace fs = boost::filesystem;
+
+using dcParams = doubleConversionParams;
 
 const Value Value::undefined;
 const VectorType VectorType::EMPTY(nullptr);
-const RangeType RangeType::EMPTY{0, 0, 0};
 
-/* Define values for double-conversion library. */
-#define DC_BUFFER_SIZE 128
-#define DC_FLAGS (double_conversion::DoubleToStringConverter::UNIQUE_ZERO | double_conversion::DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN)
-#define DC_INF "inf"
-#define DC_NAN "nan"
-#define DC_EXP 'e'
-#define DC_DECIMAL_LOW_EXP -6
-#define DC_DECIMAL_HIGH_EXP 21
-#define DC_MAX_LEADING_ZEROES 5
-#define DC_MAX_TRAILING_ZEROES 0
-
-/* WARNING: using values > 8 will significantly slow double to string
- * conversion, defeating the purpose of using double-conversion library */
-#define DC_PRECISION_REQUESTED 6
-
-//private definitions used by trimTrailingZeroesHelper
-#define TRIM_TRAILINGZEROES_DONE 0
-#define TRIM_TRAILINGZEROES_CONTINUE 1
-
+ namespace {
+   int constexpr trimTrailingZeroesDone = 0;
+   int constexpr trimTrailingZeroesContinue = 1;
+ }
 //process parameter buffer from the end to start to find out where the zeroes are located (if any).
 //parameter pos shall be the pos in buffer where '\0' is located.
 //parameter currentpos shall be set to end of buffer (where '\0' is located).
 //set parameters exppos and decimalpos when needed.
 //leave parameter zeropos as is.
-inline int trimTrailingZeroesHelper(char *buffer, const int pos, char *currentpos = nullptr, char *exppos = nullptr, char *decimalpos = nullptr, char *zeropos = nullptr) {
-
-  int cont = TRIM_TRAILINGZEROES_CONTINUE;
-
+inline int
+trimTrailingZeroesHelper(char *buffer, const int pos, char *currentpos = nullptr,
+char *exppos = nullptr, char *decimalpos = nullptr, char *zeropos = nullptr)
+{
+  int cont = trimTrailingZeroesContinue;
   //we have exhausted all positions from end to start
-  if (currentpos <= buffer) return TRIM_TRAILINGZEROES_DONE;
-
+  if (currentpos <= buffer) return trimTrailingZeroesDone;
   //we do no need to process the terminator of string
   if (*currentpos == '\0') {
     currentpos--;
     cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
   }
-
   //we have an exponent and jumps to the position before the exponent - no need to process the characters belonging to the exponent
   if (cont && exppos && currentpos >= exppos) {
     currentpos = exppos;
     currentpos--;
     cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
   }
-
   //we are still on the right side of the decimal and still counting zeroes (keep track of) from the back to start
   if (cont && currentpos && decimalpos < currentpos && *currentpos == '0') {
     zeropos = currentpos;
     currentpos--;
     cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
   }
-
-  //we have found the first occurrence of not a zero and have zeroes and exponent to take care of (move exponent to either the position of the zero or the decimal)
+  // we have found the first occurrence of not a zero and have zeroes and exponent to take care
+  // of (move exponent to either the position of the zero or the decimal)
   if (cont && zeropos && exppos) {
     int count = &buffer[pos] - exppos + 1;
     memmove(zeropos - 1 == decimalpos ? decimalpos : zeropos, exppos, count);
-    return TRIM_TRAILINGZEROES_DONE;
+    return trimTrailingZeroesDone;
   }
 
   //we have found a zero and need to take care of (truncate the string to the position of either the zero or the decimal)
   if (cont && zeropos) {
     zeropos - 1 == decimalpos ? *decimalpos = '\0' : *zeropos = '\0';
-    return TRIM_TRAILINGZEROES_DONE;
+    return trimTrailingZeroesDone;
   }
 
   //we have just another character (other than a zero) and are done
-  if (cont && !zeropos) return TRIM_TRAILINGZEROES_DONE;
+  if (cont && !zeropos)
+    return trimTrailingZeroesDone;
 
-  return TRIM_TRAILINGZEROES_DONE;
+  return trimTrailingZeroesDone;
 }
 
 inline void trimTrailingZeroes(char *buffer, const int pos) {
   char *decimal = strchr(buffer, '.');
   if (decimal) {
-    char *exppos = strchr(buffer, DC_EXP);
+    char *exppos = strchr(buffer, dcParams::exp);
     trimTrailingZeroesHelper(buffer, pos, &buffer[pos], exppos, decimal, nullptr);
   }
 }
@@ -140,25 +123,26 @@ inline bool HandleSpecialValues(const double& value, double_conversion::StringBu
     if (value < 0) {
       builder.AddCharacter('-');
     }
-    builder.AddString(DC_INF);
+    builder.AddString(dcParams::inf);
     return true;
   }
   if (double_inspect.IsNan()) {
-    builder.AddString(DC_NAN);
+    builder.AddString(dcParams::nan);
     return true;
   }
   return false;
 }
 
-inline std::string DoubleConvert(const double& value, char *buffer,
-                                 double_conversion::StringBuilder& builder, const double_conversion::DoubleToStringConverter& dc) {
+std::string DoubleConvert(const double& value, char *buffer,
+                                 double_conversion::StringBuilder& builder,
+      const double_conversion::DoubleToStringConverter& dc) {
   builder.Reset();
   if (double_conversion::Double(value).IsSpecial()) {
     HandleSpecialValues(value, builder);
     builder.Finalize();
     return buffer;
   }
-  dc.ToPrecision(value, DC_PRECISION_REQUESTED, &builder);
+  dc.ToPrecision(value, dcParams::precisionRequested, &builder);
   int pos = builder.position(); // get position before Finalize destroys it
   builder.Finalize();
   trimTrailingZeroes(buffer, pos);
@@ -332,14 +316,12 @@ class tostream_visitor
 {
 public:
   std::ostringstream& stream;
-  mutable char buffer[DC_BUFFER_SIZE];
+  mutable char buffer[dcParams::bufferSize];
   mutable double_conversion::StringBuilder builder;
-  double_conversion::DoubleToStringConverter dc;
-
+  dcParams dc;
   tostream_visitor(std::ostringstream& stream)
-    : stream(stream), builder(buffer, DC_BUFFER_SIZE),
-    dc(DC_FLAGS, DC_INF, DC_NAN, DC_EXP, DC_DECIMAL_LOW_EXP, DC_DECIMAL_HIGH_EXP, DC_MAX_LEADING_ZEROES, DC_MAX_TRAILING_ZEROES)
-  {}
+    : stream(stream), builder(buffer, dcParams::bufferSize)
+    {}
 
   template <typename T> void operator()(const T& op1) const {
     //std::cout << "[generic tostream_visitor]\n";
@@ -408,10 +390,21 @@ public:
   }
 
   std::string operator()(const double& op1) const {
-    char buffer[DC_BUFFER_SIZE];
-    double_conversion::StringBuilder builder(buffer, DC_BUFFER_SIZE);
-    double_conversion::DoubleToStringConverter dc(DC_FLAGS, DC_INF, DC_NAN, DC_EXP,
-                                                  DC_DECIMAL_LOW_EXP, DC_DECIMAL_HIGH_EXP, DC_MAX_LEADING_ZEROES, DC_MAX_TRAILING_ZEROES);
+    char buffer[dcParams::bufferSize];
+    double_conversion::StringBuilder builder(buffer, dcParams::bufferSize);
+    dcParams dc;
+/*
+    double_conversion::DoubleToStringConverter dc(
+      dcParams::flags,
+      dcParams::inf,
+      dcParams::nan,
+      dcParams::exp,
+      dcParams::decimalLowExp,
+      dcParams::decimalHighExp,
+      dcParams::maxLeadingZeroes,
+      dcParams::maxTrailingZeroes
+    );
+*/
     return DoubleConvert(op1, buffer, builder, dc);
   }
 
@@ -482,20 +475,6 @@ std::string Value::toEchoStringNoThrow() const
   return ret;
 }
 
-std::string UndefType::toString() const {
-  std::ostringstream stream;
-  if (!reasons->empty()) {
-    auto it = reasons->begin();
-    stream << *it;
-    for (++it; it != reasons->end(); ++it) {
-      stream << "\n\t" << *it;
-    }
-  }
-  // clear reasons so multiple same warnings are not given on the same value
-  reasons->clear();
-  return stream.str();
-}
-
 const UndefType& Value::toUndef()
 {
   return std::get<UndefType>(this->value);
@@ -504,12 +483,6 @@ const UndefType& Value::toUndef()
 std::string Value::toUndefString() const
 {
   return std::get<UndefType>(this->value).toString();
-}
-
-std::ostream& operator<<(std::ostream& stream, const UndefType& u)
-{
-  stream << "undef";
-  return stream;
 }
 
 class chr_visitor
@@ -546,7 +519,8 @@ public:
   {
     const uint32_t steps = v->numValues();
     if (steps >= RangeType::MAX_RANGE_STEPS) {
-      LOG(message_group::Warning, Location::NONE, "", "Bad range parameter in for statement: too many elements (%1$lu).", steps);
+      LOG(message_group::Warning, Location::NONE, "",
+       "Bad range parameter in for statement: too many elements (%1$lu).", steps);
       return "";
     }
 
@@ -737,38 +711,6 @@ const FunctionType& Value::toFunction() const
 bool Value::isUncheckedUndef() const
 {
   return this->type() == Type::UNDEFINED && !std::get<UndefType>(this->value).empty();
-}
-
-Value FunctionType::operator==(const FunctionType& other) const {
-  return this == &other;
-}
-Value FunctionType::operator!=(const FunctionType& other) const {
-  return this != &other;
-}
-Value FunctionType::operator<(const FunctionType& other) const {
-  return Value::undef("operation undefined (function < function)");
-}
-Value FunctionType::operator>(const FunctionType& other) const {
-  return Value::undef("operation undefined (function > function)");
-}
-Value FunctionType::operator<=(const FunctionType& other) const {
-  return Value::undef("operation undefined (function <= function)");
-}
-Value FunctionType::operator>=(const FunctionType& other) const {
-  return Value::undef("operation undefined (function >= function)");
-}
-
-Value UndefType::operator<(const UndefType& other) const {
-  return Value::undef("operation undefined (undefined < undefined)");
-}
-Value UndefType::operator>(const UndefType& other) const {
-  return Value::undef("operation undefined (undefined > undefined)");
-}
-Value UndefType::operator<=(const UndefType& other) const {
-  return Value::undef("operation undefined (undefined <= undefined)");
-}
-Value UndefType::operator>=(const UndefType& other) const {
-  return Value::undef("operation undefined (undefined >= undefined)");
 }
 
 Value ObjectType::operator==(const ObjectType& other) const {
@@ -1236,108 +1178,6 @@ Value Value::operator[](size_t idx) const
 size_t str_utf8_wrapper::iterator::char_len()
 {
   return g_utf8_next_char(ptr) - ptr;
-}
-
-uint32_t RangeType::numValues() const
-{
-  if (std::isnan(begin_val) || std::isnan(end_val) || std::isnan(step_val)) {
-    return 0;
-  }
-  if (step_val < 0) {
-    if (begin_val < end_val) return 0;
-  } else {
-    if (begin_val > end_val) return 0;
-  }
-  if ((begin_val == end_val) || std::isinf(step_val)) {
-    return 1;
-  }
-  if (std::isinf(begin_val) || std::isinf(end_val) || step_val == 0) {
-    return std::numeric_limits<uint32_t>::max();
-  }
-  // Use nextafter to compensate for possible floating point inaccurary where result is just below a whole number.
-  const uint32_t max = std::numeric_limits<uint32_t>::max();
-  uint32_t num_steps = std::nextafter((end_val - begin_val) / step_val, max);
-  return (num_steps == max) ? max : num_steps + 1;
-}
-
-RangeType::iterator::iterator(const RangeType& range, type_t type) : range(range), val(range.begin_val), type(type),
-  num_values(range.numValues()), i_step(type == type_t::RANGE_TYPE_END ? num_values : 0)
-{
-  update_type();
-}
-
-void RangeType::iterator::update_type()
-{
-  if (range.step_val == 0) {
-    type = type_t::RANGE_TYPE_END;
-  } else if (range.step_val < 0) {
-    if (i_step >= num_values) {
-      type = type_t::RANGE_TYPE_END;
-    }
-  } else {
-    if (i_step >= num_values) {
-      type = type_t::RANGE_TYPE_END;
-    }
-  }
-
-  if (std::isnan(range.begin_val) || std::isnan(range.end_val) || std::isnan(range.step_val)) {
-    type = type_t::RANGE_TYPE_END;
-    i_step = num_values;
-  }
-}
-
-RangeType::iterator::reference RangeType::iterator::operator*()
-{
-  return val;
-}
-
-RangeType::iterator& RangeType::iterator::operator++()
-{
-  val = range.begin_val + range.step_val * ++i_step;
-  update_type();
-  return *this;
-}
-
-bool RangeType::iterator::operator==(const iterator& other) const
-{
-  if (type == type_t::RANGE_TYPE_RUNNING) {
-    return (type == other.type) && (val == other.val) && (range == other.range);
-  } else {
-    return (type == other.type) && (range == other.range);
-  }
-}
-
-bool RangeType::iterator::operator!=(const iterator& other) const
-{
-  return !(*this == other);
-}
-
-std::ostream& operator<<(std::ostream& stream, const RangeType& r)
-{
-  char buffer[DC_BUFFER_SIZE];
-  double_conversion::StringBuilder builder(buffer, DC_BUFFER_SIZE);
-  double_conversion::DoubleToStringConverter dc(DC_FLAGS, DC_INF,
-                                                DC_NAN, DC_EXP, DC_DECIMAL_LOW_EXP, DC_DECIMAL_HIGH_EXP,
-                                                DC_MAX_LEADING_ZEROES, DC_MAX_TRAILING_ZEROES);
-  return stream << "["
-                << DoubleConvert(r.begin_value(), buffer, builder, dc) << " : "
-                << DoubleConvert(r.step_value(),  buffer, builder, dc) << " : "
-                << DoubleConvert(r.end_value(),   buffer, builder, dc) << "]";
-}
-
-std::ostream& operator<<(std::ostream& stream, const FunctionType& f)
-{
-  stream << "function(";
-  bool first = true;
-  for (const auto& parameter : *(f.getParameters())) {
-    stream << (first ? "" : ", ") << parameter->getName();
-    if (parameter->getExpr()) {
-      stream << " = " << *parameter->getExpr();
-    }
-    first = false;
-  }
-  stream << ") " << *f.getExpr();
-  return stream;
 }
 
 // called by clone()

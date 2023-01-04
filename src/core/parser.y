@@ -50,7 +50,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <core/SourceFile.h>
 #include <core/UserModule.h>
 #include <core/ModuleInstantiation.h>
-#include <core/ModuleReference.h>
+#include <core/value/ModuleReference.h>
 #include <core/Assignment.h>
 #include <core/expression/expressions.h>
 #include <core/function.h>

@@ -10,7 +10,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <Feature.h>
 
 #include <core/Context.h>
-#include <core/ModuleReference.h>
+#include <core/value/ModuleReference.h>
 #include <core/LocalScope.h>
 #include <core/UserModule.h>
 

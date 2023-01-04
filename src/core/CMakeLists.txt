@@ -49,7 +49,10 @@ set(CORE_LIB_SOURCES
   AST.cc
   FreetypeRenderer.cc
   GroupModule.cc
-  ModuleReference.cc
+  value/ModuleReference.cc
+  value/RangeType.cc
+  value/FunctionType.cc
+  value/UndefType.cc
   ModuleInstantiation.cc
   NodeVisitor.cc
   SourceFile.cc
