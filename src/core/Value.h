@@ -6,7 +6,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 #include <vector>
 #include <string>
-#include <algorithm>
+//#include <algorithm>
 #include <cstdint>
 #include <limits>
 #include <iostream>
@@ -16,14 +16,25 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <glib.h>
 
 #include "Assignment.h"
+
+#include <core/value/VectorType.h>
+#include <core/value/EmbeddedVectorType.h>
 #include <core/value/ValuePtr.h>
 #include <core/value/ModuleReference.h>
 #include <core/value/RangeType.h>
 #include <core/value/FunctionType.h>
+#include <core/value/ObjectType.h>
 #include <core/value/UndefType.h>
 #include <core/value/str_utf8_wrapper.h>
 
-#include "QuotedString.h"
+class QuotedString;
+class VectorType;
+template <typename T> class ValuePtr;
+class ModuleReference;
+class RangeType;
+class FunctionType;
+class ObjectType;
+class str_utf8_wrapper;
 
 class tostring_visitor;
 class tostream_visitor;
@@ -34,8 +45,6 @@ class Value;
 using FunctionPtr = ValuePtr<FunctionType>;
 using ModuleReferencePtr = ValuePtr<ModuleReference>;
 using RangePtr = ValuePtr<RangeType>;
-
-std::ostream& operator<<(std::ostream& stream, const UndefType& u);
 
 /**
  *  @brief Value class encapsulates a std::variant value which can represent any of the
@@ -51,8 +60,7 @@ std::ostream& operator<<(std::ostream& stream, const UndefType& u);
  *    should return either a const reference or a clone of the cached value if returning by-value.
  *    NEVER return a non-const reference!
  */
-class Value
-{
+class Value{
 public:
   enum class Type {
     UNDEFINED,
@@ -68,201 +76,6 @@ public:
   };
   // FIXME: eventually remove this in favor of specific messages for each undef usage
   static const Value undefined;
-
-  /**
-   * VectorType is the underlying "BoundedType" of std::variant for OpenSCAD vectors.
-   * It holds only a shared_ptr to its VectorObject type, and provides a convenient
-   * interface for various operations needed on the vector.
-   *
-   * EmbeddedVectorType class derives from VectorType and enables O(1) concatenation of vectors
-   * by treating their elements as elements of their parent, traversable via VectorType's custom iterator.
-   * -- An embedded vector should never exist "in the wild", only as a pseudo-element of a parent vector.
-   *    Eg "Lc*" Expressions return Embedded Vectors but they are necessarily child expressions of a Vector expression.
-   * -- Any VectorType containing embedded elements will be forced to "flatten" upon usage of operator[],
-   *    which is the only case of random-access.
-   * -- Any loops through VectorTypes should prefer automatic range-based for loops  eg: for(const auto& value : vec) { ... }
-   *    which make use of begin() and end() iterators of VectorType.  https://en.cppreference.com/w/cpp/language/range-for
-   * -- Moving a temporary Value of type VectorType or EmbeddedVectorType is always safe,
-   *    since it just moves the shared_ptr in its possession (which might be a copy but that doesn't matter).
-   *    Additionally any VectorType can be converted to an EmbeddedVectorType by moving it into
-   *    EmbeddedVectorType's converting constructor (or vice-versa).
-   * -- HOWEVER, moving elements out of a [Embedded]VectorType is potentially DANGEROUS unless it can be
-   *    verified that ( ptr.use_count() == 1 ) for that outermost [Embedded]VectorType
-   *    AND recursively any EmbeddedVectorTypes which led to that element.
-   *    Therefore elements are currently cloned rather than making any attempt to move.
-   *    Performing such use_count checks may be an area for further optimization.
-   */
-  class EmbeddedVectorType;
-  class VectorType
-  {
-
-protected:
-    // The object type which VectorType's shared_ptr points to.
-    struct VectorObject {
-      using vec_t = std::vector<Value>;
-      using size_type = vec_t::size_type;
-      vec_t vec;
-      size_type embed_excess = 0; // Keep count of the number of embedded elements *excess of* vec.size()
-      class EvaluationSession *evaluation_session = nullptr; // Used for heap size bookkeeping. May be null for vectors of known small maximum size.
-      size_type size() const { return vec.size() + embed_excess;  }
-    };
-    using vec_t = VectorObject::vec_t;
-public:
-    std::shared_ptr<VectorObject> ptr;
-protected:
-
-    // A Deleter is used on the shared_ptrs to avoid stack overflow in cases
-    // of destructing a very large list of nested embedded vectors, such as from a
-    // recursive function which concats one element at a time.
-    // (A similar solution can also be seen with CSGNode.h:CSGOperationDeleter).
-    struct VectorObjectDeleter {
-      void operator()(VectorObject *vec);
-    };
-    void flatten() const; // flatten replaces VectorObject::vec with a new vector
-                          // where any embedded elements are copied directly into the top level vec,
-                          // leaving only true elements for straightforward indexing by operator[].
-    explicit VectorType(const std::shared_ptr<VectorObject>& copy) : ptr(copy) { } // called by clone()
-public:
-    using size_type = VectorObject::size_type;
-    static const VectorType EMPTY;
-    // EmbeddedVectorType-aware iterator, manages its own stack of begin/end vec_t::const_iterators
-    // such that calling code will only receive references to "true" elements (i.e. NOT EmbeddedVectorTypes).
-    // Also tracks the overall element index. In case flattening occurs during iteration, it can continue based on that index.
-   // (Issue #3541)
-    class iterator
-    {
-private:
-      const VectorObject *vo;
-      std::vector<std::pair<vec_t::const_iterator, vec_t::const_iterator>> it_stack;
-      vec_t::const_iterator it, end;
-      size_t index;
-
-      // Recursively push stack while current (pseudo)element is an EmbeddedVector
-      //  - Depends on the fact that VectorType::emplace_back(EmbeddedVectorType&& mbed)
-      //    will not embed an empty vector, which ensures iterator will arrive at an actual element,
-      //    unless already at end of parent VectorType.
-      void check_and_push()
-      {
-        if (it != end) {
-          while (it->type() == Type::EMBEDDED_VECTOR) {
-            const vec_t& cur = it->toEmbeddedVector().ptr->vec;
-            it_stack.emplace_back(it, end);
-            it = cur.begin();
-            end = cur.end();
-          }
-        }
-      }
-public:
-      using iterator_category = std::forward_iterator_tag;
-      using value_type = Value;
-      using difference_type = void;
-      using reference = const value_type&;
-      using pointer = const value_type *;
-
-      iterator() : vo(EMPTY.ptr.get()), it_stack(), it(EMPTY.ptr->vec.begin()), end(EMPTY.ptr->vec.end()), index(0) {}
-      iterator(const VectorObject *v) : vo(v), it(v->vec.begin()), end(v->vec.end()), index(0) {
-        if (vo->embed_excess) check_and_push();
-      }
-      iterator(const VectorObject *v, bool /*end*/) : vo(v), index(v->size()) { }
-      iterator& operator++() {
-        ++index;
-        if (vo->embed_excess) {
-          // recursively increment and pop stack while at the end of EmbeddedVector(s)
-          while (++it == end && !it_stack.empty()) {
-            const auto& up = it_stack.back();
-            it = up.first;
-            end = up.second;
-            it_stack.pop_back();
-          }
-          check_and_push();
-        } else { // vo->vec is flat
-          it = vo->vec.begin() + index;
-        }
-        return *this;
-      }
-      reference operator*() const { return *it; }
-      pointer operator->() const { return &*it; }
-      bool operator==(const iterator& other) const { return this->vo == other.vo && this->index == other.index; }
-      bool operator!=(const iterator& other) const { return this->vo != other.vo || this->index != other.index; }
-    };
-    using const_iterator = const iterator;
-    VectorType(class EvaluationSession *session); // : ptr(shared_ptr<VectorObject>(new VectorObject(), VectorObjectDeleter() )) {}
-    VectorType(class EvaluationSession *session, double x, double y, double z);
-    VectorType(const VectorType&) = delete; // never copy, move instead
-    VectorType& operator=(const VectorType&) = delete; // never copy, move instead
-    VectorType(VectorType&&) = default;
-    VectorType& operator=(VectorType&&) = default;
-    VectorType clone() const { return VectorType(this->ptr); } // Copy explicitly only when necessary
-    static Value Empty() { return VectorType(nullptr); }
-
-    const_iterator begin() const { return iterator(ptr.get()); }
-    const_iterator   end() const { return iterator(ptr.get(), true); }
-    size_type size() const { return ptr->size(); }
-    bool empty() const { return ptr->vec.empty(); }
-    // const accesses to VectorObject require .clone to be move-able
-    const Value& operator[](size_t idx) const {
-      if (idx < this->size()) {
-        if (ptr->embed_excess) flatten();
-        return ptr->vec[idx];
-      } else {
-        return Value::undefined;
-      }
-    }
-    Value operator==(const VectorType& v) const;
-    Value operator<(const VectorType& v) const;
-    Value operator>(const VectorType& v) const;
-    Value operator!=(const VectorType& v) const;
-    Value operator<=(const VectorType& v) const;
-    Value operator>=(const VectorType& v) const;
-    class EvaluationSession *evaluation_session() const { return ptr->evaluation_session; }
-
-    void emplace_back(Value&& val);
-    void emplace_back(EmbeddedVectorType&& mbed);
-    template <typename ... Args> void emplace_back(Args&&... args) { emplace_back(Value(std::forward<Args>(args)...)); }
-  };
-
-  class EmbeddedVectorType : public VectorType
-  {
-private:
-    explicit EmbeddedVectorType(const std::shared_ptr<VectorObject>& copy) : VectorType(copy) { } // called by clone()
-public:
-    EmbeddedVectorType(class EvaluationSession *session) : VectorType(session) {}
-    EmbeddedVectorType(const EmbeddedVectorType&) = delete;
-    EmbeddedVectorType& operator=(const EmbeddedVectorType&) = delete;
-    EmbeddedVectorType(EmbeddedVectorType&&) = default;
-    EmbeddedVectorType& operator=(EmbeddedVectorType&&) = default;
-
-    EmbeddedVectorType(VectorType&& v) : VectorType(std::move(v)) {} // converting constructor
-    EmbeddedVectorType clone() const { return EmbeddedVectorType(this->ptr); }
-    static Value Empty() { return EmbeddedVectorType(nullptr); }
-  };
-
-  class ObjectType
-  {
-protected:
-    struct ObjectObject;
-    struct ObjectObjectDeleter {
-      void operator()(ObjectObject *obj);
-    };
-
-private:
-    explicit ObjectType(const std::shared_ptr<ObjectObject>& copy);
-
-public:
-    std::shared_ptr<ObjectObject> ptr;
-    ObjectType(class EvaluationSession *session);
-    ObjectType clone() const;
-    const Value& get(const std::string& key) const;
-    void set(const std::string& key, Value&& value);
-    Value operator==(const ObjectType& v) const;
-    Value operator<(const ObjectType& v) const;
-    Value operator>(const ObjectType& v) const;
-    Value operator!=(const ObjectType& v) const;
-    Value operator<=(const ObjectType& v) const;
-    Value operator>=(const ObjectType& v) const;
-    const Value& operator[](const str_utf8_wrapper& v) const;
-    const std::vector<std::string>& keys() const;
-  };
 
 private:
   Value() : value(UndefType()) { } // Don't default construct empty Values.  If "undefined" needed, use reference to Value::undefined, or call Value::undef() for return by value
@@ -337,11 +150,7 @@ public:
 
   static bool cmp_less(const Value& v1, const Value& v2);
 
-  friend std::ostream& operator<<(std::ostream& stream, const Value& value) {
-    if (value.type() == Value::Type::STRING) stream << QuotedString(value.toString());
-    else stream << value.toString();
-    return stream;
-  }
+  friend std::ostream& operator<<(std::ostream& stream, const Value& value);
 
   typedef std::variant<UndefType, bool, double, str_utf8_wrapper,
     VectorType, EmbeddedVectorType, RangePtr, FunctionPtr, ObjectType,
@@ -350,22 +159,8 @@ public:
 
   static_assert(sizeof(Value::Variant) <= 24, "Memory size of Value too big");
   const Variant& getVariant() const { return value; }
-
+  Variant & getVariant() { return value;}
 private:
   Variant value;
 };
 
-// The object type which ObjectType's shared_ptr points to.
-struct Value::ObjectType::ObjectObject {
-  using obj_t = std::unordered_map<std::string, Value>;
-  obj_t map;
-  class EvaluationSession *evaluation_session = nullptr;
-  std::vector<std::string> keys;
-  std::vector<Value> values;
-};
-
-std::ostream& operator<<(std::ostream& stream, const Value::ObjectType& u);
-
-using VectorType = Value::VectorType;
-using EmbeddedVectorType = Value::EmbeddedVectorType;
-using ObjectType = Value::ObjectType;

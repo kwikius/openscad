@@ -1,9 +1,12 @@
 #pragma once
 
 #include <string>
-#include <memory>
+
+#include <boost/optional.hpp>
 
 #include "Context.h"
+
+class EvaluationSession;
 
 class BuiltinContext : public Context
 {

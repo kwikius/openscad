@@ -44,6 +44,7 @@
 #include <utils/boost-utils.h>
 
 #include <core/Value.h>
+#include <core/QuotedString.h>
 
 #include <geometry/Polygon2d.h>
 #include <geometry/Grid.h>

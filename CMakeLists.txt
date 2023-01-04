@@ -81,16 +81,16 @@ endif(CLANG_TIDY)
 #TODO sort HEADLESS
 
 set(openscadEXECUTABLE OpenSCAD)
-set(openscadSTATIC_LIBS openscadCGAL openscadGUI openscadCORE openscadIO)
+set(openscadSTATIC_LIBS openscadCORE openscadGUI openscadCGAL openscadIO)
 set(openscadALLTARGETS ${openscadEXECUTABLE} ${openscadSTATIC_LIBS})
 
 add_executable(${openscadEXECUTABLE})
 
 add_subdirectory(submodules)
 # static libraries
-add_subdirectory(src/geometry/cgal)
-add_subdirectory(src/gui)
 add_subdirectory(src/core)
+add_subdirectory(src/gui)
+add_subdirectory(src/geometry/cgal)
 add_subdirectory(src/io)
 
 target_link_libraries(${openscadEXECUTABLE} PUBLIC
@@ -677,6 +677,8 @@ set(MISC_SOURCES
   src/core/customizer/CommentParser.cc
   src/core/customizer/ParameterObject.cc
   src/core/customizer/ParameterSet.cc
+  src/core/Builtins.cc
+  src/core/BuiltinContext.cc
   src/utils/boost-utils.cc
   src/utils/calc.cc
   src/utils/degree_trig.cc

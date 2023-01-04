@@ -48,90 +48,107 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <core/value/double_converter_params.h>
 #include "Value.h"
 
+#include <core/value/VectorType.h>
+#include <core/value/EmbeddedVectorType.h>
+#include <core/value/ValuePtr.h>
+#include <core/value/ModuleReference.h>
+#include <core/value/RangeType.h>
+#include <core/value/FunctionType.h>
+#include <core/value/ObjectType.h>
+#include <core/value/UndefType.h>
+#include <core/value/str_utf8_wrapper.h>
+#include "QuotedString.h"
+
 namespace fs = boost::filesystem;
 
 using dcParams = doubleConversionParams;
 
 const Value Value::undefined;
-const VectorType VectorType::EMPTY(nullptr);
+
+std::ostream& operator<<(std::ostream& stream, const Value& value) {
+ if (value.type() == Value::Type::STRING) stream << QuotedString(value.toString());
+ else stream << value.toString();
+ return stream;
+}
 
  namespace {
    int constexpr trimTrailingZeroesDone = 0;
    int constexpr trimTrailingZeroesContinue = 1;
- }
-//process parameter buffer from the end to start to find out where the zeroes are located (if any).
-//parameter pos shall be the pos in buffer where '\0' is located.
-//parameter currentpos shall be set to end of buffer (where '\0' is located).
-//set parameters exppos and decimalpos when needed.
-//leave parameter zeropos as is.
-inline int
-trimTrailingZeroesHelper(char *buffer, const int pos, char *currentpos = nullptr,
-char *exppos = nullptr, char *decimalpos = nullptr, char *zeropos = nullptr)
-{
-  int cont = trimTrailingZeroesContinue;
-  //we have exhausted all positions from end to start
-  if (currentpos <= buffer) return trimTrailingZeroesDone;
-  //we do no need to process the terminator of string
-  if (*currentpos == '\0') {
-    currentpos--;
-    cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
-  }
-  //we have an exponent and jumps to the position before the exponent - no need to process the characters belonging to the exponent
-  if (cont && exppos && currentpos >= exppos) {
-    currentpos = exppos;
-    currentpos--;
-    cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
-  }
-  //we are still on the right side of the decimal and still counting zeroes (keep track of) from the back to start
-  if (cont && currentpos && decimalpos < currentpos && *currentpos == '0') {
-    zeropos = currentpos;
-    currentpos--;
-    cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
-  }
-  // we have found the first occurrence of not a zero and have zeroes and exponent to take care
-  // of (move exponent to either the position of the zero or the decimal)
-  if (cont && zeropos && exppos) {
-    int count = &buffer[pos] - exppos + 1;
-    memmove(zeropos - 1 == decimalpos ? decimalpos : zeropos, exppos, count);
-    return trimTrailingZeroesDone;
-  }
 
-  //we have found a zero and need to take care of (truncate the string to the position of either the zero or the decimal)
-  if (cont && zeropos) {
-    zeropos - 1 == decimalpos ? *decimalpos = '\0' : *zeropos = '\0';
-    return trimTrailingZeroesDone;
-  }
+   //process parameter buffer from the end to start to find out where the zeroes are located (if any).
+   //parameter pos shall be the pos in buffer where '\0' is located.
+   //parameter currentpos shall be set to end of buffer (where '\0' is located).
+   //set parameters exppos and decimalpos when needed.
+   //leave parameter zeropos as is.
+   inline int
+   trimTrailingZeroesHelper(char *buffer, const int pos, char *currentpos = nullptr,
+   char *exppos = nullptr, char *decimalpos = nullptr, char *zeropos = nullptr)
+   {
+     int cont = trimTrailingZeroesContinue;
+     //we have exhausted all positions from end to start
+     if (currentpos <= buffer) return trimTrailingZeroesDone;
+     //we do no need to process the terminator of string
+     if (*currentpos == '\0') {
+       currentpos--;
+       cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
+     }
+     //we have an exponent and jumps to the position before the exponent - no need to process the characters belonging to the exponent
+     if (cont && exppos && currentpos >= exppos) {
+       currentpos = exppos;
+       currentpos--;
+       cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
+     }
+     //we are still on the right side of the decimal and still counting zeroes (keep track of) from the back to start
+     if (cont && currentpos && decimalpos < currentpos && *currentpos == '0') {
+       zeropos = currentpos;
+       currentpos--;
+       cont = trimTrailingZeroesHelper(buffer, pos, currentpos, exppos, decimalpos, zeropos);
+     }
+     // we have found the first occurrence of not a zero and have zeroes and exponent to take care
+     // of (move exponent to either the position of the zero or the decimal)
+     if (cont && zeropos && exppos) {
+       int count = &buffer[pos] - exppos + 1;
+       memmove(zeropos - 1 == decimalpos ? decimalpos : zeropos, exppos, count);
+       return trimTrailingZeroesDone;
+     }
 
-  //we have just another character (other than a zero) and are done
-  if (cont && !zeropos)
-    return trimTrailingZeroesDone;
+     //we have found a zero and need to take care of (truncate the string to the position of either the zero or the decimal)
+     if (cont && zeropos) {
+       zeropos - 1 == decimalpos ? *decimalpos = '\0' : *zeropos = '\0';
+       return trimTrailingZeroesDone;
+     }
 
-  return trimTrailingZeroesDone;
-}
+     //we have just another character (other than a zero) and are done
+     if (cont && !zeropos)
+       return trimTrailingZeroesDone;
 
-inline void trimTrailingZeroes(char *buffer, const int pos) {
-  char *decimal = strchr(buffer, '.');
-  if (decimal) {
-    char *exppos = strchr(buffer, dcParams::exp);
-    trimTrailingZeroesHelper(buffer, pos, &buffer[pos], exppos, decimal, nullptr);
-  }
-}
+     return trimTrailingZeroesDone;
+   }
 
-inline bool HandleSpecialValues(const double& value, double_conversion::StringBuilder& builder) {
-  double_conversion::Double double_inspect(value);
-  if (double_inspect.IsInfinite()) {
-    if (value < 0) {
-      builder.AddCharacter('-');
-    }
-    builder.AddString(dcParams::inf);
-    return true;
-  }
-  if (double_inspect.IsNan()) {
-    builder.AddString(dcParams::nan);
-    return true;
-  }
-  return false;
-}
+   inline void trimTrailingZeroes(char *buffer, const int pos) {
+     char *decimal = strchr(buffer, '.');
+     if (decimal) {
+       char *exppos = strchr(buffer, dcParams::exp);
+       trimTrailingZeroesHelper(buffer, pos, &buffer[pos], exppos, decimal, nullptr);
+     }
+   }
+
+   inline bool HandleSpecialValues(const double& value, double_conversion::StringBuilder& builder) {
+     double_conversion::Double double_inspect(value);
+     if (double_inspect.IsInfinite()) {
+       if (value < 0) {
+         builder.AddCharacter('-');
+       }
+       builder.AddString(dcParams::inf);
+       return true;
+     }
+     if (double_inspect.IsNan()) {
+       builder.AddString(dcParams::nan);
+       return true;
+     }
+     return false;
+   }
+} // ~namespace
 
 std::string DoubleConvert(const double& value, char *buffer,
                                  double_conversion::StringBuilder& builder,
@@ -149,43 +166,21 @@ std::string DoubleConvert(const double& value, char *buffer,
   return buffer;
 }
 
-static uint32_t convert_to_uint32(const double d)
-{
-  auto ret = std::numeric_limits<uint32_t>::max();
-  if (std::isfinite(d)) {
-    try {
-      ret = boost::numeric_cast<uint32_t>(d);
-    } catch (boost::bad_numeric_cast&) {
-      // ignore, leaving the default max() value
-    }
-  }
-  return ret;
-}
+namespace {
 
-std::ostream& operator<<(std::ostream& stream, const Filename& filename)
-{
-  fs::path fnpath{static_cast<std::string>(filename)}; // gcc-4.6
-  auto fpath = boostfs_uncomplete(fnpath, fs::current_path());
-  stream << QuotedString(fpath.generic_string());
-  return stream;
-}
-
-// FIXME: This could probably be done more elegantly using boost::regex
-std::ostream& operator<<(std::ostream& stream, const QuotedString& s)
-{
-  stream << '"';
-  for (char c : s) {
-    switch (c) {
-    case '\t': stream << "\\t"; break;
-    case '\n': stream << "\\n"; break;
-    case '\r': stream << "\\r"; break;
-    case '"':  stream << "\\\""; break;
-    case '\\': stream << "\\\\"; break;
-    default:   stream << c;
-    }
-  }
-  return stream << '"';
-}
+   static uint32_t convert_to_uint32(const double d)
+   {
+     auto ret = std::numeric_limits<uint32_t>::max();
+     if (std::isfinite(d)) {
+       try {
+         ret = boost::numeric_cast<uint32_t>(d);
+       } catch (boost::bad_numeric_cast&) {
+         // ignore, leaving the default max() value
+       }
+     }
+     return ret;
+   }
+} //~namespace
 
 Value Value::clone() const {
   switch (this->type()) {
@@ -309,6 +304,7 @@ bool Value::getPositiveInt(unsigned int& v) const
 const str_utf8_wrapper& Value::toStrUtf8Wrapper() const {
   return std::get<str_utf8_wrapper>(this->value);
 }
+
 
 // Optimization to avoid multiple stream instantiations and copies to str for long vectors.
 // Functions identically to "class tostring_visitor", except outputting to stream and not returning strings
@@ -535,99 +531,6 @@ std::string Value::chrString() const
   return std::visit(chr_visitor(), this->value);
 }
 
-VectorType::VectorType(EvaluationSession *session) :
-  ptr(std::shared_ptr<VectorObject>(new VectorObject(), VectorObjectDeleter() ))
-{
-  ptr->evaluation_session = session;
-}
-
-VectorType::VectorType(class EvaluationSession *session, double x, double y, double z) :
-  ptr(std::shared_ptr<VectorObject>(new VectorObject(), VectorObjectDeleter() ))
-{
-  ptr->evaluation_session = session;
-  emplace_back(x);
-  emplace_back(y);
-  emplace_back(z);
-}
-
-void VectorType::emplace_back(Value&& val)
-{
-  if (val.type() == Value::Type::EMBEDDED_VECTOR) {
-    emplace_back(std::move(val.toEmbeddedVectorNonConst()));
-  } else {
-    ptr->vec.push_back(std::move(val));
-    if (ptr->evaluation_session) {
-      ptr->evaluation_session->accounting().addVectorElement(1);
-    }
-  }
-}
-
-// Specialized handler for EmbeddedVectorTypes
-void VectorType::emplace_back(EmbeddedVectorType&& mbed)
-{
-  if (mbed.size() > 1) {
-    // embed_excess represents how many to add to vec.size() to get the total elements after flattening,
-    // the embedded vector itself already counts towards an element in the parent's size, so subtract 1 from its size.
-    ptr->embed_excess += mbed.size() - 1;
-    ptr->vec.emplace_back(std::move(mbed));
-    if (ptr->evaluation_session) {
-      ptr->evaluation_session->accounting().addVectorElement(1);
-    }
-  } else if (mbed.size() == 1) {
-    // If embedded vector contains only one value, then insert a copy of that element
-    // Due to the above mentioned "-1" count, putting it in directaly as an EmbeddedVector
-    // would not change embed_excess, which is needed to check if flatten is required.
-    emplace_back(mbed.ptr->vec[0].clone());
-  }
-  // else mbed.size() == 0, do nothing
-}
-
-void VectorType::flatten() const
-{
-  vec_t ret;
-  ret.reserve(this->size());
-  // VectorType::iterator already handles the tricky recursive navigation of embedded vectors,
-  // so just build up our new vector from that.
-  for (const auto& el : *this) ret.emplace_back(el.clone());
-  assert(ret.size() == this->size());
-  ptr->embed_excess = 0;
-  if (ptr->evaluation_session) {
-    ptr->evaluation_session->accounting().addVectorElement(ret.size());
-    ptr->evaluation_session->accounting().removeVectorElement(ptr->vec.size());
-  }
-  ptr->vec = std::move(ret);
-}
-
-void VectorType::VectorObjectDeleter::operator()(VectorObject *v)
-{
-  if (v->evaluation_session) {
-    v->evaluation_session->accounting().removeVectorElement(v->vec.size());
-  }
-
-  VectorObject *orig = v;
-  std::shared_ptr<VectorObject> curr;
-  std::vector<std::shared_ptr<VectorObject>> purge;
-  while (true) {
-    if (v && v->embed_excess) {
-      for (Value& val : v->vec) {
-        auto type = val.type();
-        if (type == Value::Type::EMBEDDED_VECTOR) {
-          std::shared_ptr<VectorObject>& temp = std::get<EmbeddedVectorType>(val.value).ptr;
-          if (temp.use_count() <= 1) purge.emplace_back(std::move(temp));
-        } else if (type == Value::Type::VECTOR) {
-          std::shared_ptr<VectorObject>& temp = std::get<VectorType>(val.value).ptr;
-          if (temp.use_count() <= 1) purge.emplace_back(std::move(temp));
-        }
-      }
-    }
-    if (purge.empty()) break;
-    curr = std::move(purge.back()); // this should cause destruction of the *previous value* for curr
-    v = curr.get();
-    purge.pop_back();
-  }
-  delete orig;
-}
-
 const VectorType& Value::toVector() const
 {
   static const VectorType empty(nullptr);
@@ -713,76 +616,6 @@ bool Value::isUncheckedUndef() const
   return this->type() == Type::UNDEFINED && !std::get<UndefType>(this->value).empty();
 }
 
-Value ObjectType::operator==(const ObjectType& other) const {
-  return Value::undef("operation undefined (object == object)");
-}
-Value ObjectType::operator!=(const ObjectType& other) const {
-  return Value::undef("operation undefined (object != object)");
-}
-Value ObjectType::operator<(const ObjectType& other) const {
-  return Value::undef("operation undefined (object < object)");
-}
-Value ObjectType::operator>(const ObjectType& other) const {
-  return Value::undef("operation undefined (object > object)");
-}
-Value ObjectType::operator<=(const ObjectType& other) const {
-  return Value::undef("operation undefined (object <= object)");
-}
-Value ObjectType::operator>=(const ObjectType& other) const {
-  return Value::undef("operation undefined (object >= object)");
-}
-
-Value VectorType::operator==(const VectorType& v) const {
-  size_t i = 0;
-  auto first1 = this->begin(), last1 = this->end(), first2 = v.begin(), last2 = v.end();
-  for ( ; (first1 != last1) && (first2 != last2); ++first1, ++first2, ++i) {
-    Value temp = *first1 == *first2;
-    if (temp.isUndefined()) {
-      temp.toUndef().append(STR("in vector comparison at index ", i));
-      return temp;
-    }
-    if (!temp.toBool()) return false;
-  }
-  return (first1 == last1) && (first2 == last2);
-}
-
-Value VectorType::operator!=(const VectorType& v) const {
-  Value temp = this->VectorType::operator==(v);
-  if (temp.isUndefined()) return temp;
-  return !temp.toBool();
-}
-
-// lexicographical compare with possible undef result
-Value VectorType::operator<(const VectorType& v) const {
-  auto first1 = this->begin(), last1 = this->end(), first2 = v.begin(), last2 = v.end();
-  size_t i = 0;
-  for ( ; (first1 != last1) && (first2 != last2); ++first1, ++first2, ++i) {
-    Value temp = *first1 < *first2;
-    if (temp.isUndefined()) {
-      temp.toUndef().append(STR("in vector comparison at index ", i));
-      return temp;
-    }
-    if (temp.toBool()) return true;
-    if ((*first2 < *first1).toBool()) return false;
-  }
-  return (first1 == last1) && (first2 != last2);
-}
-
-Value VectorType::operator>(const VectorType& v) const {
-  return v.VectorType::operator<(*this);
-}
-
-Value VectorType::operator<=(const VectorType& v) const {
-  Value temp = this->VectorType::operator>(v);
-  if (temp.isUndefined()) return temp;
-  return !temp.toBool();
-}
-
-Value VectorType::operator>=(const VectorType& v) const {
-  Value temp = this->VectorType::operator<(v);
-  if (temp.isUndefined()) return temp;
-  return !temp.toBool();
-}
 
 class notequal_visitor
 {
@@ -1051,11 +884,13 @@ public:
           }
           return Value(std::move(dstv));
         } else {
-          return Value::undef(STR("matrix*matrix requires left operand column count to match right operand row count (", (*first1).toVector().size(), " != ", op2.size(), ')'));
+          return Value::undef(STR("matrix*matrix requires left operand column count to match right operand row count (",
+          (*first1).toVector().size(), " != ", op2.size(), ')'));
         }
       }
     }
-    return Value::undef(STR("undefined vector*vector multiplication where first elements are types ", (*first1).typeName(), " and ", (*first2).typeName() ));
+    return Value::undef(STR("undefined vector*vector multiplication where first elements are types ",
+       (*first1).typeName(), " and ", (*first2).typeName() ));
   }
 };
 
@@ -1119,8 +954,7 @@ Value Value::operator^(const Value& v) const
  * If the string is multi-byte unicode then the index will offset to the character (2 or 4 byte) and not to the byte.
  * A 'normal' string with byte chars are a subset of unicode and still work.
  */
-class bracket_visitor
-{
+class bracket_visitor{
 public:
   Value operator()(const str_utf8_wrapper& str, const double& idx) const {
     const auto i = convert_to_uint32(idx);
@@ -1138,7 +972,8 @@ public:
     return Value::undefined.clone();
   }
 
-  Value operator()(const VectorType& vec, const double& idx) const {
+  Value operator()(const VectorType& vec, const double& idx) const
+  {
     const auto i = convert_to_uint32(idx);
     if (i < vec.size()) return vec[i].clone();
     return Value::undef(STR("index ", i, " out of bounds for vector of size ", vec.size()));
@@ -1178,62 +1013,4 @@ Value Value::operator[](size_t idx) const
 size_t str_utf8_wrapper::iterator::char_len()
 {
   return g_utf8_next_char(ptr) - ptr;
-}
-
-// called by clone()
-ObjectType::ObjectType(const std::shared_ptr<ObjectObject>& copy)
-  : ptr(copy)
-{
-}
-
-ObjectType::ObjectType(EvaluationSession *session) :
-  ptr(std::shared_ptr<ObjectObject>(new ObjectObject()))
-{
-  ptr->evaluation_session = session;
-}
-
-const Value& ObjectType::get(const std::string& key) const
-{
-  auto result = ptr->map.find(key);
-  // NEEDSWORK it would be nice to have a "cause" for the undef, but Value::undef(...)
-  // does not appear compatible with Value&.
-  return result == ptr->map.end() ? Value::undefined : result->second;
-}
-
-void ObjectType::set(const std::string& key, Value&& value)
-{
-  ptr->map.emplace(key, std::move(value));
-  ptr->keys.emplace_back(key);
-  ptr->values.emplace_back(std::move(value));
-}
-
-const std::vector<std::string>& ObjectType::keys() const
-{
-  return ptr->keys;
-}
-
-const Value& ObjectType::operator[](const str_utf8_wrapper& v) const
-{
-  return this->get(v.toString());
-}
-
-// Copy explicitly only when necessary
-ObjectType ObjectType::clone() const
-{
-  return ObjectType(this->ptr);
-}
-
-std::ostream& operator<<(std::ostream& stream, const ObjectType& v)
-{
-  stream << "{ ";
-  auto iter = v.ptr->keys.begin();
-  if (iter != v.ptr->keys.end()) {
-    str_utf8_wrapper k(*iter);
-    for (; iter != v.ptr->keys.end(); ++iter) {
-      str_utf8_wrapper k2(*iter);
-      stream << k2.toString() << " = " << v[k2] << "; ";
-    }
-  }
-  stream << "}";
-  return stream;
 }

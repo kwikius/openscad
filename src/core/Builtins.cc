@@ -2,7 +2,6 @@
 #include "Builtins.h"
 #include "function.h"
 #include "AbstractModule.h"
-
 #include "expression/Literal.h"
 #include "expression/Vector.h"
 

@@ -1,9 +1,9 @@
 #core lib
 
 set(CORE_LIB_SOURCES
+  Filename.cc
+  QuotedString.cc
   Arguments.cc
-  Builtins.cc
-  BuiltinContext.cc
   CgalAdvNode.cc
   Children.cc
   ColorNode.cc
@@ -44,15 +44,10 @@ set(CORE_LIB_SOURCES
   SurfaceNode.cc
   TextNode.cc
   TransformNode.cc
-  Value.cc
   Assignment.cc
   AST.cc
   FreetypeRenderer.cc
   GroupModule.cc
-  value/ModuleReference.cc
-  value/RangeType.cc
-  value/FunctionType.cc
-  value/UndefType.cc
   ModuleInstantiation.cc
   NodeVisitor.cc
   SourceFile.cc
@@ -61,7 +56,14 @@ set(CORE_LIB_SOURCES
   UserModule.cc
   Tree.cc
   ValueMap.cc
-)
+  Value.cc
+  value/VectorType.cc
+  value/EmbeddedVectorType.cc
+  value/ModuleReference.cc
+  value/RangeType.cc
+  value/FunctionType.cc
+  value/ObjectType.cc
+  value/UndefType.cc)
 
 add_library(openscadCORE ${CORE_LIB_SOURCES})
 

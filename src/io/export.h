@@ -10,6 +10,7 @@
 #include <glview/Camera.h>
 
 class PolySet;
+class Geometry;
 
 enum class FileFormat {
   ASCIISTL,
@@ -42,7 +43,7 @@ struct ExportInfo {
 };
 
 bool canPreview(const FileFormat format);
-bool exportFileByName(const std::shared_ptr<const class Geometry>& root_geom, const ExportInfo& exportInfo);
+bool exportFileByName(const std::shared_ptr<const Geometry>& root_geom, const ExportInfo& exportInfo);
 
 void export_stl(const std::shared_ptr<const Geometry>& geom, std::ostream& output,
                 bool binary = true);

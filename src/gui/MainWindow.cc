@@ -29,6 +29,7 @@
 #include <utils/printutils.h>
 #include <utils/boost-utils.h>
 
+#include <core/Builtins.h>
 #include <core/BuiltinContext.h>
 #include <core/customizer/CommentParser.h>
 #include <core/SourceFileCache.h>

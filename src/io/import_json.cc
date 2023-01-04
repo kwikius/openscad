@@ -50,7 +50,7 @@ Value to_value(const json& j, EvaluationSession *session)
   } else if (j.is_object()) {
     return Value{to_obj(j, session)};
   } else if (j.is_array()) {
-    Value::VectorType vec{session};
+    VectorType vec{session};
     for (const auto& elem : j) {
       vec.emplace_back(to_value(elem, session));
     }

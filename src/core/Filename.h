@@ -7,5 +7,6 @@ class Filename : public QuotedString
 public:
   Filename() : QuotedString() {}
   Filename(const std::string& f) : QuotedString(f) {}
+  friend std::ostream& operator<<(std::ostream& stream, const Filename& filename);
 };
-std::ostream& operator<<(std::ostream& stream, const Filename& filename);
+
