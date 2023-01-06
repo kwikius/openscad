@@ -3,22 +3,30 @@
 #include <cstddef>
 #include "EvaluationSession.h"
 #include "ContextFrame.h"
-/*
+/**
+ * @brief ABC for ContextHandle
  * A ContextFrameHandle stores a reference to a ContextFrame, and keeps it on
  * the special variable stack for the lifetime of the handle.
- */
-
-class ContextFrameHandle
-{
-public:
-  ContextFrameHandle(ContextFrame *frame) :
-    session(frame->session())
+ * Only intended for a short life on the Context Stack
+ **/
+class ContextFrameHandle{
+protected:
+  /**
+  *  @brief Create a handle to a context
+  *  The Context is always created using Context<C>::create(args..)
+  * except for Parameters which is described as Not a true context
+  * The create function
+  **/
+  friend class Parameters;
+  ContextFrameHandle(ContextFrame *frame)
+  :session(frame->session()),
+  frame_index(session->push_frame(frame))
   {
-    frame_index = session->push_frame(frame);
   }
-  ~ContextFrameHandle()
+public:
+  virtual ~ContextFrameHandle()
   {
-    release();
+     release();
   }
 
   ContextFrameHandle(const ContextFrameHandle&) = delete;
