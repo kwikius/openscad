@@ -11,7 +11,8 @@
 template <typename T>
 class ContextHandle : ContextFrameHandle
 {
-public:
+friend class Context;
+private:
   ContextHandle(std::shared_ptr<T>&& context) :
     ContextFrameHandle(context.get()),
     context(std::move(context))
@@ -23,12 +24,12 @@ public:
       throw;
     }
   }
-
+public:
   ~ContextHandle()
   {
     assert(!!session == !!context);
     if (session) {
-      session->contextMemoryManager().addContext(std::move(this->context));
+       session->contextMemoryManager().addContext(std::move(this->context));
     }
   }
 
