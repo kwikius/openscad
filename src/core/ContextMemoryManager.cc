@@ -108,8 +108,6 @@ struct ReferencedContextVisitor
   const std::shared_ptr<const Context> *operator()(const ModuleReferencePtr& value) const { return &value->getContext(); }
 };
 
-
-
 /*
  * Finds all contexts that have an inbound reference from something that is not
  * another context.

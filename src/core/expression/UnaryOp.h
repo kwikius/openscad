@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Expression.h"
+#include <core/Expression.h>
 
 class UnaryOp : public Expression
 {
@@ -16,7 +16,6 @@ public:
 
 private:
   const char *opString() const;
-
   Op op;
   std::shared_ptr<Expression> expr;
 };

@@ -16,12 +16,27 @@ set(CORE_LIB_SOURCES
   CSGTreeEvaluator.cc
   EvaluationSession.cc
   Expression.cc
+  expression/UnaryOp.cc
   expression/BinaryOp.cc
-  expression/ValueWrapper.cc
+  expression/TernaryOp.cc
+  expression/ArrayLookup.cc
+  expression/Lookup.cc
+  expression/Range.cc
+  expression/FunctionDefinition.cc
+  expression/ListComprehension.cc
+  expression/FunctionCall.cc
   expression/ModuleLiteral.cc
   expression/MemberLookup.cc
   expression/Literal.cc
   expression/Vector.cc
+  expression/Assert.cc
+  expression/Echo.cc
+  expression/Let.cc
+  expression/LcLet.cc
+  expression/LcIf.cc
+  expression/LcEach.cc
+  expression/LcFor.cc
+  expression/LcForC.cc
   builtin_functions.cc
   function.cc
   ImportNode.cc

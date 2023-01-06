@@ -2,7 +2,7 @@
 
 #include <iosfwd>
 
-#include "../Expression.h"
+#include <core/Expression.h>
 
 class Lookup : public Expression
 {

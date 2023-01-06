@@ -3,6 +3,9 @@
 #include "../Expression.h"
 #include "../Assignment.h"
 
+template <typename T> class ContextHandle;
+class Context;
+
 class Let : public Expression{
 public:
   Let(const AssignmentList& args, Expression *expr, const Location& loc);
