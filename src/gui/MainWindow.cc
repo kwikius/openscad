@@ -1230,7 +1230,6 @@ void MainWindow::instantiateRoot()
 
     AbstractNode::resetIndexCounter();
 
-
     EvaluationSession session{doc.parent_path().string()};
     ContextHandle<BuiltinContext> builtin_context{Context::create<BuiltinContext>(&session)};
     setRenderVariables(builtin_context);

@@ -14,7 +14,13 @@ class Value;
 class ContextFrame;
 
 /**
-*  @brief Context stack rooted in the Openscad root source file
+*  @brief New instance of EvaluationSession created on the stack when the main file ( documentroot) is recompiled
+*  Main member is a context stack.
+*  The Evaluation session doesnt appear to own the Contexts on the stack.
+*  Lifetime is somewhat obsure therefore
+*  push_frame() and pop_frame() push and pop Context on the stack
+*  EvaluationSession is created on the stack in MainWindow::instantiateRoot()
+*  and in openscad.cc do_export
 **/
 class EvaluationSession
 {
@@ -23,7 +29,16 @@ public:
     document_root(std::move(documentRoot))
   {}
 
+  /**
+  *  @brief push a new Context
+  *  @return current context stack index ( stack is based on a std::vector of context*
+  *  Note that EvaluationSession doesnt own the Context
+  *
+  **/
   size_t push_frame(ContextFrame *frame);
+  /**
+   * @brief
+   **/
   void replace_frame(size_t index, ContextFrame *frame);
   void pop_frame(size_t index);
 
