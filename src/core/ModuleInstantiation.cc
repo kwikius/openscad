@@ -128,6 +128,9 @@ namespace{
        switch ( bin_op->getOpID()) {
          case Op::Translate:
          case Op::Rotate:{
+               assert(modInst->arguments.empty());
+               assert(modInst->name() == "");
+             //  assert(modInst->scope.hasChildren() == false);
                // TODO check that modInst args is empty
                // and modInst has no child modules
                // the arg is already checked later in the builtin_translate etc fun
@@ -204,23 +207,26 @@ ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) cons
    // restore them after the evaluation, thus preserving "constness" of the ModuleInstantiation
    std::string const old_name = this->modname;
    AssignmentList const old_args = this->arguments;
-   std::vector<std::shared_ptr<ModuleInstantiation> > const old_children = this->scope.moduleInstantiations;
    //TODO LocalScope -> AbstractScope
    auto setTo = [this](std::string const & name , AssignmentList const & args){
      const_cast<ModuleInstantiation*>(this)->modname = name;
      const_cast<ModuleInstantiation*>(this)->arguments = args;
    };
 
-   auto restore = [this,old_name,old_args,old_children](){
+   auto restore = [this,old_name,old_args](){
       const_cast<ModuleInstantiation*>(this)->modname = old_name;
       const_cast<ModuleInstantiation*>(this)->arguments = old_args;
-      const_cast<ModuleInstantiation*>(this)->scope.moduleInstantiations = old_children;
    };
 
    std::shared_ptr<const Context> module_lookup_context = context;
    if ( id_expr) {
-      bool res = evalModuleExpr(const_cast<ModuleInstantiation*>(this),id_expr,module_lookup_context);
-      if ( ! res){
+      // so no we know its an r_value. It has been called with (expr)()
+      // The evalModuleExpr function potentially adds entities to the child scope
+      // but if its an rvalue, this should be ok
+      // do we actually need to restore in this case ?
+
+      if (! evalModuleExpr(const_cast<ModuleInstantiation*>(this),id_expr,module_lookup_context)){
+         // evalModuleExpr has provided the diagnostic
          return nullptr;
       }
    }
