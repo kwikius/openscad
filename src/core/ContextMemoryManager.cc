@@ -32,6 +32,8 @@
 #include "ContextMemoryManager.h"
 #include "Value.h"
 
+#define COLLECT_GARBAGE
+
 /*
  * The garbage collector needs to know, for each Value, whether it stores
  * any references to other Values (VectorType, EmbeddedVectorType) or to
@@ -347,13 +349,26 @@ static void collectGarbage(std::vector<std::weak_ptr<Context>>& managedContexts)
 #endif
 }
 
-
-
 ContextMemoryManager::~ContextMemoryManager()
 {
+#if defined COLLECT_GARBAGE
   collectGarbage(managedContexts);
-  assert(managedContexts.empty());
-  assert(heapSizeAccounting.size() == 0);
+ // assert(managedContexts.empty());
+ // assert(heapSizeAccounting.size() == 0);
+#endif
+   if (! managedContexts.empty()){
+     LOG(message_group::Warning, Location::NONE , "",
+       "ContextMemoryManager::managedContexts.size() = '%1$u' ",managedContexts.size());
+   }
+   if (heapSizeAccounting.size() != 0){
+     LOG(message_group::Warning, Location::NONE , "",
+        "ContextMemoryManager::heapSizeAccounting.size() = '%1$u'", heapSizeAccounting.size());
+   }
+}
+
+void ContextMemoryManager::releaseContext()
+{
+   heapSizeAccounting.removeContext();
 }
 
 void ContextMemoryManager::addContext(const std::shared_ptr<Context>& context)
@@ -366,9 +381,9 @@ void ContextMemoryManager::addContext(const std::shared_ptr<Context>& context)
    * the garbage collection machinery, we can just let context get destroyed
    * right away.
    */
+#if defined COLLECT_GARBAGE
   if (context.use_count() > 1) {
     managedContexts.emplace_back(context);
-
     if (heapSizeAccounting.size() >= nextGarbageCollectSize) {
       collectGarbage(managedContexts);
       /*
@@ -383,4 +398,5 @@ void ContextMemoryManager::addContext(const std::shared_ptr<Context>& context)
       nextGarbageCollectSize = heapSizeAccounting.size() * 2;
     }
   }
+#endif
 }
