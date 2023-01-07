@@ -47,7 +47,7 @@ public:
   /**
    * @brief evaluate the instantiation. IOW instantiate it int the CSG tree
    */
-  std::shared_ptr<AbstractNode> evaluate(const std::shared_ptr<const Context> context) const;
+  std::shared_ptr<AbstractNode> evaluate(std::shared_ptr<const Context> const & context) const;
 
   /**
    * name of the module to be instantiated in the source code
@@ -70,6 +70,10 @@ public:
 protected:
   std::string modname;
   std::shared_ptr<Expression> id_expr;
+private:
+    std::shared_ptr<AbstractNode> ll_evaluate(
+    std::shared_ptr<const Context> const & context,
+    std::shared_ptr<const Context> & module_lookup_context) const;
 };
 
 class IfElseModuleInstantiation : public ModuleInstantiation

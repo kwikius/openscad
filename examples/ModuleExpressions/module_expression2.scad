@@ -5,4 +5,4 @@ module m() {
 
 m();
 
-//translate ([20,0,0]) m();
+translate ([20,0,0]) m();

@@ -197,20 +197,17 @@ TODO
    }
 }// ~namespace
 
-/**
-*  ModuleInstantiation
-**/
-std::shared_ptr<AbstractNode>
-ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) const
+
+std::shared_ptr<AbstractNode> ModuleInstantiation::ll_evaluate(
+   std::shared_ptr<const Context> const & context,
+   std::shared_ptr<const Context> & module_lookup_context ) const
 {
-   // save all the parts that may be modified
-   // restore them after the evaluation, thus preserving "constness" of the ModuleInstantiation
    std::string const old_name = this->modname;
    AssignmentList const old_args = this->arguments;
    //TODO LocalScope -> AbstractScope
    auto setTo = [this](std::string const & name , AssignmentList const & args){
-     const_cast<ModuleInstantiation*>(this)->modname = name;
-     const_cast<ModuleInstantiation*>(this)->arguments = args;
+      const_cast<ModuleInstantiation*>(this)->modname = name;
+      const_cast<ModuleInstantiation*>(this)->arguments = args;
    };
 
    auto restore = [this,old_name,old_args](){
@@ -218,19 +215,82 @@ ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) cons
       const_cast<ModuleInstantiation*>(this)->arguments = old_args;
    };
 
+   // max number of references to reference
+   int32_t constexpr maxLoopCount = 1000;
+   for(int32_t loopCount = 0;loopCount < maxLoopCount;++loopCount){
+      boost::optional<InstantiableModule> maybe_module
+         = module_lookup_context->lookup_module(this->name(), this->loc);
+      if (maybe_module) {
+         try{
+            auto node = maybe_module->module->instantiate(maybe_module->defining_context, this, context);
+            restore();
+            return node;
+         } catch (EvaluationException& e) {
+            restore();
+            if (e.traceDepth > 0) {
+               print_trace(this, context);
+               e.traceDepth--;
+            }
+            throw;
+         }
+      }else{
+         boost::optional<const Value&> maybe_modRef =  module_lookup_context->lookup_moduleReference(this->name());
+         if (!maybe_modRef ){
+            LOG(message_group::Warning, this->loc, context->documentRoot(),
+              "Ignoring unknown module/ref '%1$s'", this->name());
+            restore();
+            return nullptr;
+         }
+         auto const & modRef = maybe_modRef->toModuleReference();
+
+         AssignmentList argsOut;
+         if (modRef.transformToInstantiationArgs(
+            this->arguments,
+            this->loc,
+            context,
+            argsOut
+         )){
+            setTo(modRef.getModuleName(),argsOut);
+            module_lookup_context = modRef.getContext();
+         }else{
+            restore();
+            return nullptr;
+         }
+      }
+   }
+   LOG(message_group::Warning, this->loc, context->documentRoot(),
+      "ModuleInstantiation: too many module_references '%1$s'", this->name());
+   restore();
+   return nullptr;
+}
+
+/**
+*  ModuleInstantiation
+**/
+std::shared_ptr<AbstractNode>
+ModuleInstantiation::evaluate(std::shared_ptr<const Context> const & context) const
+{
    std::shared_ptr<const Context> module_lookup_context = context;
    if ( id_expr) {
       // so no we know its an r_value. It has been called with (expr)()
       // The evalModuleExpr function potentially adds entities to the child scope
       // but if its an rvalue, this should be ok
       // do we actually need to restore in this case ?
-
-      if (! evalModuleExpr(const_cast<ModuleInstantiation*>(this),id_expr,module_lookup_context)){
+      // either modname or id_expr , not both
+      assert( this->modname == "");
+      auto inst1 = new ModuleInstantiation(*this);
+      if (! evalModuleExpr(inst1,id_expr,module_lookup_context)){
          // evalModuleExpr has provided the diagnostic
+         delete inst1;
          return nullptr;
       }
+      auto res = inst1->ll_evaluate(context,module_lookup_context);
+      return res;
    }
-
+   assert( this->modname != "");
+#if 1
+   return ll_evaluate(context,module_lookup_context);
+#else
    int32_t loopcount = 0;
    // max number of references to reference
    int32_t constexpr maxLoopCount = 1000;
@@ -279,6 +339,7 @@ ModuleInstantiation::evaluate(const std::shared_ptr<const Context> context) cons
       }
     }
   }
+#endif
 }
 
 LocalScope *IfElseModuleInstantiation::makeElseScope()
