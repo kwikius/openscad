@@ -4,9 +4,9 @@
 #include "EvaluationSession.h"
 #include "ContextFrame.h"
 /**
- * @brief ABC for ContextHandle
- * A ContextFrameHandle stores a reference to a ContextFrame, and keeps it on
- * the special variable stack for the lifetime of the handle.
+ * @brief Base class for ContextHandle
+ * A ContextFrameHandle stores the index the current  ContextFrame, in current EvaluationSeession
+ * and keeps it on the special variable stack for the lifetime of the handle.
  * Only intended for a short life on the Context Stack
  **/
 class ContextFrameHandle{
@@ -23,12 +23,13 @@ protected:
   frame_index(session->push_frame(frame))
   {
   }
-public:
+
+ //~ContextFrameHandle()
   virtual ~ContextFrameHandle()
   {
      release();
   }
-
+public:
   ContextFrameHandle(const ContextFrameHandle&) = delete;
   ContextFrameHandle& operator=(const ContextFrameHandle&) = delete;
   ContextFrameHandle& operator=(ContextFrameHandle&&) = delete;
