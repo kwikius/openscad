@@ -150,22 +150,23 @@ namespace{
          case Op::Rotate:{
                assert(modInst->arguments.empty());
                assert(modInst->name() == "");
-             //  assert(modInst->scope.hasChildren() == false);
-               // TODO check that modInst args is empty
-               // and modInst has no child modules
-               // the arg is already checked later in the builtin_translate etc fun
                auto arg_expr = bin_op->getRight();
                auto arg = std::make_shared<Assignment>("",arg_expr,arg_expr->location() );
                modInst->arguments.emplace_back(arg);
                std::shared_ptr<const Context> child_context = context;
                auto childModInst = evalModuleExpr(bin_op->getLeft(),child_context);
-               modInst->setName(
-                  (bin_op->getOpID() == Op::Translate)
-                 ?"translate"
-                 :"rotate"
-               );
-               modInst->scope.addModuleInst(childModInst);
-               return true;
+               if ( childModInst){
+                  modInst->setName(
+                     (bin_op->getOpID() == Op::Translate)
+                    ?"translate"
+                    :"rotate"
+                  );
+                  modInst->scope.addModuleInst(childModInst);
+                  return true;
+               }else{
+                  // something went wrong. evalModuleExpr has provided the diagnostic
+                  return false;
+               }
          }
 /*
 TODO
@@ -291,16 +292,28 @@ namespace {
 std::shared_ptr<AbstractNode>
 ExprModInst::evalInst(std::shared_ptr<const Context> const & context) const
 {
-      std::shared_ptr<const Context> module_lookup_context = context;
-      auto inst1 = std::make_shared<ModuleInstantiation>(*this);
-      modstack.push(inst1);
-      if (! evalModuleExpr(inst1.get(),id_expr,module_lookup_context)){
-         // evalModuleExpr has provided the diagnostic
-         modstack.pop();
-         return nullptr;
+   std::shared_ptr<const Context> module_lookup_context = context;
+   std::shared_ptr<ModuleInstantiation> mi;
+   // Has the expression already been expanded?
+   auto iter = this->instMap.find(context.get());
+   // If not then expand it and put it in the map
+   if (iter == std::end(instMap)){
+//      LOG(message_group::Warning, this->loc, context->documentRoot(),
+//      "adding mod expr to map");
+      // N.B note this is a special converting constructor from ExprModInst to ModuleInstantiation
+      // just slices off the useful parts
+      mi = std::make_shared<ModuleInstantiation>(*this);
+      if (evalModuleExpr(mi.get(),id_expr,module_lookup_context)){
+         instMap.insert({context.get(),mi});
+      }else{
+        // evalModuleExpr has provided the diagnostic
+        return nullptr;
       }
-      return inst1->ll_evaluate(context,module_lookup_context);
-
+   }else{
+      //already in map
+      mi = iter->second;
+   }
+   return mi->ll_evaluate(context,module_lookup_context);
 }
 
 std::shared_ptr<AbstractNode>

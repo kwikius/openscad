@@ -64,6 +64,7 @@ protected:
     void print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined)const;
 };
 
+class ModuleInstantiation;
 class ExprModInst : public ABCModuleInstantiation{
 public :
    ExprModInst( std::shared_ptr<Expression> const & expr,
@@ -76,6 +77,7 @@ public:
   std::shared_ptr<AbstractNode> evalInst(std::shared_ptr<const Context> const & context) const override;
   private:
   std::shared_ptr<Expression> id_expr;
+  mutable std::unordered_map<const Context*, std::shared_ptr<ModuleInstantiation> > instMap;
 };
 
 class ModuleInstantiation : public ABCModuleInstantiation{
