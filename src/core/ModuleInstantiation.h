@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "AST.h"
@@ -17,17 +18,9 @@
 *    - module_literal
 *    - module_operation
 */
-class ModuleInstantiation : public ASTNode
+class ABCModuleInstantiation : public ASTNode
 {
-public:
-  /**
-   * @brief constructor used when the instantiation uses a module_expression
-   * @param expr The module_expression to be instantiated
-   * @param args The arguments to the instantiation
-   * @param loc The sourcefile location
-  */
-  ModuleInstantiation(std::shared_ptr<Expression> expr, const AssignmentList& args , const Location& loc)
-    : ASTNode(loc), arguments(args), tag_root(false), tag_highlight(false), tag_background(false), id_expr(expr) { }
+protected:
 
  /**
    * @brief constructor used when the instantiation uses a name representing a module or module_reference
@@ -35,31 +28,31 @@ public:
    * @param args The arguments to the instantiation
    * @param loc The sourcefile location
   */
-  ModuleInstantiation(std::string const & name, const AssignmentList& args = AssignmentList(), const Location& loc = Location::NONE)
-    : ASTNode(loc), arguments(args), tag_root(false), tag_highlight(false), tag_background(false), modname(name) { }
-  ~ModuleInstantiation();
+  ABCModuleInstantiation(const AssignmentList& args = AssignmentList(), const Location& loc = Location::NONE)
+    : ASTNode(loc), arguments(args), tag_root(false), tag_highlight(false), tag_background(false){ }
+
+public:
+  ~ABCModuleInstantiation();
 
   /**
    * @brief output the instantiation params to the console
    */
-  virtual void print(std::ostream& stream, const std::string& indent, const bool inlined) const;
+  virtual void print(std::ostream& stream, const std::string& indent, const bool inlined) const =0;
   void print(std::ostream& stream, const std::string& indent) const override { print(stream, indent, false); }
   /**
    * @brief evaluate the instantiation. IOW instantiate it int the CSG tree
    */
-  std::shared_ptr<AbstractNode> evaluate(std::shared_ptr<const Context> const & context) const;
+  virtual std::shared_ptr<AbstractNode>
+  evalInst(std::shared_ptr<const Context> const & context) const =0;
 
   /**
    * name of the module to be instantiated in the source code
    * Note that static_cast<bool>(id_expr) == true then the name is not valid then the name is found via the id_expr
   */
-  const std::string& name() const { return this->modname; }
+
   bool isBackground() const { return this->tag_background; }
   bool isHighlight() const { return this->tag_highlight; }
   bool isRoot() const { return this->tag_root; }
-
-  std::shared_ptr<Expression> const & getIdExpr() const { return id_expr;}
-  void setName(std::string const & name) { modname = name;}
 
   AssignmentList arguments;
   LocalScope scope;
@@ -68,16 +61,48 @@ public:
   bool tag_highlight;
   bool tag_background;
 protected:
-  std::string modname;
-  std::shared_ptr<Expression> id_expr;
-private:
-    std::shared_ptr<AbstractNode> ll_evaluate(
-    std::shared_ptr<const Context> const & context,
-    std::shared_ptr<const Context> & module_lookup_context) const;
+    void print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined)const;
 };
 
-class IfElseModuleInstantiation : public ModuleInstantiation
-{
+class ExprModInst : public ABCModuleInstantiation{
+public :
+   ExprModInst( std::shared_ptr<Expression> const & expr,
+   const AssignmentList& args = AssignmentList(),
+   const Location& loc = Location::NONE)
+  : ABCModuleInstantiation{args,loc}, id_expr{expr}
+  {}
+public:
+  void print(std::ostream& stream, const std::string& indent, const bool inlined) const override;
+  std::shared_ptr<AbstractNode> evalInst(std::shared_ptr<const Context> const & context) const override;
+  private:
+  std::shared_ptr<Expression> id_expr;
+};
+
+class ModuleInstantiation : public ABCModuleInstantiation{
+public:
+  ModuleInstantiation( std::string const & name,
+   const AssignmentList& args = AssignmentList(),
+   const Location& loc = Location::NONE)
+  : ABCModuleInstantiation{args,loc}, modname{name}
+  {}
+  explicit ModuleInstantiation( ExprModInst const & exprMi)
+   : ABCModuleInstantiation{static_cast<ABCModuleInstantiation const &>(exprMi) }
+  {
+  }
+  void print(std::ostream& stream, const std::string& indent, const bool inlined) const override;
+  std::shared_ptr<AbstractNode>
+  evalInst(std::shared_ptr<const Context> const & context) const override;
+  std::string const & name() const { return modname;}
+  void setName(std::string const & name){ modname = name;}
+  std::shared_ptr<AbstractNode> ll_evaluate(
+    std::shared_ptr<const Context> const & context,
+    std::shared_ptr<const Context> & module_lookup_context) const;
+  private:
+  std::string modname;
+
+};
+
+class IfElseModuleInstantiation : public ModuleInstantiation{
 public:
   IfElseModuleInstantiation(std::shared_ptr<class Expression> expr, const Location& loc) :
     ModuleInstantiation("if", AssignmentList{assignment("", expr)}, loc) { }

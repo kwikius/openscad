@@ -101,13 +101,19 @@ struct ReferencedContextVisitor
   const std::shared_ptr<const Context> *operator()(bool) const { return nullptr; }
   const std::shared_ptr<const Context> *operator()(double) const { return nullptr; }
   const std::shared_ptr<const Context> *operator()(const str_utf8_wrapper&) const { return nullptr; }
-  const std::shared_ptr<const Context> *operator()(const RangePtr&) const { return nullptr; }
+  const std::shared_ptr<const Context> *operator()(const RangePtr&) const
+  { return nullptr; }
 
-  const std::shared_ptr<const Context> *operator()(const VectorType&) const { return nullptr; }
-  const std::shared_ptr<const Context> *operator()(const EmbeddedVectorType&) const { return nullptr; }
-  const std::shared_ptr<const Context> *operator()(const ObjectType&) const { return nullptr; }
-  const std::shared_ptr<const Context> *operator()(const FunctionPtr& value) const { return &value->getContext(); }
-  const std::shared_ptr<const Context> *operator()(const ModuleReferencePtr& value) const { return &value->getContext(); }
+  const std::shared_ptr<const Context> *operator()(const VectorType&) const
+  { return nullptr; }
+  const std::shared_ptr<const Context> *operator()(const EmbeddedVectorType&) const
+  { return nullptr; }
+  const std::shared_ptr<const Context> *operator()(const ObjectType&) const
+  { return nullptr; }
+  const std::shared_ptr<const Context> *operator()(const FunctionPtr& value) const
+  { return &value->getContext(); }
+  const std::shared_ptr<const Context> *operator()(const ModuleReferencePtr& value) const
+  { return &value->getContext(); }
 };
 
 /*
@@ -123,7 +129,8 @@ struct ReferencedContextVisitor
  *
  * Implemented as a breadth first search to save on stack space.
  */
-static std::vector<Context *> findRootContexts(const std::vector<std::shared_ptr<Context>>& managedContexts)
+static std::vector<Context *>
+findRootContexts(const std::vector<std::shared_ptr<Context>>& managedContexts)
 {
   std::map<ValueIdentifier, int> accountedValueReferences;
   std::map<const Context *, int> accountedContextReferences;
@@ -209,7 +216,8 @@ static std::vector<Context *> findRootContexts(const std::vector<std::shared_ptr
  *
  * Implemented as a breadth first search to save on stack space.
  */
-static std::unordered_set<const Context *> findReachableContexts(const std::vector<Context *>& rootContexts)
+static std::unordered_set<const Context *>
+findReachableContexts(const std::vector<Context *>& rootContexts)
 {
   std::unordered_set<ValueIdentifier> valuesSeen;
   std::unordered_set<const Context *> contextsSeen;

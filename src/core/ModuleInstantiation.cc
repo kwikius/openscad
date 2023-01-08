@@ -3,7 +3,7 @@
 Copyright (C) Andy Little (kwikius@yahoo.com) 10/10/2022  initial revision module_reference evaluate
 https://github.com/openscad/openscad/blob/master/COPYING
 */
-
+#include <stack>
 #include <boost/filesystem.hpp>
 
 #include <utils/exceptions.h>
@@ -20,24 +20,28 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 namespace fs = boost::filesystem;
 
-ModuleInstantiation::~ModuleInstantiation()
-{
-}
+//ModuleInstantiation::~ModuleInstantiation()
+//{
+//}
 
 IfElseModuleInstantiation::~IfElseModuleInstantiation()
 {
 }
 
-void ModuleInstantiation::print(std::ostream& stream, const std::string& indent, const bool inlined) const
+ABCModuleInstantiation::~ABCModuleInstantiation()
 {
-  if (!inlined) stream << indent;
-  if ( id_expr){
-   // stream << "( ";
-    id_expr->print(stream,"");
-   // stream << " )";
-  }else{
-     stream << modname;
-  }
+}
+
+void ABCModuleInstantiation::print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined) const
+{
+//  if (!inlined) stream << indent;
+//  if ( id_expr){
+//   // stream << "( ";
+//    id_expr->print(stream,"");
+//   // stream << " )";
+//  }else{
+//     stream << modname;
+//  }
   stream <<  "(";
   for (size_t i = 0; i < this->arguments.size(); ++i) {
     const auto& arg = this->arguments[i];
@@ -55,6 +59,22 @@ void ModuleInstantiation::print(std::ostream& stream, const std::string& indent,
     scope.print(stream, indent + "\t", false);
     stream << indent << "}\n";
   }
+}
+
+void ModuleInstantiation::print(std::ostream& stream, const std::string& indent, const bool inlined) const
+{
+  if (!inlined) stream << indent;
+  stream << this->modname;
+  this->print_scope_args(stream,indent,inlined);
+}
+
+void ExprModInst::print(std::ostream& stream, const std::string& indent, const bool inlined) const
+{
+  if (!inlined) stream << indent;
+  stream << "( ";
+  this->id_expr->print(stream,"");
+  stream << " )";
+  this->print_scope_args(stream,indent,inlined);
 }
 
 void IfElseModuleInstantiation::print(std::ostream& stream, const std::string& indent, const bool inlined) const
@@ -234,7 +254,8 @@ std::shared_ptr<AbstractNode> ModuleInstantiation::ll_evaluate(
             throw;
          }
       }else{
-         boost::optional<const Value&> maybe_modRef =  module_lookup_context->lookup_moduleReference(this->name());
+         boost::optional<const Value&> maybe_modRef
+           = module_lookup_context->lookup_moduleReference(this->name());
          if (!maybe_modRef ){
             LOG(message_group::Warning, this->loc, context->documentRoot(),
               "Ignoring unknown module/ref '%1$s'", this->name());
@@ -264,82 +285,29 @@ std::shared_ptr<AbstractNode> ModuleInstantiation::ll_evaluate(
    return nullptr;
 }
 
-/**
-*  ModuleInstantiation
-**/
+namespace {
+  std::stack<std::shared_ptr<ModuleInstantiation> > modstack;
+}
 std::shared_ptr<AbstractNode>
-ModuleInstantiation::evaluate(std::shared_ptr<const Context> const & context) const
+ExprModInst::evalInst(std::shared_ptr<const Context> const & context) const
 {
-   std::shared_ptr<const Context> module_lookup_context = context;
-   if ( id_expr) {
-      // so no we know its an r_value. It has been called with (expr)()
-      // The evalModuleExpr function potentially adds entities to the child scope
-      // but if its an rvalue, this should be ok
-      // do we actually need to restore in this case ?
-      // either modname or id_expr , not both
-      assert( this->modname == "");
-      auto inst1 = new ModuleInstantiation(*this);
-      if (! evalModuleExpr(inst1,id_expr,module_lookup_context)){
+      std::shared_ptr<const Context> module_lookup_context = context;
+      auto inst1 = std::make_shared<ModuleInstantiation>(*this);
+      modstack.push(inst1);
+      if (! evalModuleExpr(inst1.get(),id_expr,module_lookup_context)){
          // evalModuleExpr has provided the diagnostic
-         delete inst1;
+         modstack.pop();
          return nullptr;
       }
-      auto res = inst1->ll_evaluate(context,module_lookup_context);
-      return res;
-   }
-   assert( this->modname != "");
-#if 1
-   return ll_evaluate(context,module_lookup_context);
-#else
-   int32_t loopcount = 0;
-   // max number of references to reference
-   int32_t constexpr maxLoopCount = 1000;
-   for(;;){
-      if (++loopcount > maxLoopCount){
-        LOG(message_group::Warning, this->loc, context->documentRoot(),
-          "ModuleInstantiation: too many module_references '%1$s'", this->name());
-        restore();
-        return nullptr;
-      }
-      boost::optional<InstantiableModule> maybe_module = module_lookup_context->lookup_module(this->name(), this->loc);
-      if (maybe_module) {
-        try{
-          auto node = maybe_module->module->instantiate(maybe_module->defining_context, this, context);
-          restore();
-          return node;
-        } catch (EvaluationException& e) {
-          restore();
-          if (e.traceDepth > 0) {
-            print_trace(this, context);
-            e.traceDepth--;
-          }
-          throw;
-        }
-     }else{
-      boost::optional<const Value&> maybe_modRef =  module_lookup_context->lookup_moduleReference(this->name());
-      if (!maybe_modRef ){
-        LOG(message_group::Warning, this->loc, context->documentRoot(), "Ignoring unknown module/ref '%1$s'", this->name());
-        restore();
-        return nullptr;
-      }
-      auto const & modRef = maybe_modRef->toModuleReference();
+      return inst1->ll_evaluate(context,module_lookup_context);
 
-      AssignmentList argsOut;
-      if (modRef.transformToInstantiationArgs(
-         this->arguments,
-         this->loc,
-         context,
-         argsOut
-      )){
-         setTo(modRef.getModuleName(),argsOut);
-         module_lookup_context = modRef.getContext();
-      }else{
-          restore();
-          return nullptr;
-      }
-    }
-  }
-#endif
+}
+
+std::shared_ptr<AbstractNode>
+ModuleInstantiation::evalInst(std::shared_ptr<const Context> const & context) const
+{
+   std::shared_ptr<const Context> module_lookup_context = context;
+   return ll_evaluate(context,module_lookup_context);
 }
 
 LocalScope *IfElseModuleInstantiation::makeElseScope()

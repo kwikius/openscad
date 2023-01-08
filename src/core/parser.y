@@ -104,7 +104,7 @@ bool fileEnded=false;
   double number;
   class Expression *expr;
   class Vector *vec;
-  class ModuleInstantiation *inst;
+  class ABCModuleInstantiation *inst;
   class IfElseModuleInstantiation *ifelse;
   class Assignment *arg;
   AssignmentList *args;
@@ -198,7 +198,7 @@ statement
         | '{' inner_input '}'
         | module_instantiation
             {
-              if ($1) scope_stack.top()->addModuleInst(std::shared_ptr<ModuleInstantiation>($1));
+              if ($1) scope_stack.top()->addModuleInst(std::shared_ptr<ABCModuleInstantiation>($1));
             }
         | assignment
         | TOK_MODULE TOK_ID '(' parameters ')'
@@ -325,7 +325,7 @@ child_statement
         | '{' child_statements '}'
         | module_instantiation
             {
-                if ($1) scope_stack.top()->addModuleInst(std::shared_ptr<ModuleInstantiation>($1));
+                if ($1) scope_stack.top()->addModuleInst(std::shared_ptr<ABCModuleInstantiation>($1));
             }
         ;
 
@@ -347,7 +347,7 @@ single_module_instantiation
         }
      | '(' expr ')' '(' arguments ')'
          {
-            $$ = new ModuleInstantiation(std::shared_ptr<Expression>($2), *$5, LOCD("modulecall", @$));
+            $$ = new ExprModInst(std::shared_ptr<Expression>($2), *$5, LOCD("modulecall", @$));
             delete $5;
          }
         ;
