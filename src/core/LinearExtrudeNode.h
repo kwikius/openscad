@@ -1,15 +1,11 @@
 #pragma once
 
-#include "node.h"
+#include "AbstractNode.h"
 #include "Filename.h"
 
-
-class LinearExtrudeNode : public AbstractPolyNode
-{
+class LinearExtrudeNode : public Visitable<AbstractPolyNode, LinearExtrudeNode>{
 public:
-  VISITABLE();
-  LinearExtrudeNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
-  }
+  LinearExtrudeNode(const ModuleInstantiation *mi) : Visitable(mi) {}
   std::string toString() const override;
   std::string name() const override { return "linear_extrude"; }
 

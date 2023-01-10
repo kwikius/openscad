@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_CGAL
 
-#include <core/node.h>
+#include <core/AbstractNode.h>
 #include <core/progress.h>
 
 #include "CGALHybridPolyhedron.h"

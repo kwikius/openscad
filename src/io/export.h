@@ -11,6 +11,7 @@
 
 class PolySet;
 class Geometry;
+class SourceFile;
 
 enum class FileFormat {
   ASCIISTL,

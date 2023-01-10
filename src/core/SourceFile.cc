@@ -29,16 +29,18 @@
 #include <utils/printutils.h>
 #include <utils/exceptions.h>
 
+#include "parsersettings.h"
+
 #include "StatCache.h"
 #include "FontCache.h"
 #include <sys/stat.h>
 
-#include "SourceFile.h"
 #include "SourceFileCache.h"
-#include "node.h"
+#include "AbstractNode.h"
 
-#include "ScopeContext.h"
-#include "parsersettings.h"
+#include "FileContext.h"
+#include "Value.h"
+#include "SourceFile.h"
 
 namespace fs = boost::filesystem;
 

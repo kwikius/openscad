@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <type_traits>
 
 // FIXME: Default constructor Response()
 enum class Response {ContinueTraversal, AbortTraversal, PruneTraversal};
@@ -15,27 +16,23 @@ public:
 template <class T>
 class Visitor{
 public:
-  virtual Response visit(State& state, const T&) = 0;
+  [[nodiscard]] virtual Response visit(State& state, const T&) = 0;
 };
+
+class NodeVisitor;
 
 class BaseVisitable{
 public:
   virtual ~BaseVisitable() = default;
-  virtual Response accept(State&, BaseVisitor&) const = 0;
-protected:
-  template <class T>
-  static Response acceptImpl(State& state, const T& node, BaseVisitor& visitor) {
-    if (auto *p = dynamic_cast<Visitor<T> *>(&visitor)) {
-      return p->visit(state, node);
-    }
-    // FIXME: If we want to allow for missing nodes in visitors, we need
-    // to handle it here, e.g. by calling some handler.
-    // See e.g. page 225 of Alexandrescu's "Modern C++ Design"
-    return Response::AbortTraversal;
-  }
+  [[nodiscard]] virtual Response accept(State&, NodeVisitor&) const = 0;
 };
 
-#define VISITABLE() \
-        Response accept(State &state, BaseVisitor &visitor) const override { \
-          return acceptImpl(state, *this, visitor); \
-        }
+// B is derived from NodeVisitor
+// D is derived from Visitable<D>
+template <typename B , typename D>
+class Visitable : public B {
+public:
+   template <typename... Args>
+   Visitable(Args&&... args) : B{std::forward<Args>(args)...}{}
+   [[nodiscard]] Response accept(State &state, NodeVisitor &visitor) const override;
+};

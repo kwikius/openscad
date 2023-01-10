@@ -26,6 +26,7 @@
 
 #include "Children.h"
 #include "ScopeContext.h"
+#include "Value.h"
 
 std::shared_ptr<AbstractNode>
 Children::instantiate(const std::shared_ptr<AbstractNode> &target) const

@@ -34,7 +34,7 @@
 #include "Parameters.h"
 #include "Builtins.h"
 #include "FreetypeRenderer.h"
-
+#include "NodeVisitor.h"
 #include "TextNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope

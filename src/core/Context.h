@@ -5,8 +5,7 @@
 /**
 *  @brief Context
 **/
-class Context : public ContextFrame, public std::enable_shared_from_this<Context>
-{
+class Context : public ContextFrame, public std::enable_shared_from_this<Context>{
 protected:
   Context(EvaluationSession *session);
   Context(const std::shared_ptr<const Context>& parent);
@@ -14,9 +13,10 @@ protected:
 public:
   ~Context() override;
 
-  template <typename C, typename ... T>
-  static ContextHandle<C> create(T&& ... t) {
-    return ContextHandle<C>{std::shared_ptr<C>(new C(std::forward<T>(t)...))};
+  template <typename  C, typename ... Args>
+     requires std::is_base_of_v<Context,C>
+  static ContextHandle<C> create(Args&& ... args) {
+    return ContextHandle<C>{std::shared_ptr<C>(new C(std::forward<Args>(args)...))};
   }
 
   virtual void init() { }

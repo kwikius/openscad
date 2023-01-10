@@ -27,8 +27,8 @@ Value LcForC::evaluate(const std::shared_ptr<const Context>& context) const
       throw LoopCntException::create("for", loc);
     }
 
-    /*
-     * The next context should be evaluated in the current context,
+    /**
+     * @brief The next context should be evaluated in the current context,
      * and replace the current context; but there is no reason for
      * it to _parent_ the current context, for the next context
      * replaces every variable in it. Keeping the next context
@@ -37,7 +37,7 @@ Value LcForC::evaluate(const std::shared_ptr<const Context>& context) const
      * However, we can't just use apply_variables(), as this breaks
      * captured context references in lambda functions.
      * So, we reparent the next context to the initial context.
-     */
+     **/
     ContextHandle<Context> nextContext{
       Let::sequentialAssignmentContext(this->incr_arguments, this->location(), *currentContext)
     };

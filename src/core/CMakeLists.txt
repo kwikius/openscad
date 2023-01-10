@@ -1,6 +1,7 @@
 #core lib
 
 set(CORE_LIB_SOURCES
+  AbstractNode.cc
   Filename.cc
   QuotedString.cc
   Arguments.cc
@@ -43,8 +44,9 @@ set(CORE_LIB_SOURCES
   LinearExtrudeNode.cc
   LocalScope.cc
   ScopeContext.cc
+  UserModuleContext.cc
+  FileContext.cc
   BuiltinModule.cc
-  node.cc
   NodeDumper.cc
   OffsetNode.cc
   Parameters.cc

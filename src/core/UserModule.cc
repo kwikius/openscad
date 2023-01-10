@@ -32,10 +32,13 @@
 #include <utils/StackCheck.h>
 
 #include "ModuleInstantiation.h"
-#include "node.h"
+#include "AbstractNode.h"
 
 #include "ScopeContext.h"
 #include "Expression.h"
+#include "Arguments.h"
+#include "UserModuleContext.h"
+#include "Value.h"
 
 #include "UserModule.h"
 

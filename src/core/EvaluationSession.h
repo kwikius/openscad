@@ -14,13 +14,13 @@ class Value;
 class ContextFrame;
 
 /**
-*  @brief New instance of EvaluationSession created on the stack when the main file ( documentroot) is recompiled
+*  @brief New instance of EvaluationSession is created
+*  (in MainWindow::instantiateRoot() and in openscad.cc do_export)
+*  when the main file ( documentroot) is recompiled
 *  Main member is a context stack.
-*  The Evaluation session doesnt appear to own the Contexts on the stack.
-*  Lifetime is somewhat obsure therefore
+*  The Evaluation session doesnt own the Contexts on the stack.
 *  push_frame() and pop_frame() push and pop Context on the stack
-*  EvaluationSession is created on the stack in MainWindow::instantiateRoot()
-*  and in openscad.cc do_export
+*  EvaluationSession is created on the stack
 **/
 class EvaluationSession
 {
@@ -33,19 +33,25 @@ public:
   *  @brief push a new Context
   *  @return current context stack index ( stack is based on a std::vector of context*
   *  Note that EvaluationSession doesnt own the Context
-  *
   **/
   size_t push_frame(ContextFrame *frame);
   /**
-   * @brief
+   * @brief replaces the ContextFrame at index on the context stack with fram
    **/
   void replace_frame(size_t index, ContextFrame *frame);
+/**
+* @brief pops context stack and asserts that the size of the resulting stack is same as index
+**/
   void pop_frame(size_t index);
 
-  [[nodiscard]] boost::optional<const Value&> try_lookup_special_variable(const std::string& name) const;
-  [[nodiscard]] const Value& lookup_special_variable(const std::string& name, const Location& loc) const;
-  [[nodiscard]] boost::optional<CallableFunction> lookup_special_function(const std::string& name, const Location& loc) const;
-  [[nodiscard]] boost::optional<InstantiableModule> lookup_special_module(const std::string& name, const Location& loc) const;
+  [[nodiscard]] boost::optional<const Value&>
+     try_lookup_special_variable(const std::string& name) const;
+  [[nodiscard]] const Value&
+     lookup_special_variable(const std::string& name, const Location& loc) const;
+  [[nodiscard]] boost::optional<CallableFunction>
+     lookup_special_function(const std::string& name, const Location& loc) const;
+  [[nodiscard]] boost::optional<InstantiableModule>
+     lookup_special_module(const std::string& name, const Location& loc) const;
 
   [[nodiscard]] const std::string& documentRoot() const { return document_root; }
   ContextMemoryManager& contextMemoryManager() { return context_memory_manager; }

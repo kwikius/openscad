@@ -28,7 +28,7 @@
 #include <cassert>
 
 #include "CsgOpNode.h"
-
+#include "NodeVisitor.h"
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Builtins.h"

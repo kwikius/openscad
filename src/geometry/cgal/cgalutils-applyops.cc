@@ -18,7 +18,7 @@
 #include <utils/printutils.h>
 
 #include <core/progress.h>
-#include <core/node.h>
+#include <core/AbstractNode.h>
 
 #include "cgal.h"
 

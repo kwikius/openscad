@@ -5,7 +5,7 @@
 
 #include <geometry/linalg.h>
 
-#include "node.h"
+#include "AbstractNode.h"
 
 #define FLAG(var, flag, on) on ? (var |= flag) : (var &= ~flag)
 

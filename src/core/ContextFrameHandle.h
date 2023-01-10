@@ -14,8 +14,7 @@ protected:
   /**
   *  @brief Create a handle to a context
   *  The Context is always created using Context<C>::create(args..)
-  * except for Parameters which is described as Not a true context
-  * The create function
+  * except for Parameters which is described as "not a true context"
   **/
   friend class Parameters;
   ContextFrameHandle(ContextFrame *frame)
@@ -24,6 +23,7 @@ protected:
   {
   }
 
+  // This isnt virtual on main branch. Should it be?
  //~ContextFrameHandle()
   virtual ~ContextFrameHandle()
   {

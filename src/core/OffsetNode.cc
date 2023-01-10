@@ -24,7 +24,9 @@
  *
  */
 
-#include "OffsetNode.h"
+
+#include <sstream>
+#include <boost/assign/std/vector.hpp>
 
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
@@ -32,8 +34,9 @@
 #include "Parameters.h"
 #include "Builtins.h"
 
-#include <sstream>
-#include <boost/assign/std/vector.hpp>
+#include "NodeVisitor.h"
+#include "OffsetNode.h"
+
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 static std::shared_ptr<AbstractNode> builtin_offset(const ModuleInstantiation *inst, Arguments arguments, const Children& children)

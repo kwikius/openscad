@@ -6,7 +6,7 @@
 
 #include <utils/printutils.h>
 
-#include "node.h"
+#include "AbstractNode.h"
 
 /*!
    Caches string values per node based on the node.index().

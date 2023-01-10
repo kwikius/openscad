@@ -4,15 +4,15 @@
 #include <string>
 #include <unordered_map>
 
-class Value;
+#include "Value.h"
 // Wrapper for provide *futuristic* unordered_map features,
 // plus some functions specialized to our use case.
 /**
 * Brief Map names to Values. Used in a ContextFrame for lexical and config variables
+* Thin wrapper over std::unordered_map<std::string,Value>
 * interfaced as an unordered map
 **/
-class ValueMap
-{
+class ValueMap{
   using map_t = std::unordered_map<std::string, Value>;
   map_t map;
 
@@ -38,7 +38,9 @@ public:
     return map.insert_or_assign(name, std::move(value));
   }
 
-  // Get value by name, without possibility of default-constructing a missing name
-  //   return Value::undefined if key missing
+  /**
+  * @brief Get value by name, without possibility of default-constructing a missing name
+  *   return Value::undefined if key missing
+  **/
   const Value& get(const std::string& name) const;
 };

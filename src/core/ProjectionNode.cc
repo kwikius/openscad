@@ -24,15 +24,17 @@
  *
  */
 
-#include "ProjectionNode.h"
+#include <cassert>
+#include <boost/assign/std/vector.hpp>
+
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Parameters.h"
 #include "Builtins.h"
+#include "NodeVisitor.h"
+#include "ProjectionNode.h"
 
-#include <cassert>
-#include <boost/assign/std/vector.hpp>
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 static std::shared_ptr<AbstractNode>

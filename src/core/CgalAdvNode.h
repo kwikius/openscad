@@ -2,7 +2,7 @@
 
 #include <geometry/linalg.h>
 
-#include "node.h"
+#include "AbstractNode.h"
 
 enum class CgalAdvType {
   MINKOWSKI,
@@ -11,11 +11,10 @@ enum class CgalAdvType {
   RESIZE
 };
 
-class CgalAdvNode : public AbstractNode
-{
+class CgalAdvNode : public Visitable<AbstractNode, CgalAdvNode>{
 public:
-  VISITABLE();
-  CgalAdvNode(const ModuleInstantiation *mi, CgalAdvType type) : AbstractNode(mi), type(type) {
+  CgalAdvNode(const ModuleInstantiation *mi, CgalAdvType type)
+  : Visitable(mi), type(type) {
   }
   std::string toString() const override;
   std::string name() const override;

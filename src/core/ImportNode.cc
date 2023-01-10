@@ -55,6 +55,7 @@
 #include "Parameters.h"
 #include "ImportNode.h"
 #include "Value.h"
+#include "NodeVisitor.h"
 
 namespace fs = boost::filesystem;
 

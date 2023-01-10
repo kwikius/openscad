@@ -6,13 +6,11 @@
 #include <string>
 #include <utility>
 
-#include "node.h"
+#include "AbstractNode.h"
 
-class RoofNode : public AbstractPolyNode
-{
+class RoofNode : public Visitable<AbstractPolyNode, RoofNode>{
 public:
-  VISITABLE();
-  RoofNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {}
+  RoofNode(const ModuleInstantiation *mi) : Visitable(mi) {}
   std::string toString() const override;
   std::string name() const override { return "roof"; }
 

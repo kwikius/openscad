@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "Context.h"
+#include "ScopeContext.h"
 #include "LocalScope.h"
 
 class AbstractNode;

@@ -5,6 +5,7 @@
 #include <RenderStatistic.h>
 #include "TabManager.h"
 #include <core/Tree.h>
+#include <core/BuiltinContext.h>
 #include "UIUtils.h"
 #include "qtgettext.h" // IWYU pragma: keep
 #include "ui_MainWindow.h"

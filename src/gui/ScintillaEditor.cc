@@ -147,15 +147,15 @@ ScintillaEditor::ScintillaEditor(QWidget *parent) : EditorInterface(parent)
   c->setKey(Qt::Key_Backspace | Qt::ALT);
 #endif
   // Cmd/Ctrl-T is handled by the menu
-  c = qsci->standardCommands()->boundTo(Qt::Key_T | Qt::CTRL);
+  c = qsci->standardCommands()->boundTo( static_cast<int>(Qt::Key_T) | static_cast<int>(Qt::CTRL) );
   c->setKey(0);
   // Cmd/Ctrl-D is handled by the menu
-  c = qsci->standardCommands()->boundTo(Qt::Key_D | Qt::CTRL);
+  c = qsci->standardCommands()->boundTo( static_cast<int>(Qt::Key_D) | static_cast<int>(Qt::CTRL) );
   c->setKey(0);
   // Ctrl-Shift-Z should redo on all platforms
   c = qsci->standardCommands()->find(QsciCommand::Redo);
-  c->setKey(Qt::Key_Z | Qt::CTRL | Qt::SHIFT);
-  c->setAlternateKey(Qt::Key_Y | Qt::CTRL);
+  c->setKey(static_cast<int>(Qt::Key_Z) | static_cast<int>(Qt::CTRL) | static_cast<int>(Qt::SHIFT) );
+  c->setAlternateKey(static_cast<int>(Qt::Key_Y) | static_cast<int>(Qt::CTRL));
 
 #ifdef Q_OS_MAC
   const unsigned long modifier = Qt::META;
@@ -165,13 +165,13 @@ ScintillaEditor::ScintillaEditor(QWidget *parent) : EditorInterface(parent)
 
   QShortcut *shortcutCalltip;
   shortcutCalltip = new QShortcut(modifier | Qt::SHIFT | Qt::Key_Space, this);
-  connect(shortcutCalltip, &QShortcut::activated, [ = ]() {
+  connect(shortcutCalltip, &QShortcut::activated, [this]() {
     qsci->callTip();
   });
 
   QShortcut *shortcutAutocomplete;
   shortcutAutocomplete = new QShortcut(modifier | Qt::Key_Space, this);
-  connect(shortcutAutocomplete, &QShortcut::activated, [ = ]() {
+  connect(shortcutAutocomplete, &QShortcut::activated, [this]() {
     qsci->autoCompleteFromAPIs();
   });
 

@@ -11,7 +11,10 @@
 /**
 * @brief object representing the required information for instantiation of a module
 * or a module reference into the AST tree.
-* The module is either represented as a name or as an expression returning a module literal
+* The module is either represented as
+* - a named module instantiation
+* - a module_expression instantiation
+* - an if-else module instantiation
 * TODO the module to instantiate represented as an abstract module_expression
 * - module_expression
 *    - module_name
@@ -107,7 +110,7 @@ public:
 class IfElseModuleInstantiation : public ModuleInstantiation{
 public:
   IfElseModuleInstantiation(std::shared_ptr<class Expression> expr, const Location& loc) :
-    ModuleInstantiation("if", AssignmentList{assignment("", expr)}, loc) { }
+    ModuleInstantiation("if", AssignmentList{std::make_shared<Assignment>("", expr)}, loc) { }
   ~IfElseModuleInstantiation();
   LocalScope *makeElseScope();
   LocalScope *getElseScope() const { return this->else_scope.get(); }

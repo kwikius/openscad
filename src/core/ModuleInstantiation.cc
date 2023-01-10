@@ -34,14 +34,6 @@ ABCModuleInstantiation::~ABCModuleInstantiation()
 
 void ABCModuleInstantiation::print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined) const
 {
-//  if (!inlined) stream << indent;
-//  if ( id_expr){
-//   // stream << "( ";
-//    id_expr->print(stream,"");
-//   // stream << " )";
-//  }else{
-//     stream << modname;
-//  }
   stream <<  "(";
   for (size_t i = 0; i < this->arguments.size(); ++i) {
     const auto& arg = this->arguments[i];

@@ -39,7 +39,7 @@
 #include "Builtins.h"
 #include "Value.h"
 #include "Parameters.h"
-
+#include "NodeVisitor.h"
 #include "TransformNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
@@ -259,7 +259,7 @@ std::string TransformNode::toString() const
 }
 
 TransformNode::TransformNode(const ModuleInstantiation *mi, const std::string& verbose_name) :
-  AbstractNode(mi),
+  Visitable(mi),
   matrix(Transform3d::Identity()),
   _name(verbose_name)
 {

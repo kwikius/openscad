@@ -8,6 +8,7 @@
 #include "Builtins.h"
 #include "Parameters.h"
 #include "Children.h"
+#include "NodeVisitor.h"
 #include "RoofNode.h"
 
 static std::shared_ptr<AbstractNode> builtin_roof(const ModuleInstantiation *inst, Arguments arguments, const Children& children)

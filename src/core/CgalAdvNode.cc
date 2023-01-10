@@ -30,13 +30,13 @@
 
 #include <boost/assign/std/vector.hpp>
 
-#include "CgalAdvNode.h"
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Builtins.h"
-#include "BuiltinModule.h"
 #include "Children.h"
 #include "Parameters.h"
+#include "NodeVisitor.h"
+#include "CgalAdvNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 

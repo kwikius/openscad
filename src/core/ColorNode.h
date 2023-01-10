@@ -2,13 +2,12 @@
 
 #include <geometry/linalg.h>
 
-#include "node.h"
+#include "AbstractNode.h"
 
-class ColorNode : public AbstractNode
-{
+class ColorNode : public Visitable<AbstractNode, ColorNode>{
 public:
-  VISITABLE();
-  ColorNode(const ModuleInstantiation *mi) : AbstractNode(mi), color(-1.0f, -1.0f, -1.0f, 1.0f) { }
+  ColorNode(const ModuleInstantiation *mi)
+ : Visitable(mi), color(-1.0f, -1.0f, -1.0f, 1.0f) { }
   std::string toString() const override;
   std::string name() const override;
 

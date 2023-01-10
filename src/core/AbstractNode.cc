@@ -28,7 +28,8 @@
 #include <iostream>
 #include <algorithm>
 
-#include "node.h"
+#include "AbstractNode.h"
+#include "NodeVisitor.h"
 #include "ModuleInstantiation.h"
 #include "progress.h"
 

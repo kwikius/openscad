@@ -9,8 +9,7 @@
 class EvaluationSession;
 class InstantiableModule;
 
-class BuiltinContext : public Context
-{
+class BuiltinContext : public Context{
 public:
   void init() override;
   boost::optional<CallableFunction>
@@ -18,7 +17,7 @@ public:
   boost::optional<InstantiableModule>
     lookup_local_module(const std::string& name, const Location& loc) const override;
 
-protected:
+private:
   BuiltinContext(EvaluationSession *session);
 
   friend class Context;

@@ -40,6 +40,7 @@
 #include "Parameters.h"
 #include "Builtins.h"
 #include "LinearExtrudeNode.h"
+#include "NodeVisitor.h"
 #include "Value.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
@@ -74,7 +75,8 @@ Parameters parse_parameters(Arguments arguments, const Location& location)
                            );
 }
 
-static std::shared_ptr<AbstractNode> builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
+static std::shared_ptr<AbstractNode>
+builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
 {
   auto node = std::make_shared<LinearExtrudeNode>(inst);
 

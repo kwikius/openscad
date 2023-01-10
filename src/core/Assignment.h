@@ -11,6 +11,11 @@
 
 class Expression;
 
+/**
+* @brief Associates a name with an Expression at a source file location
+* Can have Annotations added (by Customizer)
+* Alos records position wwhere the variable was overwritten, if any
+**/
 class Assignment : public ASTNode{
 public:
   Assignment(std::string name, const Location& loc)
@@ -37,18 +42,12 @@ public:
   const Location& locationOfOverwrite() const { return locOfOverwrite; }
   void setLocationOfOverwrite(const Location& locOfOverwrite) { this->locOfOverwrite = locOfOverwrite; }
 
-protected:
+private:
   std::string name;
   std::shared_ptr<Expression> expr;
   AnnotationMap annotations;
   Location locOfOverwrite;
 };
-
-template <class ... Args>
-std::shared_ptr<Assignment>
-  assignment(Args... args) {
-  return std::make_shared<Assignment>(args ...);
-}
 
 using AssignmentList = std::vector<std::shared_ptr<Assignment>>;
 using AssignmentMap = std::unordered_map<std::string, const Expression *>;

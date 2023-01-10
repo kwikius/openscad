@@ -1,15 +1,14 @@
 #pragma once
 
-#include "node.h"
+#include "AbstractNode.h"
 #include "FreetypeRenderer.h"
 
 class TextModule;
 
-class TextNode : public AbstractPolyNode
-{
+class TextNode : public Visitable< AbstractPolyNode, TextNode>{
 public:
-  VISITABLE();
-  TextNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {}
+ // VISITABLE();
+  TextNode(const ModuleInstantiation *mi) : Visitable(mi) {}
 
   std::string toString() const override;
   std::string name() const override { return "text"; }

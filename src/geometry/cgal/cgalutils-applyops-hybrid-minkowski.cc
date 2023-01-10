@@ -11,7 +11,7 @@
 
 #include <utils/printutils.h>
 
-#include <core/node.h>
+#include <core/AbstractNode.h>
 
 #include "cgal.h"
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>

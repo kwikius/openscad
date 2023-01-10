@@ -15,7 +15,7 @@
 #include <geometry/Reindexer.h>
 #include <geometry/GeometryUtils.h>
 
-#include <core/node.h>
+#include <core/AbstractNode.h>
 
 #include "cgal.h"
 #include <CGAL/Aff_transformation_3.h>

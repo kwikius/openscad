@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <type_traits>
 #include "ContextFrameHandle.h"
 
 /**
@@ -8,12 +9,15 @@
  * dynamic scoping stack using object lifetime.
  * The Context objects can hang around for longer, e.g. in case of closures.
  */
-template <typename T>
+class Context;
+
+template <typename C>
+  requires std::is_base_of_v<Context,C>
 class ContextHandle : ContextFrameHandle
 {
 friend class Context;
 private:
-  ContextHandle(std::shared_ptr<T>&& context) :
+  ContextHandle(std::shared_ptr<C>&& context) :
     ContextFrameHandle(context.get()),
     context(std::move(context))
   {
@@ -53,10 +57,10 @@ public:
     return *this;
   }
 
-  const T *operator->() const { return context.get(); }
-  T *operator->() { return context.get(); }
-  std::shared_ptr<const T> operator*() const { return context; }
+  const C *operator->() const { return context.get(); }
+  C *operator->() { return context.get(); }
+  std::shared_ptr<const C> operator*() const { return context; }
 
 private:
-  std::shared_ptr<T> context;
+  std::shared_ptr<C> context;
 };

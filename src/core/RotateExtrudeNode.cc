@@ -41,7 +41,7 @@
 #include "Children.h"
 #include "Parameters.h"
 #include "Builtins.h"
-
+#include "NodeVisitor.h"
 #include "RotateExtrudeNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope

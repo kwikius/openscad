@@ -38,7 +38,7 @@
 #include <geometry/PolySet.h>
 
 #include "BuiltinModule.h"
-#include "node.h"
+#include "AbstractNode.h"
 #include "Children.h"
 #include "Builtins.h"
 #include "Parameters.h"

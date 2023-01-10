@@ -36,12 +36,13 @@
 
 #include <utils/printutils.h>
 
-#include "ColorNode.h"
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Builtins.h"
 #include "Children.h"
 #include "Parameters.h"
+#include "NodeVisitor.h"
+#include "ColorNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 

@@ -5,7 +5,7 @@
 #include <list>
 
 #include "NodeVisitor.h"
-#include "node.h"
+#include "AbstractNode.h"
 #include "NodeCache.h"
 
 // GroupNodeChecker does a quick first pass to count children of group nodes

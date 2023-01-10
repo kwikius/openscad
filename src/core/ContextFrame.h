@@ -1,6 +1,7 @@
 #pragma once
-#include <string>
 
+#include <type_traits>
+#include <string>
 #include "ValueMap.h"
 #include "EvaluationSession.h"
 
@@ -10,8 +11,7 @@
  * Holds a pointer to the Evaluation session
  * as well as ValueMaps of config variables and lexical variables
  **/
-class ContextFrame
-{
+class ContextFrame{
 public:
   ContextFrame(EvaluationSession *session);
   virtual ~ContextFrame() = default;

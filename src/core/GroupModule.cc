@@ -26,7 +26,7 @@
 
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
-#include "node.h"
+#include "NodeVisitor.h"
 #include "Builtins.h"
 #include "Children.h"
 #include "Parameters.h"

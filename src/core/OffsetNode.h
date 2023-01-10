@@ -1,13 +1,11 @@
 #pragma once
 
-#include "node.h"
+#include "AbstractNode.h"
 #include "ext/polyclipping/clipper.hpp"
 
-class OffsetNode : public AbstractPolyNode
-{
+class OffsetNode : public Visitable<AbstractPolyNode, OffsetNode>{
 public:
-  VISITABLE();
-  OffsetNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) { }
+  OffsetNode(const ModuleInstantiation *mi) : Visitable(mi) { }
   std::string toString() const override;
   std::string name() const override { return "offset"; }
 

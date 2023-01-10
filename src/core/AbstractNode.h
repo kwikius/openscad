@@ -32,7 +32,7 @@ class AbstractNode : public BaseVisitable, public std::enable_shared_from_this<A
   // use smth. else to display node identifier in CSG tree output?
   static size_t idx_counter; // Node instantiation index
 public:
-  VISITABLE();
+//  VISITABLE();
   AbstractNode(const ModuleInstantiation *mi);
   virtual std::string toString() const;
   /*! The 'OpenSCAD name' of this node, defaults to classname, but can be
@@ -66,23 +66,20 @@ public:
 
   int idx; // Node index (unique per tree)
 
-  std::shared_ptr<const AbstractNode> getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const;
+  std::shared_ptr<const AbstractNode>
+   getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const;
 };
 
-class AbstractIntersectionNode : public AbstractNode
-{
+class AbstractIntersectionNode : public Visitable<AbstractNode, AbstractIntersectionNode>{
 public:
-  VISITABLE();
-  AbstractIntersectionNode(const ModuleInstantiation *mi) : AbstractNode(mi) { }
+  AbstractIntersectionNode(const ModuleInstantiation *mi) : Visitable(mi) { }
   std::string toString() const override;
   std::string name() const override;
 };
 
-class AbstractPolyNode : public AbstractNode
-{
+class AbstractPolyNode : public Visitable<AbstractNode, AbstractPolyNode>{
 public:
-  VISITABLE();
-  AbstractPolyNode(const ModuleInstantiation *mi) : AbstractNode(mi) { }
+  AbstractPolyNode(const ModuleInstantiation *mi) : Visitable(mi) { }
 
   enum class render_mode_e {
     RENDER_CGAL,
@@ -94,11 +91,9 @@ public:
    Used for organizing objects into lists which should not be grouped but merely
    unpacked by the parent node.
  */
-class ListNode : public AbstractNode
-{
+class ListNode : public Visitable<AbstractNode,ListNode>{
 public:
-  VISITABLE();
-  ListNode(const ModuleInstantiation *mi) : AbstractNode(mi) { }
+  ListNode(const ModuleInstantiation *mi) : Visitable(mi) { }
   std::string name() const override;
 };
 
@@ -106,11 +101,10 @@ public:
    Logically groups objects together. Used as a way of passing
    objects around without having to perform unions on them.
  */
-class GroupNode : public AbstractNode
-{
+class GroupNode : public Visitable<AbstractNode,GroupNode>{
 public:
-  VISITABLE();
-  GroupNode(const ModuleInstantiation *mi, std::string name = "") : AbstractNode(mi), _name(std::move(name)) { }
+  GroupNode(const ModuleInstantiation *mi, std::string name = "")
+ : Visitable(mi), _name(std::move(name)) { }
   std::string name() const override;
   std::string verbose_name() const override;
 private:
@@ -120,23 +114,20 @@ private:
 /*!
    Only instantiated once, for the top-level file.
  */
-class RootNode : public GroupNode
-{
+class RootNode : public Visitable<GroupNode, RootNode>{
 public:
-  VISITABLE();
-  RootNode() : GroupNode(&mi), mi("group") { }
+  RootNode() : Visitable(&mi), mi("group") { }
   std::string name() const override;
 private:
   ModuleInstantiation mi;
 };
 
-class LeafNode : public AbstractPolyNode
-{
+class LeafNode : public Visitable<AbstractPolyNode, LeafNode>{
 public:
-  VISITABLE();
-  LeafNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) { }
+  LeafNode(const ModuleInstantiation *mi) : Visitable(mi) { }
   virtual const class Geometry *createGeometry() const = 0;
 };
 
 std::ostream& operator<<(std::ostream& stream, const AbstractNode& node);
-std::shared_ptr<AbstractNode> find_root_tag(const std::shared_ptr<AbstractNode>& node, const Location **nextLocation = nullptr);
+std::shared_ptr<AbstractNode>
+find_root_tag(const std::shared_ptr<AbstractNode>& node, const Location **nextLocation = nullptr);

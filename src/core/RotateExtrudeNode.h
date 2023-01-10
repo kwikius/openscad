@@ -1,13 +1,11 @@
 #pragma once
 
-#include "node.h"
+#include "AbstractNode.h"
 #include "Filename.h"
 
-class RotateExtrudeNode : public AbstractPolyNode
-{
+class RotateExtrudeNode : public Visitable<AbstractPolyNode,RotateExtrudeNode>{
 public:
-  VISITABLE();
-  RotateExtrudeNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
+  RotateExtrudeNode(const ModuleInstantiation *mi) : Visitable(mi) {
     convexity = 0;
     fn = fs = fa = 0;
     origin_x = origin_y = scale = 0;

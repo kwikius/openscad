@@ -182,7 +182,7 @@ void TabManager::createTab(const QString& filename)
   connect(editor, SIGNAL(uriDropped(const QUrl&)), par, SLOT(handleFileDrop(const QUrl&)));
   connect(editor, SIGNAL(previewRequest()), par, SLOT(actionRenderPreview()));
   connect(editor, SIGNAL(showContextMenuEvent(const QPoint&)), this, SLOT(showContextMenuEvent(const QPoint&)));
-  connect(editor, &EditorInterface::focusIn, this, [=]() { par->setLastFocus(editor); });
+  connect(editor, &EditorInterface::focusIn, this, [this]() { par->setLastFocus(editor); });
 
   connect(Preferences::inst(), SIGNAL(editorConfigChanged()), editor, SLOT(applySettings()));
   connect(Preferences::inst(), SIGNAL(autocompleteChanged(bool)), editor, SLOT(onAutocompleteChanged(bool)));

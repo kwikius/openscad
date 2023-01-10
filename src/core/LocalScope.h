@@ -30,7 +30,7 @@ public:
   void addModule(const std::shared_ptr<UserModule>& module);
   void addFunction(const std::shared_ptr<UserFunction>& function);
   void addAssignment(const std::shared_ptr<Assignment>& assignment);
-  bool hasChildren() const {return !(moduleInstantiations.empty());}
+  [[nodiscard]] bool hasChildren() const {return !(moduleInstantiations.empty());}
 
   AssignmentList assignments;
   std::vector<std::shared_ptr<ABCModuleInstantiation> > moduleInstantiations;

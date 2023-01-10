@@ -24,15 +24,18 @@
  *
  */
 
-#include "RenderNode.h"
+#include <sstream>
+#include <boost/assign/std/vector.hpp>
+
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "Builtins.h"
 #include "Children.h"
 #include "Parameters.h"
 
-#include <sstream>
-#include <boost/assign/std/vector.hpp>
+#include "NodeVisitor.h"
+#include "RenderNode.h"
+
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 static std::shared_ptr<AbstractNode> builtin_render(const ModuleInstantiation *inst, Arguments arguments, const Children& children)

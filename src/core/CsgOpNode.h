@@ -2,15 +2,15 @@
 
 #include <string>
 
-#include "node.h"
+#include "AbstractNode.h"
 #include "enums.h"
 
-class CsgOpNode : public AbstractNode
-{
+class CsgOpNode : public Visitable<AbstractNode, CsgOpNode>{
 public:
-  VISITABLE();
+
   OpenSCADOperator type;
-  CsgOpNode(const ModuleInstantiation *mi, OpenSCADOperator type) : AbstractNode(mi), type(type) { }
+  CsgOpNode(const ModuleInstantiation *mi, OpenSCADOperator type)
+  : Visitable(mi), type(type) { }
   std::string toString() const override;
   std::string name() const override;
 };

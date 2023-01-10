@@ -26,7 +26,7 @@ public:
   /**
    * @brief instantiate override for BuiltinModule
    * @param defining_context Ignored since the module is builtin
-   * @param inst Holds argumnents and children, if any
+   * @param inst Holds arguments and children, if any
    * @param context The context where the module was instantiated
    **/
    abstractNodePtr instantiate(

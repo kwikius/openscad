@@ -4,7 +4,7 @@
 #include "ModuleInstantiation.h"
 #include "UserModule.h"
 #include "function.h"
-#include "node.h"
+#include "AbstractNode.h"
 
 void LocalScope::addModuleInst(const std::shared_ptr<ABCModuleInstantiation>& modinst)
 {

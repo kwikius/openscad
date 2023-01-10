@@ -2,7 +2,7 @@
 
 #include <boost/optional.hpp>
 
-#include "node.h"
+#include "AbstractNode.h"
 #include "Filename.h"
 
 enum class ImportType {
@@ -16,13 +16,11 @@ enum class ImportType {
   NEF3,
 };
 
-class ImportNode : public LeafNode
-{
+class ImportNode : public Visitable<LeafNode, ImportNode>{
 public:
   constexpr static double SVG_DEFAULT_DPI = 72.0;
-
-  VISITABLE();
-  ImportNode(const ModuleInstantiation *mi, ImportType type) : LeafNode(mi), type(type) { }
+  ImportNode(const ModuleInstantiation *mi, ImportType type)
+  : Visitable(mi), type(type) { }
   std::string toString() const override;
   std::string name() const override;
 

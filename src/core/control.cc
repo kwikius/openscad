@@ -28,7 +28,7 @@
 
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
-#include "node.h"
+#include "AbstractNode.h"
 #include "Arguments.h"
 #include "Children.h"
 #include "expression/expressions.h"

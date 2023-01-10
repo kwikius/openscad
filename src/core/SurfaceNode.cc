@@ -48,11 +48,12 @@
 
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
-#include "node.h"
+#include "AbstractNode.h"
 #include "Parameters.h"
 #include "Builtins.h"
 #include "Children.h"
 #include "Filename.h"
+#include "NodeVisitor.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
@@ -84,11 +85,9 @@ public:
 } img_data_t;
 
 
-class SurfaceNode : public LeafNode
-{
+class SurfaceNode : public Visitable<LeafNode, SurfaceNode>{
 public:
-  VISITABLE();
-  SurfaceNode(const ModuleInstantiation *mi) : LeafNode(mi), center(false), invert(false), convexity(1) { }
+  SurfaceNode(const ModuleInstantiation *mi) : Visitable(mi), center(false), invert(false), convexity(1) { }
   std::string toString() const override;
   std::string name() const override { return "surface"; }
 

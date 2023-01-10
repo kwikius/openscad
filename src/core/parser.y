@@ -853,7 +853,9 @@ void handle_assignment(const std::string token, Expression *expr, const Location
 		}
 	}
 	if (!found) {
-		scope_stack.top()->addAssignment(assignment(token, std::shared_ptr<Expression>(expr), loc));
+		scope_stack.top()->addAssignment(
+         std::make_shared<Assignment>(token, std::shared_ptr<Expression>(expr), loc)
+      );
 	}
 }
 

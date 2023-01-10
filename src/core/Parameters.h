@@ -1,5 +1,6 @@
 #pragma once
 
+#include <type_traits>
 #include <string>
 #include <vector>
 
@@ -7,37 +8,40 @@
 #include "ContextFrame.h"
 
 /**
- * @brief The parameters of a builtin function or module do not form a true Context;
- * it is a ValueMap, but it doesn't have a parent context or child contexts,
- * no function literals can capture it, and it has simpler memory management.
+ * @brief The parameters of a builtin function or module do not form a true Context
+ * since:
+ * - It doesn't have a parent context or child contexts.
+ * - No function literals can capture it.
+ * - It has simpler memory management.
+ *
  * But special variables passed as parameters ARE accessible on the execution
- * stack. Thus, a Parameters is a ContextFrame, held by a ContextFrameHandle.
+ * stack. A Parameters contains a ContextFrame, held by a ContextFrameHandle.
+ * @todo  Convert a Parameters into a true context. (Modify the concept of a true context)
  **/
-class Parameters
-{
+class Parameters{
 private:
   Parameters(ContextFrame&& frame, Location loc);
 
 public:
   Parameters(Parameters&& other) noexcept;
 
-  /*
-   * Matches arguments with parameters.
+  /**
+   * @brief Matches arguments with parameters.
    * Does not support default arguments.
    * Required parameters are set to undefined if absent;
    * Optional parameters are not set at all.
-   */
+   **/
   static Parameters parse(
     Arguments arguments,
     const Location& loc,
     const std::vector<std::string>& required_parameters,
     const std::vector<std::string>& optional_parameters = {}
     );
-  /*
-   * Matches arguments with parameters.
+  /**
+   * @brief Matches arguments with parameters.
    * Supports default arguments, and requires a context in which to interpret them.
    * Absent parameters without defaults are set to undefined.
-   */
+   **/
   static Parameters parse(
     Arguments arguments,
     const Location& loc,
@@ -57,9 +61,11 @@ public:
   bool valid(const std::string& name, Value::Type type);
   bool valid_required(const std::string& name, Value::Type type);
   bool validate_number(const std::string& name, double& out);
-  template <typename T> bool validate_integral(const std::string& name, T& out,
-                                               T lo = std::numeric_limits<T>::min(),
-                                               T hi = std::numeric_limits<T>::max());
+  template <typename T>
+    requires std::is_integral_v<T>
+  bool validate_integral(const std::string& name,
+    T& out,T lo = std::numeric_limits<T>::lowest(),T hi = std::numeric_limits<T>::max()
+  );
 
   ContextFrame to_context_frame() &&;
 
@@ -77,17 +83,16 @@ private:
 // Silently clamp to the given range(defaults to numeric_limits)
 // as long as param is a finite number.
 template <typename T>
+  requires std::is_integral_v<T>
 bool Parameters::validate_integral(const std::string& name, T& out, T lo, T hi)
 {
+  // check that range of T doesnt exceed double
+  static_assert(std::numeric_limits<T>::lowest() >= std::numeric_limits<double>::lowest());
+  static_assert(std::numeric_limits<T>::max() <= std::numeric_limits<double>::max());
   double temp;
   if (validate_number(name, temp)) {
-    if (temp < lo) {
-      out = lo;
-    } else if (temp > hi) {
-      out = hi;
-    } else {
-      out = static_cast<T>(temp);
-    }
+    double const tempClamped = std::clamp(temp,static_cast<double>(lo),static_cast<double>(hi));
+    out = static_cast<T>(tempClamped);
     return true;
   }
   return false;
