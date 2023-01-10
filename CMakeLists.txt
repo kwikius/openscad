@@ -99,7 +99,7 @@ target_link_libraries(${openscadEXECUTABLE} PUBLIC
 
 foreach(scadTarget ${openscadALLTARGETS})
    # Strict c++17, e.g. no GNU extensions
-   set_property(TARGET ${scadTarget} PROPERTY CXX_STANDARD 17)
+   set_property(TARGET ${scadTarget} PROPERTY CXX_STANDARD 20)
    set_property(TARGET ${scadTarget} PROPERTY CXX_EXTENSIONS OFF)
    set_property(TARGET ${scadTarget} PROPERTY CXX_STANDARD_REQUIRED ON)
    # Output compilation database (compile_commands.json), so we can e.g. run clang-tidy or other tools separately
