@@ -2,8 +2,12 @@
 
 #include <core/Expression.h>
 #include <core/Value.h>
-
-class Literal : public Expression{
+/**
+* @brief  a Literal is an expression that already evaluated to a Value.
+* The member value can hold any type of Value, which may or may not be
+* a numeric_constant.
+**/
+class Literal final : public Expression{
 public:
   Literal(const Location& loc = Location::NONE)
   : Expression(Id::Literal,loc), value(Value::undefined.clone()) { };

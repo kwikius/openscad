@@ -8,12 +8,13 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "../Expression.h"
 #include "../Assignment.h"
 
-class ModuleLiteral : public Expression{
+class ModuleLiteral final : public Expression{
 public:
   ModuleLiteral(const std::string& name, const AssignmentList & literal_params,
                const AssignmentList& module_args, const Location& loc );
   Value evaluate(const std::shared_ptr<const Context>& context) const override;
   void print(std::ostream& stream, const std::string& indent) const override;
+  [[nodiscard]] bool isModuleExpression() const override { return true;}
   // the name of the module  we are referring to
   std::string const module_name;
   AssignmentList module_literal_parameters;

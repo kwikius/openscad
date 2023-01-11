@@ -9,7 +9,7 @@
 class EvaluationSession;
 class InstantiableModule;
 
-class BuiltinContext : public Context{
+class BuiltinContext final : public Context{
 public:
   void init() override;
   boost::optional<CallableFunction>

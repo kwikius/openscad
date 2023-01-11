@@ -91,7 +91,7 @@ public:
    Used for organizing objects into lists which should not be grouped but merely
    unpacked by the parent node.
  */
-class ListNode : public Visitable<AbstractNode,ListNode>{
+class ListNode final : public Visitable<AbstractNode,ListNode>{
 public:
   ListNode(const ModuleInstantiation *mi) : Visitable(mi) { }
   std::string name() const override;
@@ -114,7 +114,7 @@ private:
 /*!
    Only instantiated once, for the top-level file.
  */
-class RootNode : public Visitable<GroupNode, RootNode>{
+class RootNode final : public Visitable<GroupNode, RootNode>{
 public:
   RootNode() : Visitable(&mi), mi("group") { }
   std::string name() const override;

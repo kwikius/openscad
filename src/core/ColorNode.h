@@ -4,7 +4,7 @@
 
 #include "AbstractNode.h"
 
-class ColorNode : public Visitable<AbstractNode, ColorNode>{
+class ColorNode final : public Visitable<AbstractNode, ColorNode>{
 public:
   ColorNode(const ModuleInstantiation *mi)
  : Visitable(mi), color(-1.0f, -1.0f, -1.0f, 1.0f) { }

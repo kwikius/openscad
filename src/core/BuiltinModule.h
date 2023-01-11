@@ -11,7 +11,7 @@
 * In the first (primitives), they have arguments but no children.
 * in the second (transforms) they have arguments and children.
 **/
-class BuiltinModule : public AbstractModule
+class BuiltinModule final : public AbstractModule
 {
 public:
 
