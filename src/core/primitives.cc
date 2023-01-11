@@ -39,6 +39,7 @@
 
 #include "BuiltinModule.h"
 #include "AbstractNode.h"
+#include "NodeVisitor.h"
 #include "Children.h"
 #include "Builtins.h"
 #include "Parameters.h"
