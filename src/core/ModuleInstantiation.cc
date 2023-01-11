@@ -18,12 +18,6 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include <core/expression/ModuleLiteral.h>
 #include <core/expression/BinaryOp.h>
 
-namespace fs = boost::filesystem;
-
-//ModuleInstantiation::~ModuleInstantiation()
-//{
-//}
-
 IfElseModuleInstantiation::~IfElseModuleInstantiation()
 {
 }
@@ -109,9 +103,8 @@ namespace{
       @param context The context of the instantiation, which may be modified during the expansion
       @returns true if the Module expression was expanded successfully else false
    **/
-   bool evalModuleExpr(ModuleInstantiation* modInst,
+   [[nodiscard]] bool evalModuleExpr(ModuleInstantiation* modInst,
       std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context);
-
 
      /**
    *  @brief expand a module expression into a module instantiation using an new moduleInstantatiation
@@ -131,87 +124,103 @@ namespace{
          return std::shared_ptr<ModuleInstantiation>();
       }
    }
-
-   bool evalModuleExpr(ModuleInstantiation* modInst,
+/**
+*  @brief Turn the expression into a module instantiation
+*  @param modInst The ModuleInstantiation which will represent the resulting expression
+*  @param expr The module expression to be converted
+*  @return true if the expression was succesfully converted, then the result has been metamorphised
+*  in modInst, else false
+**/
+   [[nodiscard]] bool evalModuleExpr(ModuleInstantiation* modInst,
       std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context)
    {
-      if ( auto bin_op = std::dynamic_pointer_cast<BinaryOp>(expr)){
-       using Op = BinaryOp::Op;
-       switch ( bin_op->getOpID()) {
-         case Op::Translate:
-         case Op::Rotate:{
-               assert(modInst->arguments.empty());
-               assert(modInst->name() == "");
-               auto arg_expr = bin_op->getRight();
+      switch( expr->getID()){
+        using exprId = Expression::Id;
+        case exprId::BinaryOp: {
+          auto binOp = std::dynamic_pointer_cast<BinaryOp>(expr);
+          assert(static_cast<bool>(binOp)==true);
+          assert(modInst->arguments.empty());
+          assert(modInst->name() == "");
+          switch ( binOp->getOpID()) {
+            using Op = BinaryOp::Op;
+            case Op::Translate:
+            case Op::Rotate:{
+               auto arg_expr = binOp->getRight();
                auto arg = std::make_shared<Assignment>("",arg_expr,arg_expr->location() );
                modInst->arguments.emplace_back(arg);
                std::shared_ptr<const Context> child_context = context;
-               auto childModInst = evalModuleExpr(bin_op->getLeft(),child_context);
+               auto childModInst = evalModuleExpr(binOp->getLeft(),child_context);
                if ( childModInst){
                   modInst->setName(
-                     (bin_op->getOpID() == Op::Translate)
+                     (binOp->getOpID() == Op::Translate)
                     ?"translate"
                     :"rotate"
                   );
                   modInst->scope.addModuleInst(childModInst);
                   return true;
-               }else{
-                  // something went wrong. evalModuleExpr has provided the diagnostic
+               }else{// something went wrong. evalModuleExpr has provided the diagnostic
                   return false;
                }
-         }
-/*
-TODO
-         case Group:
-         case Union:
-         case Intersection:
-         case Difference: {
-              lhsModInst = evalModuleExpr(bin_op->left);
-              rhsModInst = evalModuleExpr(bin_op->right);
-              assert(lhsModInst && rhsModInst);
-              modInst.name = op.name;
-              modInst.scope.addModInst(lhsModInst);
-              modInst.scope.addModInst(rhsModInst);
-              return true;
-         }
-*/
-         default:{
-           LOG(message_group::Warning, modInst->location(), context->documentRoot(),"invalid op");
-           return false;
-        }
-      }
-    }else{
-            auto const value = expr->evaluate(context);
-            switch(value.type()){
-               case Value::Type::MODULE:{
-                  auto const & modRef = value.toModuleReference();
-                  AssignmentList argsOut;
-                  if (modRef.transformToInstantiationArgs(
-                     modInst->arguments,
-                     modInst->location(),
-                     context,
-                     argsOut
-                  )){
-                     modInst->setName(modRef.getModuleName());
-                     modInst->arguments = argsOut;
-                     context = modRef.getContext();
-                  }else{
-                     return false;
-                  }
+            }// ~Op::Rotate Op::Translate
+            case Op::Minus:{ // difference
+               std::shared_ptr<const Context> child_context = context;
+               auto lhsInst = evalModuleExpr(binOp->getLeft(),child_context);
+               if ( ! lhsInst ){
+                  return false;
                }
-               break;
-               default:
-                  LOG(message_group::Warning, modInst->location(), context->documentRoot(),
-                  "ModuleInstantiation: invalid id expression" );
+               child_context = context;
+               auto rhsInst = evalModuleExpr(binOp->getRight(),child_context);
+               if (! rhsInst){
+                  return false;
+               }
+               modInst->setName("difference");
+               modInst->scope.addModuleInst(lhsInst);
+               modInst->scope.addModuleInst(rhsInst);
+               return true;
+            }// ~Op::Minus
+   /*
+   TODO
+            case Union:         // '|'
+            case LinearExtrude: // <->
+            case RotateExtrude:  // <^>
+            case Intersection:  // '&'
+   */
+           default:{ // Op::default
+              LOG(message_group::Warning, modInst->location(), context->documentRoot(),"invalid op");
+              return false;
+           }
+         } // ~switch binOp->getOpID()
+       } // ~case exprId::BinaryOp
+       default: {
+         auto const value = expr->evaluate(context);
+         if ( value.type() == Value::Type::MODULE){
+            auto const & modRef = value.toModuleReference();
+            AssignmentList argsOut;
+            if (modRef.transformToInstantiationArgs(
+               modInst->arguments,
+               modInst->location(),
+               context,
+               argsOut
+            )){
+               modInst->setName(modRef.getModuleName());
+               modInst->arguments = argsOut;
+               context = modRef.getContext();
+               return true;
+            }else{
                return false;
             }
-         return true;
-      }
-   }
+         }else {
+              LOG(message_group::Warning, modInst->location(), context->documentRoot(),
+               "invalid module instantiation expression" );
+              return false;
+         }
+        } // exprId::default
+      } // ~switch expr->getID()
+   } // ~()
 }// ~namespace
 
-
-std::shared_ptr<AbstractNode> ModuleInstantiation::ll_evaluate(
+std::shared_ptr<AbstractNode>
+ModuleInstantiation::ll_evaluate(
    std::shared_ptr<const Context> const & context,
    std::shared_ptr<const Context> & module_lookup_context ) const
 {
