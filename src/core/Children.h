@@ -9,8 +9,7 @@
 class AbstractNode;
 class ScopeContext;
 
-class Children
-{
+class Children{
 public:
   Children(const LocalScope *children_scope, std::shared_ptr<const Context> context) :
     children_scope(children_scope),

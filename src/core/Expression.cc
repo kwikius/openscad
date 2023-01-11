@@ -23,17 +23,9 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-//#include <boost/assign/std/vector.hpp>
 
 #include <utils/printutils.h>
-
 #include "Expression.h"
 #include "Context.h"
 #include "Value.h"
 
-//using namespace boost::assign; // bring 'operator+=()' into scope
-
-Value Expression::checkUndef(Value&& val, const std::shared_ptr<const Context>& context) const {
-  if (val.isUncheckedUndef()) LOG(message_group::Warning, loc, context->documentRoot(), "%1$s", val.toUndefString());
-  return std::move(val);
-}
