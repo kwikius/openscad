@@ -103,6 +103,7 @@ template <typename B , typename D>
 [[nodiscard]]  inline Response
 Visitable<B,D>::accept(State &state, NodeVisitor &visitor) const
 {
-   auto &p = static_cast<Visitor<D>&>(visitor);
-   return p.visit(state, static_cast<D const &>(*this));
+   return static_cast<Visitor<D>&>(visitor).visit(
+      state, static_cast<D const &>(*this)
+   );
 }
