@@ -2,26 +2,28 @@
 
 #include "../Expression.h"
 
-class BinaryOp : public Expression
+class BinaryOp final : public Expression
 {
 public:
+  //Be aware these enums are used as array indices
+  //so take care if modifying
   enum class Op {
-    LogicalAnd,
-    LogicalOr,
-    Exponent,
-    Multiply,
-    Divide,
-    Modulo,
-    Plus,
-    Minus,
-    Less,
-    LessEqual,
-    Greater,
-    GreaterEqual,
-    Equal,
-    NotEqual,
-    Translate,
-    Rotate
+    LogicalAnd =0,
+    LogicalOr = 1,
+    Exponent =2,
+    Multiply=3,
+    Divide=4,
+    Modulo=5,
+    Plus=6,
+    Minus=7,
+    Less=8,
+    LessEqual=9,
+    Greater=10,
+    GreaterEqual=11,
+    Equal=12,
+    NotEqual=13,
+    Translate=14,
+    Rotate = 15
   };
 
   BinaryOp(Expression *left, Op op, Expression *right, const Location& loc);

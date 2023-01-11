@@ -1,5 +1,6 @@
 #include <core/expression/UnaryOp.h>
 #include <core/Value.h>
+#include <core/Context.h>
 #include <utils/exceptions.h>
 
 UnaryOp::UnaryOp(UnaryOp::Op op, Expression *expr, const Location& loc)
@@ -9,9 +10,16 @@ UnaryOp::UnaryOp(UnaryOp::Op op, Expression *expr, const Location& loc)
 
 Value UnaryOp::evaluate(const std::shared_ptr<const Context>& context) const
 {
+  auto const & location = this->loc;
+  auto checkUndef = [context,location](Value&& val){
+    if (val.isUncheckedUndef()) LOG(message_group::Warning, location, context->documentRoot(),
+      "%1$s", val.toUndefString());
+    return std::move(val);
+  };
+  Value const val = this->expr->evaluate(context);
   switch (this->op) {
-  case (Op::Not):    return !this->expr->evaluate(context).toBool();
-  case (Op::Negate): return checkUndef(-this->expr->evaluate(context), context);
+  case (Op::Not):    return !val.toBool();
+  case (Op::Negate): return checkUndef(-val);
   default:
     assert(false && "Non-existent unary operator!");
     throw EvaluationException("Non-existent unary operator!");
