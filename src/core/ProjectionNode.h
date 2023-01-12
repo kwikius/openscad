@@ -3,7 +3,7 @@
 #include "AbstractNode.h"
 #include <string>
 
-class ProjectionNode : public Visitable<AbstractPolyNode, ProjectionNode>{
+class ProjectionNode final : public Visitable<AbstractPolyNode, ProjectionNode>{
 public:
   ProjectionNode(const ModuleInstantiation *mi) : Visitable(mi), convexity(1), cut_mode(false) { }
   std::string toString() const override;

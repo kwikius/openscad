@@ -3,7 +3,7 @@
 #include "AbstractNode.h"
 #include "Filename.h"
 
-class RotateExtrudeNode : public Visitable<AbstractPolyNode,RotateExtrudeNode>{
+class RotateExtrudeNode final : public Visitable<AbstractPolyNode,RotateExtrudeNode>{
 public:
   RotateExtrudeNode(const ModuleInstantiation *mi) : Visitable(mi) {
     convexity = 0;

@@ -8,6 +8,9 @@ class AbstractNode;
 class Context;
 class ModuleInstantiation;
 
+/**
+* @brief abstract base class for UserModule and BuiltinModule
+**/
 class AbstractModule
 {
 public:
@@ -21,12 +24,12 @@ public:
    AbstractModule(const Feature *feature) : feature(feature) {}
    virtual ~AbstractModule() {}
 
-   virtual bool is_experimental() const
+   [[nodiscard]] bool is_experimental() const
    {
       return feature != nullptr;
    }
 
-   virtual bool is_enabled() const
+   [[nodiscard]] bool is_enabled() const
    {
       return (feature == nullptr) || feature->is_enabled();
    }

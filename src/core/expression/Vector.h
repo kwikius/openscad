@@ -5,7 +5,7 @@
 
 #include "../Expression.h"
 
-class Vector : public Expression
+class Vector final : public Expression
 {
 public:
   Vector(const Location& loc);

@@ -5,7 +5,7 @@
 
 class UserModule;
 
-class UserModuleContext : public ScopeContext
+class UserModuleContext final : public ScopeContext
 {
 public:
   const Children *user_module_children() const override { return &children; }

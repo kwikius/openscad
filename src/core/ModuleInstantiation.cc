@@ -299,8 +299,6 @@ ExprModInst::evalInst(std::shared_ptr<const Context> const & context) const
    auto iter = this->instMap.find(context.get());
    // If not then expand it and put it in the map
    if (iter == std::end(instMap)){
-//      LOG(message_group::Warning, this->loc, context->documentRoot(),
-//      "adding mod expr to map");
       // N.B note this is a special converting constructor from ExprModInst to ModuleInstantiation
       // just slices off the useful parts
       mi = std::make_shared<ModuleInstantiation>(*this);

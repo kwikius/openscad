@@ -2,7 +2,7 @@
 
 #include <core/Expression.h>
 
-class UnaryOp : public Expression
+class UnaryOp final : public Expression
 {
 public:
   enum class Op {

@@ -5,7 +5,7 @@
 
 class TextModule;
 
-class TextNode : public Visitable< AbstractPolyNode, TextNode>{
+class TextNode final : public Visitable< AbstractPolyNode, TextNode>{
 public:
  // VISITABLE();
   TextNode(const ModuleInstantiation *mi) : Visitable(mi) {}

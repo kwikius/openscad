@@ -5,7 +5,7 @@
 #include "AbstractNode.h"
 #include "enums.h"
 
-class CsgOpNode : public Visitable<AbstractNode, CsgOpNode>{
+class CsgOpNode final : public Visitable<AbstractNode, CsgOpNode>{
 public:
 
   OpenSCADOperator type;

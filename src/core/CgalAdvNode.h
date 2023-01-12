@@ -11,7 +11,7 @@ enum class CgalAdvType {
   RESIZE
 };
 
-class CgalAdvNode : public Visitable<AbstractNode, CgalAdvNode>{
+class CgalAdvNode final : public Visitable<AbstractNode, CgalAdvNode>{
 public:
   CgalAdvNode(const ModuleInstantiation *mi, CgalAdvType type)
   : Visitable(mi), type(type) {

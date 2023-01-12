@@ -4,7 +4,7 @@
 
 #include "AbstractNode.h"
 
-class TransformNode : public Visitable<AbstractNode, TransformNode>{
+class TransformNode final : public Visitable<AbstractNode, TransformNode>{
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   TransformNode(const ModuleInstantiation *mi, std::string const & verbose_name);

@@ -3,7 +3,7 @@
 #include "ScopeContext.h"
 #include "SourceFile.h"
 
-class FileContext : public ScopeContext{
+class FileContext final : public ScopeContext{
 public:
   boost::optional<CallableFunction>
     lookup_local_function(const std::string& name, const Location& loc) const override;

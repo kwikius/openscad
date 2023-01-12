@@ -13,7 +13,7 @@
 // If a GroupNode has 1 child, we replace it with its child
 // This makes id strings much more compact for deeply nested trees, recursive scad scripts,
 // and increases likelihood of node cache hits.
-class GroupNodeChecker : public NodeVisitor
+class GroupNodeChecker final : public NodeVisitor
 {
 public:
   GroupNodeChecker(){}
@@ -29,7 +29,7 @@ private:
   std::unordered_map<int, int> groupChildCounts;
 };
 
-class NodeDumper : public NodeVisitor
+class NodeDumper final : public NodeVisitor
 {
 public:
   NodeDumper(NodeCache& cache, const std::shared_ptr<const AbstractNode> &root_node, const std::string& indent, bool idString) :

@@ -3,7 +3,7 @@
 #include "../Expression.h"
 #include "../Assignment.h"
 
-class Echo : public Expression{
+class Echo final : public Expression{
 public:
   Echo(const AssignmentList& args, Expression *expr, const Location& loc);
   const Expression *evaluateStep(const std::shared_ptr<const Context>& context) const;

@@ -16,7 +16,7 @@ enum class ImportType {
   NEF3,
 };
 
-class ImportNode : public Visitable<LeafNode, ImportNode>{
+class ImportNode final : public Visitable<LeafNode, ImportNode>{
 public:
   constexpr static double SVG_DEFAULT_DPI = 72.0;
   ImportNode(const ModuleInstantiation *mi, ImportType type)

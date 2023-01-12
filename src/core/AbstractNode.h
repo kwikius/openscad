@@ -70,7 +70,7 @@ public:
    getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const;
 };
 
-class AbstractIntersectionNode : public Visitable<AbstractNode, AbstractIntersectionNode>{
+class AbstractIntersectionNode final : public Visitable<AbstractNode, AbstractIntersectionNode>{
 public:
   AbstractIntersectionNode(const ModuleInstantiation *mi) : Visitable(mi) { }
   std::string toString() const override;

@@ -2,7 +2,7 @@
 
 #include "ListComprehension.h"
 
-class LcEach : public ListComprehension
+class LcEach final : public ListComprehension
 {
 public:
   LcEach(Expression *expr, const Location& loc);

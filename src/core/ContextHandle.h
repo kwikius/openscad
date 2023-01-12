@@ -13,7 +13,7 @@ class Context;
 
 template <typename C>
   requires std::is_base_of_v<Context,C>
-class ContextHandle : ContextFrameHandle
+class ContextHandle final : ContextFrameHandle
 {
 friend class Context;
 private:

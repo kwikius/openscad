@@ -10,7 +10,7 @@ template <typename C>
    requires std::is_base_of_v<Context,C>
 class ContextHandle;
 
-class Let : public Expression{
+class Let final : public Expression{
 public:
   Let(const AssignmentList& args, Expression *expr, const Location& loc);
   static void doSequentialAssignment(const AssignmentList& assignments,

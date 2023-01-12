@@ -8,7 +8,7 @@
 
 #include "AbstractNode.h"
 
-class RoofNode : public Visitable<AbstractPolyNode, RoofNode>{
+class RoofNode final : public Visitable<AbstractPolyNode, RoofNode>{
 public:
   RoofNode(const ModuleInstantiation *mi) : Visitable(mi) {}
   std::string toString() const override;

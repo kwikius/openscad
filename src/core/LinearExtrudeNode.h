@@ -3,7 +3,7 @@
 #include "AbstractNode.h"
 #include "Filename.h"
 
-class LinearExtrudeNode : public Visitable<AbstractPolyNode, LinearExtrudeNode>{
+class LinearExtrudeNode final : public Visitable<AbstractPolyNode, LinearExtrudeNode>{
 public:
   LinearExtrudeNode(const ModuleInstantiation *mi) : Visitable(mi) {}
   std::string toString() const override;

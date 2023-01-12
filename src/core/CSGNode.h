@@ -11,8 +11,7 @@
 
 class Geometry;
 
-class CSGNode
-{
+class CSGNode{
 public:
   enum Flag {
     FLAG_NONE = 0x00,

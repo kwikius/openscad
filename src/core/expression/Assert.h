@@ -3,7 +3,7 @@
 #include "../Expression.h"
 #include "../Assignment.h"
 
-class Assert : public Expression
+class Assert final : public Expression
 {
 public:
   Assert(const AssignmentList& args, Expression *expr, const Location& loc);

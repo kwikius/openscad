@@ -6,7 +6,7 @@
 #include "../Assignment.h"
 #include "../function.h"
 
-class FunctionCall : public Expression
+class FunctionCall final : public Expression
 {
 public:
   FunctionCall(Expression *expr, const AssignmentList& arglist, const Location& loc);

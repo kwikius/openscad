@@ -11,7 +11,7 @@
 
 #include "Geometry.h"
 
-class GeometryEvaluator : public NodeVisitor
+class GeometryEvaluator final : public NodeVisitor
 {
 public:
   GeometryEvaluator(const class Tree& tree);

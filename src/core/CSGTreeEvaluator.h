@@ -12,7 +12,7 @@ class CSGNode;
 class GeometryEvaluator;
 class Tree;
 
-class CSGTreeEvaluator : public NodeVisitor
+class CSGTreeEvaluator final : public NodeVisitor
 {
 public:
   CSGTreeEvaluator(const Tree& tree, GeometryEvaluator *geomevaluator = nullptr)

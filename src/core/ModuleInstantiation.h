@@ -58,6 +58,11 @@ public:
   bool isRoot() const { return this->tag_root; }
 
   AssignmentList arguments;
+
+  /**
+  * @todo Does this need to be a full scope?
+  * Aren't the only entities it can contain child modules?
+  **/
   LocalScope scope;
 
   bool tag_root;

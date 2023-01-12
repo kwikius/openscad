@@ -2,7 +2,7 @@
 
 #include "../Expression.h"
 
-class Range : public Expression
+class Range final : public Expression
 {
 public:
   Range(Expression *begin, Expression *end, const Location& loc);

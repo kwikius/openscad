@@ -2,7 +2,7 @@
 
 #include "../Expression.h"
 
-class ArrayLookup : public Expression
+class ArrayLookup final : public Expression
 {
 public:
   ArrayLookup(Expression *array, Expression *index, const Location& loc);

@@ -4,7 +4,7 @@
 
 #include <core/Expression.h>
 
-class Lookup : public Expression
+class Lookup final : public Expression
 {
 public:
   Lookup(const std::string& name, const Location& loc);

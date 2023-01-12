@@ -3,7 +3,7 @@
 #include "ListComprehension.h"
 #include "../Assignment.h"
 
-class LcFor : public ListComprehension
+class LcFor final : public ListComprehension
 {
 public:
   LcFor(const AssignmentList& args, Expression *expr, const Location& loc);

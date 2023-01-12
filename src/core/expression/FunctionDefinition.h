@@ -3,7 +3,7 @@
 #include "../Expression.h"
 #include "../Assignment.h"
 
-class FunctionDefinition : public Expression{
+class FunctionDefinition final : public Expression{
 public:
   FunctionDefinition(Expression *expr, const AssignmentList& parameters, const Location& loc);
   Value evaluate(const std::shared_ptr<const Context>& context) const override;

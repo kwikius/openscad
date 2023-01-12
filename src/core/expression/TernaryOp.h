@@ -2,7 +2,7 @@
 
 #include "../Expression.h"
 
-class TernaryOp : public Expression
+class TernaryOp final : public Expression
 {
 public:
   TernaryOp(Expression *cond, Expression *ifexpr, Expression *elseexpr, const Location& loc);

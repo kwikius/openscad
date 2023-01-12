@@ -3,7 +3,7 @@
 #include "AbstractNode.h"
 #include <string>
 
-class RenderNode : public Visitable<AbstractNode, RenderNode>{
+class RenderNode final : public Visitable<AbstractNode, RenderNode>{
 public:
   RenderNode(const ModuleInstantiation *mi) : Visitable(mi) { }
   std::string toString() const override;

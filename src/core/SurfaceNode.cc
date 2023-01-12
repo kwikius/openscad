@@ -85,7 +85,7 @@ public:
 } img_data_t;
 
 
-class SurfaceNode : public Visitable<LeafNode, SurfaceNode>{
+class SurfaceNode final : public Visitable<LeafNode, SurfaceNode>{
 public:
   SurfaceNode(const ModuleInstantiation *mi) : Visitable(mi), center(false), invert(false), convexity(1) { }
   std::string toString() const override;

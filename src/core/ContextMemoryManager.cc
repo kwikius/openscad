@@ -50,6 +50,7 @@
  */
 using ValueIdentifier = void *;
 
+// Visitor<VisitableType,ptrState>
 struct IdentifierVisitor
 {
   ValueIdentifier operator()(const UndefType&) const { return nullptr; }

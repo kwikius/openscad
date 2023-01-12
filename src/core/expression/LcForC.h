@@ -3,7 +3,7 @@
 #include "ListComprehension.h"
 #include "../Assignment.h"
 
-class LcForC : public ListComprehension
+class LcForC final : public ListComprehension
 {
 public:
   LcForC(const AssignmentList& args, const AssignmentList& incrargs,

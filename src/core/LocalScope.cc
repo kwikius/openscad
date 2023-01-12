@@ -12,21 +12,32 @@ void LocalScope::addModuleInst(const std::shared_ptr<ABCModuleInstantiation>& mo
   this->moduleInstantiations.push_back(modinst);
 }
 
+/**
+* @todo Do we really want to be replacing modules if they already exist with same name here?
+**/
 void LocalScope::addModule(const std::shared_ptr<class UserModule>& module)
 {
   assert(module);
   auto it = this->modules.find(module->name);
-  if (it != this->modules.end()) it->second = module;
-  else this->modules.emplace(module->name, module);
+  if (it != this->modules.end()) {
+    it->second = module;
+  }else{
+    this->modules.emplace(module->name, module);
+  }
   this->astModules.emplace_back(module->name, module);
 }
-
+/**
+* @todo Do we really want to be replacing functions if they already exist with same name here?
+**/
 void LocalScope::addFunction(const std::shared_ptr<class UserFunction>& func)
 {
   assert(func);
   auto it = this->functions.find(func->name);
-  if (it != this->functions.end()) it->second = func;
-  else this->functions.emplace(func->name, func);
+  if (it != this->functions.end()){
+    it->second = func;
+  }else {
+    this->functions.emplace(func->name, func);
+  }
   this->astFunctions.emplace_back(func->name, func);
 }
 

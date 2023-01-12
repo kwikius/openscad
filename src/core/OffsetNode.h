@@ -3,7 +3,7 @@
 #include "AbstractNode.h"
 #include "ext/polyclipping/clipper.hpp"
 
-class OffsetNode : public Visitable<AbstractPolyNode, OffsetNode>{
+class OffsetNode final : public Visitable<AbstractPolyNode, OffsetNode>{
 public:
   OffsetNode(const ModuleInstantiation *mi) : Visitable(mi) { }
   std::string toString() const override;
