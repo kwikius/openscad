@@ -46,7 +46,8 @@ std::string AbstractNode::toString() const
   return this->name() + "()";
 }
 
-std::shared_ptr<const AbstractNode> AbstractNode::getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const
+std::shared_ptr<const AbstractNode>
+AbstractNode::getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const
 {
   auto self = shared_from_this();
   if (this->idx == idx) {
@@ -122,7 +123,8 @@ std::shared_ptr<AbstractNode> find_root_tag(const std::shared_ptr<AbstractNode>&
 {
   std::shared_ptr<AbstractNode> rootTag;
 
-  std::function<void (const std::shared_ptr<const AbstractNode>&)> recursive_find_tag = [&](const std::shared_ptr<const AbstractNode>& node) {
+  std::function<void (const std::shared_ptr<const AbstractNode>&)> recursive_find_tag
+   = [&](const std::shared_ptr<const AbstractNode>& node) {
       for (const auto& child : node->children) {
         if (child->modinst->tag_root) {
           if (!rootTag) {

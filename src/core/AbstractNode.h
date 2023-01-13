@@ -18,13 +18,11 @@ void progress_report_prep(const std::shared_ptr<AbstractNode>& root, void (*f)(c
 void progress_report_fin();
 
 /*!
-
    The node tree is the result of evaluation of a module instantiation
    tree.  Both the module tree and the node tree are regenerated from
    scratch for each compile.
-
  */
-class AbstractNode : public BaseVisitable, public std::enable_shared_from_this<AbstractNode>
+class AbstractNode : public Visitable<void,AbstractNode>, public std::enable_shared_from_this<AbstractNode>
 {
   // FIXME: the idx_counter/idx is mostly (only?) for debugging.
   // We can hash on pointer value or smth. else.

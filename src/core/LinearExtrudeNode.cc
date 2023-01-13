@@ -45,7 +45,6 @@
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
-
 namespace fs = boost::filesystem;
 
 /*

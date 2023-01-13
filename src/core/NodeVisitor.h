@@ -1,102 +1,77 @@
 #pragma once
 
 #include "BaseVisitable.h"
-
 #include "State.h"
+#include "AbstractNode.h"
+#include "CgalAdvNode.h"
+#include "CsgOpNode.h"
+#include "TransformNode.h"
+#include "TextNode.h"
+#include "ColorNode.h"
+#include "LinearExtrudeNode.h"
+#include "RotateExtrudeNode.h"
+#include "OffsetNode.h"
+#include "RoofNode.h"
+#include "ImportNode.h"
+#include "RenderNode.h"
+#include "ProjectionNode.h"
+#include "SurfaceNode.h"
 
-class State;
+template< typename A>
+struct BaseVisitor : Visitor<A>{
+  virtual ~BaseVisitor() = default;
+};
 
-class NodeVisitor :
-  public BaseVisitor,
-  public Visitor<class AbstractNode>,
-  public Visitor<class AbstractIntersectionNode>,
-  public Visitor<class AbstractPolyNode>,
-  public Visitor<class ListNode>,
-  public Visitor<class GroupNode>,
-  public Visitor<class RootNode>,
-  public Visitor<class LeafNode>,
-  public Visitor<class CgalAdvNode>,
-  public Visitor<class CsgOpNode>,
-  public Visitor<class LinearExtrudeNode>,
-  public Visitor<class RotateExtrudeNode>,
-  public Visitor<class RoofNode>,
-  public Visitor<class ImportNode>,
-  public Visitor<class TextNode>,
-  public Visitor<class ProjectionNode>,
-  public Visitor<class RenderNode>,
-  public Visitor<class SurfaceNode>,
-  public Visitor<class TransformNode>,
-  public Visitor<class ColorNode>,
-  public Visitor<class OffsetNode>
-{
-public:
-  NodeVisitor() = default;
+template <typename VisitableType, typename VisitorList>
+struct DerivedVisitor : Visitor<VisitableType>{
+   [[nodiscard]] Response visit(State & state, VisitableType const & node) override
+   {return static_cast<VisitorList&>(*this).visitBaseClass(state,node);}
+};
 
-  Response traverse(const AbstractNode& node, const State& state = NodeVisitor::nullstate);
+template <typename A, typename ...T>
+struct VisitorList;
 
-  Response visit(State& state, const AbstractNode& node) override = 0;
-  Response visit(State& state, const AbstractIntersectionNode& node) override {
-    return visit(state, (const AbstractNode&) node);
-  }
-  Response visit(State& state, const AbstractPolyNode& node) override {
-    return visit(state, (const AbstractNode&) node);
-  }
-  Response visit(State& state, const ListNode& node) override {
-    return visit(state, (const AbstractNode&) node);
-  }
+template <typename Visitable>
+using getVisitableBaseType = typename Visitable::visitableBaseType;
 
-  Response visit(State& state, const GroupNode& node) override {
-    return visit(state, (const AbstractNode&) node);
+template <typename A, typename ...T>
+struct VisitorList : BaseVisitor<A>, DerivedVisitor<T, VisitorList<A,T...> >... {
+  using Visitor<T>::visit ...;
+  using Visitor<A>::visit;
+  template <typename V>
+    requires (!std::is_same_v<V,A>)
+  [[nodiscard]] Response visitBaseClass(State& state,V const & v)
+  {
+    return this->visit(state, static_cast< getVisitableBaseType<V> const & >(v));
   }
-  Response visit(State& state, const RootNode& node) override {
-    return visit(state, (const GroupNode&) node);
-  }
-  Response visit(State& state, const LeafNode& node) override {
-    return visit(state, (const AbstractPolyNode&) node);
-  }
-  Response visit(State& state, const CgalAdvNode& node) override {
-    return visit(state, (const AbstractNode&) node);
-  }
-  Response visit(State& state, const CsgOpNode& node) override {
-    return visit(state, (const AbstractNode&) node);
-  }
-  Response visit(State& state, const LinearExtrudeNode& node) override {
-    return visit(state, (const AbstractPolyNode&) node);
-  }
-  Response visit(State& state, const RotateExtrudeNode& node) override {
-    return visit(state, (const AbstractPolyNode&) node);
-  }
-  Response visit(State& state, const RoofNode& node) override {
-    return visit(state, (const AbstractPolyNode&) node);
-  }
-  Response visit(State& state, const ImportNode& node) override {
-    return visit(state, (const LeafNode&) node);
-  }
-  Response visit(State& state, const TextNode& node) override {
-    return visit(state, (const AbstractPolyNode&) node);
-  }
-  Response visit(State& state, const ProjectionNode& node) override {
-    return visit(state, (const AbstractPolyNode&) node);
-  }
-  Response visit(State& state, const RenderNode& node) override {
-    return visit(state, (const AbstractNode&) node);
-  }
-  Response visit(State& state, const SurfaceNode& node) override {
-    return visit(state, (const LeafNode&) node);
-  }
-  Response visit(State& state, const TransformNode& node) override {
-    return visit(state, (const AbstractNode&) node);
-  }
-  Response visit(State& state, const ColorNode& node) override {
-    return visit(state, (const AbstractNode&) node);
-  }
-  Response visit(State& state, const OffsetNode& node) override {
-    return visit(state, (const AbstractPolyNode&) node);
-  }
-  // Add visit() methods for new visitable subtypes of AbstractNode here
+};
 
-private:
-  static State nullstate;
+struct NodeVisitor : VisitorList<
+   AbstractNode,
+   AbstractIntersectionNode,
+   AbstractPolyNode,
+   ListNode,
+   GroupNode,
+   RootNode,
+   LeafNode,
+   CgalAdvNode,
+   CsgOpNode,
+   LinearExtrudeNode,
+   RotateExtrudeNode,
+   RoofNode,
+   ImportNode,
+   TextNode,
+   ProjectionNode,
+   RenderNode,
+   SurfaceNode,
+   TransformNode,
+   ColorNode,
+   OffsetNode
+  >{
+    NodeVisitor() = default;
+    Response traverse(const AbstractNode& node, const State& state = NodeVisitor::nullstate);
+    private:
+    static State nullstate;
 };
 
 template <typename B , typename D>

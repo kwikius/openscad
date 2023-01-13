@@ -1,7 +1,7 @@
 #pragma once
 
 #include <geometry/linalg.h>
-
+#include "BaseVisitable.h"
 #include "AbstractNode.h"
 
 enum class CgalAdvType {
@@ -11,11 +11,10 @@ enum class CgalAdvType {
   RESIZE
 };
 
-class CgalAdvNode final : public Visitable<AbstractNode, CgalAdvNode>{
+class CgalAdvNode : public Visitable<AbstractNode, CgalAdvNode>{
 public:
   CgalAdvNode(const ModuleInstantiation *mi, CgalAdvType type)
-  : Visitable(mi), type(type) {
-  }
+  : Visitable(mi), type(type) {}
   std::string toString() const override;
   std::string name() const override;
 

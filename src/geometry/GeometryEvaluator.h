@@ -8,7 +8,6 @@
 
 #include <core/NodeVisitor.h>
 #include <core/enums.h>
-
 #include "Geometry.h"
 
 class GeometryEvaluator final : public NodeVisitor
