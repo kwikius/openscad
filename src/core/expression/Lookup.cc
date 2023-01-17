@@ -10,7 +10,7 @@ Lookup::Lookup(const std::string& name, const Location& loc)
 
 Value Lookup::evaluate(const std::shared_ptr<const Context>& context) const
 {
-  return context->lookup_variable(this->name, loc).clone();
+  return context->get_variable_value(this->name, loc).clone();
 }
 
 void Lookup::print(std::ostream& stream, const std::string&) const

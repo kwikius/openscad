@@ -67,7 +67,7 @@ static void NOINLINE print_trace(const UserModule *mod,std::shared_ptr<const Use
         stream << " = ";
       }
       try {
-        stream << context->lookup_variable(assignment->getName(),Location::NONE);
+        stream << context->get_variable_value(assignment->getName(),Location::NONE);
       } catch (EvaluationException& e) {
         stream << "...";
       }

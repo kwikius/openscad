@@ -31,7 +31,7 @@
 #include "function.h"
 #include  "Value.h"
 
-namespace fs = boost::filesystem;
+//namespace fs = boost::filesystem;
 
 Context::Context(EvaluationSession *session) :
   ContextFrame(session),
@@ -91,7 +91,7 @@ boost::optional<const Value&> Context::lookup_moduleReference(const std::string&
   return boost::none;
 }
 
-const Value& Context::lookup_variable(const std::string& name, const Location& loc) const
+const Value& Context::get_variable_value(const std::string& name, const Location& loc) const
 {
   boost::optional<const Value&> result = try_lookup_variable(name);
   if (!result) {
@@ -101,7 +101,8 @@ const Value& Context::lookup_variable(const std::string& name, const Location& l
   return *result;
 }
 
-boost::optional<CallableFunction> Context::lookup_function(const std::string& name, const Location& loc) const
+boost::optional<CallableFunction>
+Context::lookup_function(const std::string& name, const Location& loc) const
 {
   if (is_config_variable(name)) {
     return session()->lookup_special_function(name, loc);
