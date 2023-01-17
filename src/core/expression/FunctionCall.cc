@@ -40,18 +40,16 @@ static void NOINLINE print_trace(const FunctionCall *val, const std::shared_ptr<
 FunctionCall::FunctionCall(Expression *expr, const AssignmentList& args, const Location& loc)
   : Expression(Id::FunctionCall,loc), expr(expr), arguments(args)
 {
-  if (typeid(*expr) == typeid(Lookup)) {
-    isLookup = true;
-    const Lookup *lookup = static_cast<Lookup *>(expr);
-    name = lookup->get_name();
-  } else {
-    isLookup = false;
-    std::ostringstream s;
-    s << "(";
-    expr->print(s, "");
-    s << ")";
-    name = s.str();
-  }
+   if ( this->isLookup = expr->getID() == Id::Lookup){
+      auto const & lookup = static_cast<Lookup const &>(*expr);
+      name = lookup.get_name();
+   } else {
+      std::ostringstream s;
+      s << "(";
+      expr->print(s, "");
+      s << ")";
+      name = s.str();
+   }
 }
 
 boost::optional<CallableFunction>
@@ -80,67 +78,77 @@ typedef std::variant<SimplifiedExpression, Value> SimplificationResult;
 static SimplificationResult simplify_function_body(
 const Expression *expression, const std::shared_ptr<const Context>& context)
 {
-  if (!expression) {
-    return Value::undefined.clone();
-  } else {
-    const auto& type = typeid(*expression);
-    if (type == typeid(TernaryOp)) {
-      const TernaryOp *ternary = static_cast<const TernaryOp *>(expression);
-      return SimplifiedExpression{ternary->evaluateStep(context)};
-    } else if (type == typeid(Assert)) {
-      const Assert *assertion = static_cast<const Assert *>(expression);
-      return SimplifiedExpression{assertion->evaluateStep(context)};
-    } else if (type == typeid(Echo)) {
-      const Echo *echo = static_cast<const Echo *>(expression);
-      return SimplifiedExpression{echo->evaluateStep(context)};
-    } else if (type == typeid(Let)) {
-      const Let *let = static_cast<const Let *>(expression);
-      ContextHandle<Context> let_context{Context::create<Context>(context)};
-      let_context->apply_config_variables(*context);
-      return SimplifiedExpression{let->evaluateStep(let_context), std::move(let_context)};
-    } else if (type == typeid(FunctionCall)) {
-      const FunctionCall *call = static_cast<const FunctionCall *>(expression);
-
-      const Expression *function_body;
-      const AssignmentList *required_parameters;
-      std::shared_ptr<const Context> defining_context;
-
-      auto f = call->evaluate_function_expression(context);
-      if (!f) {
-        return Value::undefined.clone();
-      } else {
-        auto index = f->index();
-        if (index == 0) {
-            return std::get<const BuiltinFunction *>(*f)->evaluate(context, call);
-        } else if (index == 1) {
-            CallableUserFunction callable = std::get<CallableUserFunction>(*f);
-            function_body = callable.function->expr.get();
-            required_parameters = &callable.function->parameters;
-            defining_context = callable.defining_context;
-        } else {
-          const FunctionType* function;
-          if (index == 2) {
-            function = &std::get<Value>(*f).toFunction();
-          } else if (index == 3) {
-            function = &std::get<const Value *>(*f)->toFunction();
-          } else {
-            assert(false);
-          }
-          function_body = function->getExpr().get();
-          required_parameters = function->getParameters().get();
-          defining_context = function->getContext();
-        }
-      }
-      ContextHandle<Context> body_context{Context::create<Context>(defining_context)};
-      body_context->apply_config_variables(*context);
-      Arguments arguments{call->arguments, context};
-      Parameters parameters = Parameters::parse(std::move(arguments), call->location(), *required_parameters, defining_context);
-      body_context->apply_variables(std::move(parameters).to_context_frame());
-
-      return SimplifiedExpression{function_body, std::move(body_context), call};
-    } else {
-      return expression->evaluate(context);
+  if (expression != nullptr) {
+    switch( expression->getID()){
+       using Id = Expression::Id;
+       case Id::TernaryOp:{
+          const TernaryOp *ternary = static_cast<const TernaryOp *>(expression);
+          return SimplifiedExpression{ternary->evaluateStep(context)};
+       }
+       case Id::Assert:{
+         const Assert *assertion = static_cast<const Assert *>(expression);
+         return SimplifiedExpression{assertion->evaluateStep(context)};
+       }
+       case Id::Echo:{
+          const Echo *echo = static_cast<const Echo *>(expression);
+          return SimplifiedExpression{echo->evaluateStep(context)};
+       }
+       case Id::Let:{
+          const Let *let = static_cast<const Let *>(expression);
+          ContextHandle<Context> let_context{Context::create<Context>(context)};
+          let_context->apply_config_variables(*context);
+          return SimplifiedExpression{let->evaluateStep(let_context), std::move(let_context)};
+       }
+       case Id::FunctionCall:{
+         const FunctionCall *call = static_cast<const FunctionCall *>(expression);
+         if (auto f = call->evaluate_function_expression(context)) {  // F is an optional CallableFunction
+            const Expression *function_body;
+            const AssignmentList *required_parameters;
+            std::shared_ptr<const Context> defining_context;
+            // f = CallableFunction = std::variant<const BuiltinFunction *, CallableUserFunction, Value, const Value *>;
+            switch (auto index = f->index()){
+               case 0:  // BuiltinFunction *
+                  return std::get<const BuiltinFunction *>(*f)->evaluate(context, call);
+               case 1:{  // CallableUserFunction
+                  CallableUserFunction callable = std::get<CallableUserFunction>(*f);
+                  function_body = callable.function->expr.get();
+                  required_parameters = &callable.function->parameters;
+                  defining_context = callable.defining_context;
+                  break;
+               }
+               case 2:  // Value
+               case 3: { // Value const *
+                  const FunctionType* function =
+                  (index == 2)
+                     ? &std::get<Value>(*f).toFunction()
+                     : &std::get<const Value *>(*f)->toFunction();
+                  function_body = function->getExpr().get();
+                  required_parameters = function->getParameters().get();
+                  defining_context = function->getContext();
+                  break;
+               }
+               default:{ // shouldnt get here!
+                  assert(false);
+               }
+            }// ~switch f->index
+            ContextHandle<Context> body_context{Context::create<Context>(defining_context)};
+            body_context->apply_config_variables(*context);
+            Arguments arguments{call->arguments, context};
+            Parameters parameters = Parameters::parse(std::move(arguments), call->location(),
+               *required_parameters, defining_context
+            );
+            body_context->apply_variables(std::move(parameters).to_context_frame());
+            return SimplifiedExpression{function_body, std::move(body_context), call};
+         }else{
+            return Value::undefined.clone();
+         }
+       }
+       default:{
+          return expression->evaluate(context);
+       }
     }
+  }else { // expression == nullptr
+    return Value::undefined.clone();
   }
 }
 
@@ -178,7 +186,8 @@ Value FunctionCall::evaluate(const std::shared_ptr<const Context>& context) cons
       if (simplified_expression->new_active_function_call) {
         current_call = *simplified_expression->new_active_function_call;
         if (recursion_depth++ == 1000000) {
-          LOG(message_group::Error, expression->location(), expression_context->documentRoot(), "Recursion detected calling function '%1$s'", current_call->name);
+          LOG(message_group::Error, expression->location(), expression_context->documentRoot(),
+             "Recursion detected calling function '%1$s'", current_call->name);
           throw RecursionException::create("function", current_call->name, current_call->location());
         }
       }
@@ -197,7 +206,8 @@ void FunctionCall::print(std::ostream& stream, const std::string&) const
   stream << this->get_name() << "(" << this->arguments << ")";
 }
 
-Expression *FunctionCall::create(const std::string& funcname, const AssignmentList& arglist, Expression *expr, const Location& loc)
+Expression *FunctionCall::create(const std::string& funcname, const AssignmentList& arglist,
+   Expression *expr, const Location& loc)
 {
   if (funcname == "assert") {
     return new Assert(arglist, expr, loc);

@@ -36,7 +36,8 @@
 #include "Parameters.h"
 #include "utils/printutils.h"
 
-static std::shared_ptr<AbstractNode> lazyUnionNode(const ModuleInstantiation *inst)
+static std::shared_ptr<AbstractNode>
+lazyUnionNode(const ModuleInstantiation *inst)
 {
   if (Feature::ExperimentalLazyUnion.is_enabled()) {
     return std::make_shared<ListNode>(inst);
@@ -45,27 +46,37 @@ static std::shared_ptr<AbstractNode> lazyUnionNode(const ModuleInstantiation *in
   }
 }
 
-static boost::optional<size_t> validChildIndex(int n, const Children *children, const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context)
+static boost::optional<size_t>
+validChildIndex(int n, const Children *children, const ModuleInstantiation *inst,
+   const std::shared_ptr<const Context>& context)
 {
   if (n < 0 || n >= static_cast<int>(children->size())) {
-    LOG(message_group::Warning, inst->location(), context->documentRoot(), "Children index (%1$d) out of bounds (%2$d children)", n, children->size());
+    LOG(message_group::Warning, inst->location(), context->documentRoot(),
+     "Children index (%1$d) out of bounds (%2$d children)", n, children->size());
     return boost::none;
   }
   return size_t(n);
 }
 
-static boost::optional<size_t> validChildIndex(const Value& value, const Children *children, const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context)
+static boost::optional<size_t>
+validChildIndex(const Value& value, const Children *children, const ModuleInstantiation *inst,
+  const std::shared_ptr<const Context>& context)
 {
   if (value.type() != Value::Type::NUMBER) {
-    LOG(message_group::Warning, inst->location(), context->documentRoot(), "Bad parameter type (%1$s) for children, only accept: empty, number, vector, range.", value.toString());
+    LOG(message_group::Warning, inst->location(), context->documentRoot(),
+       "Bad parameter type (%1$s) for children, only accept: empty, number, vector, range.",
+        value.toString()
+    );
     return boost::none;
   }
   return validChildIndex(static_cast<int>(value.toDouble()), children, inst, context);
 }
 
-static std::shared_ptr<AbstractNode> builtin_child(const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context)
+static std::shared_ptr<AbstractNode>
+builtin_child(const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context)
 {
-  LOG(message_group::Deprecated, Location::NONE, "", "child() will be removed in future releases. Use children() instead.");
+  LOG(message_group::Deprecated, Location::NONE, "",
+    "child() will be removed in future releases. Use children() instead.");
 
   if (!inst->scope.moduleInstantiations.empty()) {
     LOG(message_group::Warning, inst->location(), context->documentRoot(),
@@ -73,7 +84,9 @@ static std::shared_ptr<AbstractNode> builtin_child(const ModuleInstantiation *in
   }
 
   Arguments arguments{inst->arguments, context};
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {}, std::vector<std::string>{"index"});
+  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {},
+      std::vector<std::string>{"index"}
+  );
   const Children *children = context->user_module_children();
   if (!children) {
     // child() called outside any user module
@@ -92,63 +105,69 @@ static std::shared_ptr<AbstractNode> builtin_child(const ModuleInstantiation *in
   return children->instantiate(lazyUnionNode(inst), {*index});
 }
 
-static std::shared_ptr<AbstractNode> builtin_children(const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context)
+static std::shared_ptr<AbstractNode>
+builtin_children(const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context)
 {
-  if (!inst->scope.moduleInstantiations.empty()) {
-    LOG(message_group::Warning, inst->location(), context->documentRoot(),
-        "module %1$s() does not support child modules", inst->name());
-  }
+   if (!inst->scope.moduleInstantiations.empty()) {
+      LOG(message_group::Warning, inst->location(), context->documentRoot(),
+      "module %1$s() does not support child modules", inst->name());
+   }
 
-  Arguments arguments{inst->arguments, context};
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {}, std::vector<std::string>{"index"});
-  const Children *children = context->user_module_children();
-  if (!children) {
-    // children() called outside any user module
-    return nullptr;
-  }
-
-  if (!parameters.contains("index")) {
-    // no arguments => all children
-    return children->instantiate(lazyUnionNode(inst));
-  }
-
-  // one (or more ignored) argument
-  if (parameters["index"].type() == Value::Type::NUMBER) {
-    auto index = validChildIndex(parameters["index"], children, inst, context);
-    if (!index) {
-      return nullptr;
-    }
-    return children->instantiate(lazyUnionNode(inst), {*index});
-  } else if (parameters["index"].type() == Value::Type::VECTOR) {
-    std::vector<size_t> indices;
-    for (const auto& val : parameters["index"].toVector()) {
-      auto index = validChildIndex(val, children, inst, context);
-      if (index) {
-        indices.push_back(*index);
+   if (const Children *children = context->user_module_children()) {
+      Arguments arguments{inst->arguments, context};
+      Parameters parameters = Parameters::parse(
+            std::move(arguments), inst->location(), {}, std::vector<std::string>{"index"}
+      );
+      if (parameters.contains("index")) {
+         switch(parameters["index"].type()){
+            case Value::Type::NUMBER:{
+               if (auto index = validChildIndex(parameters["index"], children, inst, context)){
+                    return children->instantiate(lazyUnionNode(inst), {*index});
+               }else{
+                  return nullptr;
+               }
+            }
+            case Value::Type::VECTOR:{
+               std::vector<size_t> indices;
+               for (const auto& val : parameters["index"].toVector()) {
+                  if (auto index = validChildIndex(val, children, inst, context)) {
+                    indices.push_back(*index);
+                  }
+               }
+               return children->instantiate(lazyUnionNode(inst), indices);
+            }
+            case Value::Type::RANGE:{
+               const RangeType& range = parameters["index"].toRange();
+               uint32_t const steps = range.numValues();
+               if (steps < RangeType::MAX_RANGE_STEPS) {
+                  std::vector<size_t> indices;
+                  for (double d : range) {
+                     if (auto index = validChildIndex(static_cast<int>(d), children, inst, context)) {
+                        indices.push_back(*index);
+                     }
+                  }
+                  return children->instantiate(lazyUnionNode(inst), indices);
+               } else{
+                  LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+                  "Bad range parameter for children: too many elements (%1$lu)", steps);
+                  return nullptr;
+               }
+            }
+            default:{
+               LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+               "Bad parameter type (%1$s) for children, only accept: empty, number, vector, range",
+               parameters["index"].toEchoStringNoThrow());
+               return {};
+            }
+         }
+      }else{
+        // no arguments => all children
+         return children->instantiate(lazyUnionNode(inst));
       }
-    }
-    return children->instantiate(lazyUnionNode(inst), indices);
-  } else if (parameters["index"].type() == Value::Type::RANGE) {
-    const RangeType& range = parameters["index"].toRange();
-    uint32_t steps = range.numValues();
-    if (steps >= RangeType::MAX_RANGE_STEPS) {
-      LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
-          "Bad range parameter for children: too many elements (%1$lu)", steps);
+   }else{
+      // children() called outside any user module
       return nullptr;
-    }
-    std::vector<size_t> indices;
-    for (double d : range) {
-      auto index = validChildIndex(static_cast<int>(d), children, inst, context);
-      if (index) {
-        indices.push_back(*index);
-      }
-    }
-    return children->instantiate(lazyUnionNode(inst), indices);
-  } else {
-    // Invalid argument
-    LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "Bad parameter type (%1$s) for children, only accept: empty, number, vector, range", parameters["index"].toEchoStringNoThrow());
-    return {};
-  }
+   }
 }
 
 static std::shared_ptr<AbstractNode> builtin_echo(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
