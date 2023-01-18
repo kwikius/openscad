@@ -5,7 +5,7 @@
 #include "ContextFrameHandle.h"
 
 /**
- * Local handle to a all context objects. This is used to maintain the
+ * Local handle to a  Context. This is used to maintain the
  * dynamic scoping stack using object lifetime.
  * The Context objects can hang around for longer, e.g. in case of closures.
  */

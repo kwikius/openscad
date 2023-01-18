@@ -88,14 +88,16 @@ UserModule::instantiate(const std::shared_ptr<const Context>& defining_context,
     return nullptr;
   }
 
-  StaticModuleNameStack name{inst->name()}; // push on static stack, pop at end of method!
-  ContextHandle<UserModuleContext> module_context{Context::create<UserModuleContext>(
-                                                    defining_context,
-                                                    this,
-                                                    inst->location(),
-                                                    Arguments(inst->arguments, context),
-                                                    Children(&inst->scope, context)
-                                                    )};
+   StaticModuleNameStack name{inst->name()}; // push on static stack, pop at end of method!
+   ContextHandle<UserModuleContext> module_context{
+      Context::create<UserModuleContext>(
+         defining_context,
+         this,
+         inst->location(),
+         Arguments(inst->getAssignmentList(), context),
+         Children(&inst->getScope(), context)
+      )
+   };
 #if 0 && DEBUG
   PRINTDB("UserModuleContext for module %s(%s):\n", this->name % STR(this->parameters));
   PRINTDB("%s", module_context->dump());

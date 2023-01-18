@@ -3,7 +3,11 @@
 #include "ContextHandle.h"
 
 /**
-*  @brief Context
+*  @brief Context.
+* https://stackoverflow.com/a/6156770
+* "Context refers to the execution context, which is the symbols
+* reachable from a given point in the code,
+* and the value of those symbols in that particular execution"
 **/
 class Context : public ContextFrame, public std::enable_shared_from_this<Context>{
 protected:

@@ -29,7 +29,7 @@ ABCModuleInstantiation::~ABCModuleInstantiation()
 void ABCModuleInstantiation::print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined) const
 {
   stream <<  "(";
-  for (size_t i = 0; i < this->arguments.size(); ++i) {
+  for (size_t i = 0; i < this->getAssignmentList().size(); ++i) {
     const auto& arg = this->arguments[i];
     if (i > 0) stream << ", ";
     if (!arg->getName().empty()) stream << arg->getName() << " = ";
@@ -128,6 +128,7 @@ namespace{
 *  @brief Turn the expression into a module instantiation
 *  @param modInst The ModuleInstantiation which will represent the resulting expression
 *  @param expr The module expression to be converted
+*  @param context The context the ModuleInstantiation was invoked in
 *  @return true if the expression was succesfully converted, then the result has been metamorphised
 *  in modInst, else false
 **/
@@ -139,7 +140,7 @@ namespace{
         case exprId::BinaryOp: {
           auto binOp = std::dynamic_pointer_cast<BinaryOp>(expr);
           assert(static_cast<bool>(binOp)==true);
-          assert(modInst->arguments.empty());
+          assert(modInst->getAssignmentList().empty());
           assert(modInst->name() == "");
           switch ( binOp->getOpID()) {
             using Op = BinaryOp::Op;
@@ -147,7 +148,7 @@ namespace{
             case Op::Rotate:{
                auto arg_expr = binOp->getRight();
                auto arg = std::make_shared<Assignment>("",arg_expr,arg_expr->location() );
-               modInst->arguments.emplace_back(arg);
+               modInst->getAssignmentListNC().emplace_back(arg);
                std::shared_ptr<const Context> child_context = context;
                auto childModInst = evalModuleExpr(binOp->getLeft(),child_context);
                if ( childModInst){
@@ -156,7 +157,7 @@ namespace{
                     ?"translate"
                     :"rotate"
                   );
-                  modInst->scope.addModuleInst(childModInst);
+                  modInst->getScopeNC().addModuleInst(childModInst);
                   return true;
                }else{// something went wrong. evalModuleExpr has provided the diagnostic
                   return false;
@@ -174,8 +175,8 @@ namespace{
                   return false;
                }
                modInst->setName("difference");
-               modInst->scope.addModuleInst(lhsInst);
-               modInst->scope.addModuleInst(rhsInst);
+               modInst->getScopeNC().addModuleInst(lhsInst);
+               modInst->getScopeNC().addModuleInst(rhsInst);
                return true;
             }// ~Op::Minus
    /*
@@ -197,13 +198,13 @@ namespace{
             auto const & modRef = value.toModuleReference();
             AssignmentList argsOut;
             if (modRef.transformToInstantiationArgs(
-               modInst->arguments,
+               modInst->getAssignmentList(),
                modInst->location(),
                context,
                argsOut
             )){
                modInst->setName(modRef.getModuleName());
-               modInst->arguments = argsOut;
+               modInst->setAssignmentList(std::move(argsOut));
                context = modRef.getContext();
                return true;
             }else{
@@ -224,17 +225,16 @@ ModuleInstantiation::ll_evaluate(
    std::shared_ptr<const Context> const & context,
    std::shared_ptr<const Context> & module_lookup_context ) const
 {
-   std::string const old_name = this->modname;
-   AssignmentList const old_args = this->arguments;
-   //TODO LocalScope -> AbstractScope
-   auto setTo = [this](std::string const & name , AssignmentList const & args){
+   std::string old_name = this->modname;
+   AssignmentList old_args = this->getAssignmentList();
+   auto setTo = [this](std::string const & name , AssignmentList & args){
       const_cast<ModuleInstantiation*>(this)->modname = name;
-      const_cast<ModuleInstantiation*>(this)->arguments = args;
+      const_cast<ModuleInstantiation*>(this)->setAssignmentList(std::move(args));
    };
 
-   auto restore = [this,old_name,old_args](){
-      const_cast<ModuleInstantiation*>(this)->modname = old_name;
-      const_cast<ModuleInstantiation*>(this)->arguments = old_args;
+   auto restore = [this,&old_name,&old_args](){
+      const_cast<ModuleInstantiation*>(this)->modname = std::move(old_name);
+      const_cast<ModuleInstantiation*>(this)->setAssignmentList(std::move(old_args));
    };
 
    // max number of references to reference
@@ -268,7 +268,7 @@ ModuleInstantiation::ll_evaluate(
 
          AssignmentList argsOut;
          if (modRef.transformToInstantiationArgs(
-            this->arguments,
+            this->getAssignmentList(),
             this->loc,
             context,
             argsOut

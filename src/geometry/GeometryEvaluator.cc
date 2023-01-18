@@ -91,17 +91,19 @@ std::shared_ptr<const Geometry> GeometryEvaluator::evaluateGeometry(const Abstra
 }
 
 bool GeometryEvaluator::isValidDim(const Geometry::GeometryItem& item, unsigned int& dim) const {
-  if (!item.first->modinst->isBackground() && item.second) {
+  if (!item.first->isBackground() && item.second) {
     if (!dim) dim = item.second->getDimension();
     else if (dim != item.second->getDimension() && !item.second->isEmpty()) {
-      LOG(message_group::Warning, item.first->modinst->location(), this->tree.getDocumentPath(), "Mixing 2D and 3D objects is not supported");
+      LOG(message_group::Warning, item.first->getLocation(), this->tree.getDocumentPath(),
+       "Mixing 2D and 3D objects is not supported");
       return false;
     }
   }
   return true;
 }
 
-GeometryEvaluator::ResultObject GeometryEvaluator::applyToChildren(const AbstractNode& node, OpenSCADOperator op)
+GeometryEvaluator::ResultObject
+GeometryEvaluator::applyToChildren(const AbstractNode& node, OpenSCADOperator op)
 {
   unsigned int dim = 0;
   for (const auto& item : this->visitedchildren[node.index()]) {
@@ -117,7 +119,8 @@ GeometryEvaluator::ResultObject GeometryEvaluator::applyToChildren(const Abstrac
 
    May return nullptr or any 3D Geometry object (can be either PolySet or CGAL_Nef_polyhedron)
  */
-GeometryEvaluator::ResultObject GeometryEvaluator::applyToChildren3D(const AbstractNode& node, OpenSCADOperator op)
+GeometryEvaluator::ResultObject
+GeometryEvaluator::applyToChildren3D(const AbstractNode& node, OpenSCADOperator op)
 {
   Geometry::Geometries children = collectChildren3D(node);
   if (children.size() == 0) return ResultObject();
@@ -134,7 +137,8 @@ GeometryEvaluator::ResultObject GeometryEvaluator::applyToChildren3D(const Abstr
   }
   else if (op == OpenSCADOperator::FILL) {
     for (const auto& item : children) {
-      LOG(message_group::Warning, item.first->modinst->location(), this->tree.getDocumentPath(), "fill() not yet implemented for 3D");
+      LOG(message_group::Warning, item.first->getLocation(),
+       this->tree.getDocumentPath(), "fill() not yet implemented for 3D");
     }
   }
 
@@ -209,7 +213,8 @@ Polygon2d *GeometryEvaluator::applyHull2D(const AbstractNode& node)
       }
       geometry->addOutline(outline);
     } catch (const CGAL::Failure_exception& e) {
-      LOG(message_group::Warning, Location::NONE, "", "GeometryEvaluator::applyHull2D() during CGAL::convex_hull_2(): %1$s", e.what());
+      LOG(message_group::Warning, Location::NONE, "",
+     "GeometryEvaluator::applyHull2D() during CGAL::convex_hull_2(): %1$s", e.what());
     }
   }
   return geometry;
@@ -266,7 +271,7 @@ std::vector<const class Polygon2d *> GeometryEvaluator::collectChildren2D(const 
   for (const auto& item : this->visitedchildren[node.index()]) {
     auto &chnode = item.first;
     const std::shared_ptr<const Geometry>& chgeom = item.second;
-    if (chnode->modinst->isBackground()) continue;
+    if (chnode->isBackground()) continue;
 
     // NB! We insert into the cache here to ensure that all children of
     // a node is a valid object. If we inserted as we created them, the
@@ -276,7 +281,7 @@ std::vector<const class Polygon2d *> GeometryEvaluator::collectChildren2D(const 
 
     if (chgeom) {
       if (chgeom->getDimension() == 3) {
-        LOG(message_group::Warning, item.first->modinst->location(), this->tree.getDocumentPath(), "Ignoring 3D child object for 2D operation");
+        LOG(message_group::Warning, item.first->getLocation(), this->tree.getDocumentPath(), "Ignoring 3D child object for 2D operation");
         children.push_back(nullptr); // replace 3D geometry with empty geometry
       } else {
         if (chgeom->isEmpty()) {
@@ -343,7 +348,7 @@ Geometry::Geometries GeometryEvaluator::collectChildren3D(const AbstractNode& no
   for (const auto& item : this->visitedchildren[node.index()]) {
     auto &chnode = item.first;
     const std::shared_ptr<const Geometry>& chgeom = item.second;
-    if (chnode->modinst->isBackground()) continue;
+    if (chnode->isBackground()) continue;
 
     // NB! We insert into the cache here to ensure that all children of
     // a node is a valid object. If we inserted as we created them, the
@@ -352,7 +357,7 @@ Geometry::Geometries GeometryEvaluator::collectChildren3D(const AbstractNode& no
     smartCacheInsert(*chnode, chgeom);
 
     if (chgeom && chgeom->getDimension() == 2) {
-      LOG(message_group::Warning, item.first->modinst->location(), this->tree.getDocumentPath(), "Ignoring 2D child object for 3D operation");
+      LOG(message_group::Warning, item.first->getLocation(), this->tree.getDocumentPath(), "Ignoring 2D child object for 3D operation");
       children.push_back(std::make_pair(item.first, nullptr)); // replace 2D geometry with empty geometry
     } else {
       // Add children if geometry is 3D OR null/empty
@@ -460,8 +465,8 @@ Response GeometryEvaluator::visit(State& state, const AbstractNode& node)
 Response GeometryEvaluator::visit(State& state, const ListNode& node)
 {
   if (state.parent()) {
-    if (state.isPrefix() && node.modinst->isBackground()) {
-      if (node.modinst->isBackground()) state.isBackground();
+    if (state.isPrefix() && node.isBackground()) {
+      if (node.isBackground()) state.isBackground();
       return Response::PruneTraversal;
     }
     if (state.isPostfix()) {
@@ -490,7 +495,7 @@ Response GeometryEvaluator::visit(State& state, const GroupNode& node)
 
 Response GeometryEvaluator::lazyEvaluateRootNode(State& state, const AbstractNode& node) {
   if (state.isPrefix()) {
-    if (node.modinst->isBackground()) {
+    if (node.isBackground()) {
       state.isBackground();
       return Response::PruneTraversal;
     }
@@ -507,7 +512,7 @@ Response GeometryEvaluator::lazyEvaluateRootNode(State& state, const AbstractNod
       if (!isValidDim(item, dim)) break;
       auto &chnode = item.first;
       const std::shared_ptr<const Geometry>& chgeom = item.second;
-      if (chnode->modinst->isBackground()) continue;
+      if (chnode->isBackground()) continue;
       // NB! We insert into the cache here to ensure that all children of
       // a node is a valid object. If we inserted as we created them, the
       // cache could have been modified before we reach this point due to a large
@@ -681,7 +686,7 @@ Response GeometryEvaluator::visit(State& state, const TransformNode& node)
     if (!isSmartCached(node)) {
       if (matrix_contains_infinity(node.matrix) || matrix_contains_nan(node.matrix)) {
         // due to the way parse/eval works we can't currently distinguish between NaN and Inf
-        LOG(message_group::Warning, node.modinst->location(), this->tree.getDocumentPath(), "Transformation matrix contains Not-a-Number and/or Infinity - removing object.");
+        LOG(message_group::Warning, node.getLocation(), this->tree.getDocumentPath(), "Transformation matrix contains Not-a-Number and/or Infinity - removing object.");
       } else {
         // First union all children
         ResultObject res = applyToChildren(node, OpenSCADOperator::UNION);
@@ -1387,7 +1392,7 @@ std::shared_ptr<const Geometry> GeometryEvaluator::projectionNoCut(const Project
   for (const auto& item : this->visitedchildren[node.index()]) {
     auto &chnode = item.first;
     const std::shared_ptr<const Geometry>& chgeom = item.second;
-    if (chnode->modinst->isBackground()) continue;
+    if (chnode->isBackground()) continue;
 
     const Polygon2d *poly = nullptr;
 
@@ -1561,7 +1566,7 @@ Response GeometryEvaluator::visit(State& state, const RoofNode& node)
         try {
           roof = roofOverPolygon(node, *polygons);
         } catch (RoofNode::roof_exception& e) {
-          LOG(message_group::Error, node.modinst->location(), this->tree.getDocumentPath(),
+          LOG(message_group::Error, node.getLocation(), this->tree.getDocumentPath(),
               "Skeleton computation error. " + e.message());
           roof = new PolySet(3);
         }

@@ -6,8 +6,7 @@
 
 class LocalScope;
 
-class ScopeContext : public Context
-{
+class ScopeContext : public Context{
 public:
   void init() override;
   boost::optional<CallableFunction> lookup_local_function(const std::string& name, const Location& loc) const override;

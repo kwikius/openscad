@@ -45,10 +45,9 @@ private:
   void addToParent(const State& state, const AbstractNode& node);
   void applyToChildren(State& state, const AbstractNode& node, OpenSCADOperator op);
 
-  std::shared_ptr<CSGNode> evaluateCSGNodeFromGeometry(State& state,
-                                                  const std::shared_ptr<const class Geometry>& geom,
-                                                  const ModuleInstantiation *modinst,
-                                                    const AbstractNode& node);
+  std::shared_ptr<CSGNode>
+  evaluateCSGNodeFromGeometry(State& state,
+    const std::shared_ptr<const class Geometry>& geom, const AbstractNode& node);
 
   void applyBackgroundAndHighlight(State& state, const AbstractNode& node);
 

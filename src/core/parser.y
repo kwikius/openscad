@@ -75,18 +75,20 @@ std::shared_ptr<fs::path> sourcefile(void);
 void lexer_set_parser_sourcefile(const fs::path& path);
 int lexerlex_destroy(void);
 int lexerlex(void);
-static void handle_assignment(const std::string token, Expression *expr, const Location loc);
 
-std::stack<LocalScope *> scope_stack;
+namespace {
+   void handle_assignment(const std::string token, Expression *expr, const Location loc);
+   std::stack<LocalScope *> scope_stack;
+   fs::path mainFilePath;
+   bool parsingMainFile;
+   bool fileEnded=false;
+}
 SourceFile *rootfile;
 
 extern void lexerdestroy();
 extern FILE *lexerin;
 const char *parser_input_buffer;
-static fs::path mainFilePath;
-static bool parsingMainFile;
 
-bool fileEnded=false;
 %}
 
 %initial-action
@@ -257,9 +259,9 @@ module_instantiation
          {
              if ( $2 != nullptr) {
                 switch($1){
-                   case '!': $2->tag_root = true;break;
-                   case '#': $2->tag_highlight = true;break;
-                   case '%': $2->tag_background = true;break;
+                   case '!': $2->setRoot();break;
+                   case '#': $2->setHighlight();break;
+                   case '%': $2->setBackground();break;
                    case '*': delete $2; $2 = nullptr;
                    default : {
                       assert(false);
@@ -272,7 +274,7 @@ module_instantiation
         | single_module_instantiation
             {
                 $<inst>$ = $1;
-                scope_stack.push(&$1->scope);
+                scope_stack.push(&$1->getScopeNC());
             }
           child_statement
             {
@@ -305,7 +307,7 @@ if_statement
         : TOK_IF '(' expr ')'
             {
                 $<ifelse>$ = new IfElseModuleInstantiation(std::shared_ptr<Expression>($3), LOCD("if", @$));
-                scope_stack.push(&$<ifelse>$->scope);
+                scope_stack.push(&$<ifelse>$->getScopeNC());
             }
           child_statement
             {
@@ -789,74 +791,80 @@ void yyerror (char const *s)
 	LOG(message_group::Error, loc, "", "Parser error: %1$s", s);
 }
 
-#ifdef DEBUG
-static Location debug_location(const std::string& info, const YYLTYPE& loc)
-{
-	auto location = LOC(loc);
-	PRINTDB("%3d, %3d - %3d, %3d | %s", loc.first_line % loc.first_column % loc.last_line % loc.last_column % info);
-	return location;
-}
-#endif
 
-static void warn_reassignment(const Location& loc, const std::shared_ptr<Assignment>& assignment, const fs::path& path)
-{
-	LOG(message_group::Warning,
-			loc,
-			path.parent_path().generic_string(),
-			"%1$s was assigned on line %2$i but was overwritten",
-			assignment->getName(),
-			assignment->location().firstLine());
 
-}
+   #ifdef DEBUG
+  static  Location debug_location(const std::string& info, const YYLTYPE& loc)
+   {
+      auto location = LOC(loc);
+      PRINTDB("%3d, %3d - %3d, %3d | %s", loc.first_line % loc.first_column % loc.last_line % loc.last_column % info);
+      return location;
+   }
+   #endif
 
-static void warn_reassignment(const Location& loc, const std::shared_ptr<Assignment>& assignment, const fs::path& path1, const fs::path& path2)
-{
-	LOG(message_group::Warning,
-			loc,
-			path1.parent_path().generic_string(),
-			"%1$s was assigned on line %2$i of %3$s but was overwritten",
-			assignment->getName(),
-			assignment->location().firstLine(),
-			path2);
-}
+namespace {
+   void warn_reassignment(const Location& loc, const std::shared_ptr<Assignment>& assignment,
+     const fs::path& path)
+   {
+      LOG(message_group::Warning,
+            loc,
+            path.parent_path().generic_string(),
+            "%1$s was assigned on line %2$i but was overwritten",
+            assignment->getName(),
+            assignment->location().firstLine());
 
-void handle_assignment(const std::string token, Expression *expr, const Location loc)
-{
-	bool found = false;
-	for (auto &assignment : scope_stack.top()->assignments) {
-		if (assignment->getName() == token) {
-			auto mainFile = mainFilePath.string();
-			auto prevFile = assignment->location().fileName();
-			auto currFile = loc.fileName();
+   }
 
-			const auto uncPathCurr = boostfs_uncomplete(currFile, mainFilePath.parent_path());
-			const auto uncPathPrev = boostfs_uncomplete(prevFile, mainFilePath.parent_path());
-			if (fileEnded) {
-				//assignments via commandline
-			} else if (prevFile == mainFile && currFile == mainFile) {
-				//both assignments in the mainFile
-				warn_reassignment(loc, assignment, mainFilePath);
-			} else if (uncPathCurr == uncPathPrev) {
-				//assignment overwritten within the same file
-				//the line number being equal happens, when a file is included multiple times
-				if (assignment->location().firstLine() != loc.firstLine()) {
-					warn_reassignment(loc, assignment, mainFilePath, uncPathPrev);
-				}
-			} else if (prevFile == mainFile && currFile != mainFile) {
-				//assignment from the mainFile overwritten by an include
-				warn_reassignment(loc, assignment, mainFilePath, uncPathPrev);
-			}
-			assignment->setExpr(std::shared_ptr<Expression>(expr));
-			assignment->setLocationOfOverwrite(loc);
-			found = true;
-			break;
-		}
-	}
-	if (!found) {
-		scope_stack.top()->addAssignment(
-         std::make_shared<Assignment>(token, std::shared_ptr<Expression>(expr), loc)
-      );
-	}
+   void warn_reassignment(const Location& loc, const std::shared_ptr<Assignment>& assignment,
+    const fs::path& path1, const fs::path& path2)
+   {
+      LOG(message_group::Warning,
+            loc,
+            path1.parent_path().generic_string(),
+            "%1$s was assigned on line %2$i of %3$s but was overwritten",
+            assignment->getName(),
+            assignment->location().firstLine(),
+            path2);
+   }
+
+   void handle_assignment(const std::string token, Expression *expr, const Location loc)
+   {
+      bool found = false;
+      for (auto &assignment : scope_stack.top()->assignments) {
+         if (assignment->getName() == token) {
+            auto mainFile = mainFilePath.string();
+            auto prevFile = assignment->location().fileName();
+            auto currFile = loc.fileName();
+
+            const auto uncPathCurr = boostfs_uncomplete(currFile, mainFilePath.parent_path());
+            const auto uncPathPrev = boostfs_uncomplete(prevFile, mainFilePath.parent_path());
+            if (fileEnded) {
+               //assignments via commandline
+            } else if (prevFile == mainFile && currFile == mainFile) {
+               //both assignments in the mainFile
+               warn_reassignment(loc, assignment, mainFilePath);
+            } else if (uncPathCurr == uncPathPrev) {
+               //assignment overwritten within the same file
+               //the line number being equal happens, when a file is included multiple times
+               if (assignment->location().firstLine() != loc.firstLine()) {
+                  warn_reassignment(loc, assignment, mainFilePath, uncPathPrev);
+               }
+            } else if (prevFile == mainFile && currFile != mainFile) {
+               //assignment from the mainFile overwritten by an include
+               warn_reassignment(loc, assignment, mainFilePath, uncPathPrev);
+            }
+            assignment->setExpr(std::shared_ptr<Expression>(expr));
+            assignment->setLocationOfOverwrite(loc);
+            found = true;
+            break;
+         }
+      }
+      if (!found) {
+         scope_stack.top()->addAssignment(
+            std::make_shared<Assignment>(token, std::shared_ptr<Expression>(expr), loc)
+         );
+      }
+   }
 }
 
 bool parse(SourceFile *&file, const std::string& text, const std::string &filename, const std::string &mainFile, int debug)

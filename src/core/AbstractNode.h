@@ -45,24 +45,40 @@ public:
      are inserted into the cache*/
   virtual class Geometry *evaluate_geometry(class PolySetEvaluator *) const { return nullptr; }
 
-  const std::vector<std::shared_ptr<AbstractNode>>& getChildren() const {
+  const std::vector<std::shared_ptr<AbstractNode>>& getChildren() const
+  {
     return this->children;
   }
+  std::vector<std::shared_ptr<AbstractNode>>& getChildrenNC()
+  {
+    return this->children;
+  }
+
+  Location const & getLocation() const { return getModInst().location();}
+  bool isHighlight() const { return getModInst().isHighlight();}
+  bool isRoot() const {return getModInst().isRoot();}
+  bool isBackground() const { return getModInst().isBackground();}
+
+
+
+  bool hasSameModInst(std::shared_ptr<AbstractNode> const & other) const
+  { return &this->getModInst() == &other->getModInst();}
+
   size_t index() const { return this->idx; }
 
   static void resetIndexCounter() { idx_counter = 1; }
-
+private:
   // FIXME: Make protected
   std::vector<std::shared_ptr<AbstractNode>> children;
   const ModuleInstantiation *modinst;
-
+  int idx; // Node index (unique per tree)
+  ModuleInstantiation const & getModInst() const { return *modinst;}
+public:
   // progress_mark is a running number used for progress indication
   // FIXME: Make all progress handling external, put it in the traverser class?
   int progress_mark{0};
   void progress_prepare();
   void progress_report() const;
-
-  int idx; // Node index (unique per tree)
 
   std::shared_ptr<const AbstractNode>
    getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const;
@@ -127,5 +143,5 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& stream, const AbstractNode& node);
-std::shared_ptr<AbstractNode>
-find_root_tag(const std::shared_ptr<AbstractNode>& node, const Location **nextLocation = nullptr);
+std::shared_ptr<const AbstractNode>
+find_root_tag(const std::shared_ptr<const AbstractNode>& node, const Location **nextLocation = nullptr);

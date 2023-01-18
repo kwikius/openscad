@@ -128,8 +128,9 @@ void CSGTreeEvaluator::applyToChildren(State& state, const AbstractNode& node, O
     }
   }
   if (t1) {
-    if (node.modinst->isBackground() || state.isBackground()) t1->setBackground(true);
-    if (node.modinst->isHighlight() || state.isHighlight()) t1->setHighlight(true);
+
+    if (node.isBackground() || state.isBackground()) t1->setBackground(true);
+    if (node.isHighlight() || state.isHighlight()) t1->setHighlight(true);
   }
   this->stored_term[node.index()] = t1;
 }
@@ -156,8 +157,8 @@ Response CSGTreeEvaluator::visit(State& state, const class ListNode& node)
 {
   if (state.parent()) {
     if (state.isPrefix()) {
-      if (node.modinst->isHighlight()) state.setHighlight(true);
-      if (node.modinst->isBackground()) state.setBackground(true);
+      if (node.isHighlight()) state.setHighlight(true);
+      if (node.isBackground()) state.setBackground(true);
     }
     if (state.isPostfix()) {
       for (auto &chnode : this->visitedchildren[node.index()]) {
@@ -174,7 +175,7 @@ Response CSGTreeEvaluator::visit(State& state, const class ListNode& node)
 
 std::shared_ptr<CSGNode> CSGTreeEvaluator::evaluateCSGNodeFromGeometry(
   State& state, const std::shared_ptr<const Geometry>& geom,
-  const ModuleInstantiation *modinst, const AbstractNode& node)
+ const AbstractNode& node)
 {
   // We cannot render Polygon2d directly, so we preprocess (tessellate) it here
   auto g = geom;
@@ -186,9 +187,12 @@ std::shared_ptr<CSGNode> CSGTreeEvaluator::evaluateCSGNodeFromGeometry(
     // 3D PolySets are tessellated before inserting into Geometry cache, inside GeometryEvaluator::evaluateGeometry
   }
 
-  std::shared_ptr<CSGNode> t(new CSGLeaf(g, state.matrix(), state.color(), STR(node.name(), node.index()), node.index()));
-  if (modinst->isHighlight() || state.isHighlight()) t->setHighlight(true);
-  if (modinst->isBackground() || state.isBackground()) t->setBackground(true);
+  std::shared_ptr<CSGNode> t(
+    new CSGLeaf(g, state.matrix(), state.color(), STR(node.name(), node.index()),
+    node.index()));
+
+  if (node.isHighlight() || state.isHighlight()) t->setHighlight(true);
+  if (node.isBackground() || state.isBackground()) t->setBackground(true);
   return t;
 }
 
@@ -199,7 +203,7 @@ Response CSGTreeEvaluator::visit(State& state, const AbstractPolyNode& node)
     if (this->geomevaluator) {
       auto geom = this->geomevaluator->evaluateGeometry(node, false);
       if (geom) {
-        t1 = evaluateCSGNodeFromGeometry(state, geom, node.modinst, node);
+        t1 = evaluateCSGNodeFromGeometry(state, geom, node);
       } else {
         t1 = CSGNode::createEmptySet();
       }
@@ -224,7 +228,8 @@ Response CSGTreeEvaluator::visit(State& state, const TransformNode& node)
 {
   if (state.isPrefix()) {
     if (matrix_contains_infinity(node.matrix) || matrix_contains_nan(node.matrix)) {
-      LOG(message_group::Warning, Location::NONE, "", "Transformation matrix contains Not-a-Number and/or Infinity - removing object.");
+      LOG(message_group::Warning, Location::NONE, "",
+        "Transformation matrix contains Not-a-Number and/or Infinity - removing object.");
       return Response::PruneTraversal;
     }
     state.setMatrix(state.matrix() * node.matrix);
@@ -257,7 +262,7 @@ Response CSGTreeEvaluator::visit(State& state, const RenderNode& node)
     if (this->geomevaluator) {
       geom = this->geomevaluator->evaluateGeometry(node, false);
       if (geom) {
-        t1 = evaluateCSGNodeFromGeometry(state, geom, node.modinst, node);
+        t1 = evaluateCSGNodeFromGeometry(state, geom, node);
       } else {
         t1 = CSGNode::createEmptySet();
       }
@@ -278,7 +283,7 @@ Response CSGTreeEvaluator::visit(State& state, const CgalAdvNode& node)
     if (this->geomevaluator) {
       geom = this->geomevaluator->evaluateGeometry(node, false);
       if (geom) {
-        t1 = evaluateCSGNodeFromGeometry(state, geom, node.modinst, node);
+        t1 = evaluateCSGNodeFromGeometry(state, geom, node);
       } else {
         t1 = CSGNode::createEmptySet();
       }

@@ -50,6 +50,6 @@ private:
 };
 
 using AssignmentList = std::vector<std::shared_ptr<Assignment>>;
-using AssignmentMap = std::unordered_map<std::string, const Expression *>;
+//using AssignmentMap = std::unordered_map<std::string, const Expression *>;
 
 std::ostream& operator<<(std::ostream& stream, const AssignmentList& assignments);

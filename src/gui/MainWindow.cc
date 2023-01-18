@@ -1244,7 +1244,9 @@ void MainWindow::instantiateRoot()
     if (this->absolute_root_node) {
       // Do we have an explicit root node (! modifier)?
       const Location *nextLocation = nullptr;
-      if (!(this->root_node = find_root_tag(this->absolute_root_node, &nextLocation))) {
+      if (!(this->root_node = std::const_pointer_cast<AbstractNode>(
+          find_root_tag(this->absolute_root_node, &nextLocation)))
+      ) {
         this->root_node = this->absolute_root_node;
       }
       if (nextLocation) {
@@ -2244,7 +2246,7 @@ void MainWindow::selectObject(QPoint mouse)
         continue;
       }
 
-      auto location = step->modinst->location();
+      auto location = step->getLocation();
       ss.str("");
 
       // Check if the path is contained in a library (using parsersettings.h)

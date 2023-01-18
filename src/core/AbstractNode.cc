@@ -39,6 +39,7 @@ AbstractNode::AbstractNode(const ModuleInstantiation *mi) :
   modinst(mi),
   idx(idx_counter++)
 {
+   assert(modinst);
 }
 
 std::string AbstractNode::toString() const
@@ -119,21 +120,21 @@ std::ostream& operator<<(std::ostream& stream, const AbstractNode& node)
    If a second root modifier was found, nextLocation (if non-zero) will be set to point to
    the location of that second modifier.
  */
-std::shared_ptr<AbstractNode> find_root_tag(const std::shared_ptr<AbstractNode>& node, const Location **nextLocation)
+std::shared_ptr<const AbstractNode> find_root_tag(const std::shared_ptr<const AbstractNode>& node, const Location **nextLocation)
 {
-  std::shared_ptr<AbstractNode> rootTag;
+  std::shared_ptr<const AbstractNode> rootTag;
 
   std::function<void (const std::shared_ptr<const AbstractNode>&)> recursive_find_tag
    = [&](const std::shared_ptr<const AbstractNode>& node) {
-      for (const auto& child : node->children) {
-        if (child->modinst->tag_root) {
+      for (const auto& child : node->getChildren()) {
+        if (child->isRoot()) {
           if (!rootTag) {
             rootTag = child;
             // shortcut if we're not interested in further root modifiers
             if (!nextLocation) return;
-          } else if (nextLocation && rootTag->modinst != child->modinst) {
+          } else if (nextLocation && (!rootTag->hasSameModInst(child)) ) { //(&rootTag->getModInst() != &child->getModInst()) ) {
             // Throw if we have more than one root modifier in the source
-            *nextLocation = &child->modinst->location();
+            *nextLocation = &child->getLocation();
             return;
           }
         }

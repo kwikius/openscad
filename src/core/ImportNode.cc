@@ -181,7 +181,7 @@ static std::shared_ptr<AbstractNode> builtin_import_dxf(const ModuleInstantiatio
 const Geometry *ImportNode::createGeometry() const
 {
   Geometry *g = nullptr;
-  auto loc = this->modinst->location();
+  auto loc = this->getLocation();
 
   switch (this->type) {
   case ImportType::STL: {
@@ -216,7 +216,8 @@ const Geometry *ImportNode::createGeometry() const
   }
 #endif
   default:
-    LOG(message_group::Error, Location::NONE, "", "Unsupported file format while trying to import file '%1$s', import() at line %2$d", this->filename, loc.firstLine());
+    LOG(message_group::Error, Location::NONE, "",
+      "Unsupported file format while trying to import file '%1$s', import() at line %2$d", this->filename, loc.firstLine());
     g = new PolySet(3);
   }
 

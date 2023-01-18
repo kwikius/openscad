@@ -8,12 +8,6 @@ enum class Response {ContinueTraversal, AbortTraversal, PruneTraversal};
 class State;
 class NodeVisitor;
 
-template <typename VisitableType>
-class Visitor{
-public:
-  [[nodiscard]] virtual Response visit(State& state, const VisitableType&) = 0;
-};
-
 template <typename B , typename D>
 class Visitable : public B {
 public:

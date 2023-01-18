@@ -10,10 +10,12 @@
 
 #include "cgalutils.h"
 
-Location getLocation(const std::shared_ptr<const AbstractNode>& node)
-{
-  return node && node->modinst ? node->modinst->location() : Location::NONE;
-}
+//Location getLocation(const std::shared_ptr<const AbstractNode>& node)
+//{
+//  return (node)
+//    ? node->getLocation()
+//    : Location::NONE;
+//}
 
 namespace CGALUtils {
 

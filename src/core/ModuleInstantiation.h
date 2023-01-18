@@ -36,7 +36,6 @@ protected:
 
 public:
   ~ABCModuleInstantiation();
-
   /**
    * @brief output the instantiation params to the console
    */
@@ -47,29 +46,34 @@ public:
    */
   virtual std::shared_ptr<AbstractNode>
   evalInst(std::shared_ptr<const Context> const & context) const =0;
-
-  /**
-   * name of the module to be instantiated in the source code
-   * Note that static_cast<bool>(id_expr) == true then the name is not valid then the name is found via the id_expr
-  */
-
   bool isBackground() const { return this->tag_background; }
   bool isHighlight() const { return this->tag_highlight; }
   bool isRoot() const { return this->tag_root; }
 
-  AssignmentList arguments;
+  void setRoot() { tag_root = true;}
+  void setHighlight() { tag_highlight = true;}
+  void setBackground(){ tag_background = true;}
 
   /**
   * @todo Does this need to be a full scope?
   * Aren't the only entities it can contain child modules?
   **/
+  LocalScope const & getScope()const { return scope;}
+  LocalScope & getScopeNC() { return scope;}
+  void setAssignmentList(AssignmentList&& args)
+  { arguments = args;}
+  AssignmentList const & getAssignmentList() const
+  { return arguments;}
+  AssignmentList & getAssignmentListNC()
+  { return arguments;}
+protected:
+    void print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined)const;
+private:
+  AssignmentList arguments;
   LocalScope scope;
-
   bool tag_root;
   bool tag_highlight;
   bool tag_background;
-protected:
-    void print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined)const;
 };
 
 class ModuleInstantiation;
@@ -109,7 +113,6 @@ public:
     std::shared_ptr<const Context> & module_lookup_context) const;
   private:
   std::string modname;
-
 };
 
 class IfElseModuleInstantiation : public ModuleInstantiation{

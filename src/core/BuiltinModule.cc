@@ -47,7 +47,9 @@ BuiltinModule::BuiltinModule(fnArgsChildrenInstantiate fnInstantiate, const Feat
   AbstractModule(feature),
   do_instantiate(
      [fnInstantiate](ModInst const *inst, contextPtr const & context) {
-        return fnInstantiate(inst, Arguments(inst->arguments, context), Children(&inst->scope, context));
+        return fnInstantiate(inst, Arguments(inst->getAssignmentList(), context),
+           Children(&inst->getScope(), context)
+        );
      }
   )
 {}

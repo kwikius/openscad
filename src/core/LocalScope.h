@@ -12,9 +12,11 @@ class UserFunction;
 
 /**
 * @brief repository for storage of ModuleInstantiations, UserModule definitions and values
-* Member of ABCModuleInstantiation, ScopeContext, UserModule, SourceFile,
+* Member of ABCModuleInstantiation, IfElseModuleInstantiation, ScopeContext, UserModule, SourceFile,
 * LocalScopes are pushed and popped from a parser stack during parsing, and entities are added
 * as various entities are parsed.
+* Most scopes are created as part of an object . IfElse else scope is a unique_ptr in IfElseModuleInstantiation
+* Scope lifetime therefore follows lifetime of the object it was created in.
 **/
 class LocalScope
 {

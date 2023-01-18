@@ -17,6 +17,12 @@
 #include "ProjectionNode.h"
 #include "SurfaceNode.h"
 
+template <typename VisitableType>
+class Visitor{
+public:
+  [[nodiscard]] virtual Response visit(State& state, const VisitableType&) = 0;
+};
+
 template< typename A>
 struct BaseVisitor : Visitor<A>{
   virtual ~BaseVisitor() = default;

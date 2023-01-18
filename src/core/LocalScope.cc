@@ -67,9 +67,8 @@ std::shared_ptr<AbstractNode>
   const std::shared_ptr<AbstractNode> &target) const
 {
   for (const auto& modinst : this->moduleInstantiations) {
-    auto node = modinst->evalInst(context);
-    if (node) {
-      target->children.push_back(node);
+    if ( auto node = modinst->evalInst(context) ) {
+      target->getChildrenNC().push_back(node);
     }
   }
   return target;
@@ -81,9 +80,8 @@ LocalScope::instantiateModules(const std::shared_ptr<const Context>& context,
 {
   for (size_t index : indices) {
     assert(index < this->moduleInstantiations.size());
-    auto node = moduleInstantiations[index]->evalInst(context);
-    if (node) {
-      target->children.push_back(node);
+    if (auto node = moduleInstantiations[index]->evalInst(context) ) {
+      target->getChildrenNC().push_back(node);
     }
   }
   return target;
