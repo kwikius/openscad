@@ -911,7 +911,7 @@ experimental_tests(lazyunion-offpngtest_lazyunion-transform-for)
 experimental_tests(lazyunion-offpngtest_2d-3d)
 experimental_tests(lazyunion-dxfpngtest_lazyunion-toplevel-2dobjects)
 experimental_tests(lazyunion-svgpngtest_lazyunion-toplevel-2dobjects)
-
+experimental_tests(dumptest-examples_load_cell)
 experimental_tests(dumptest-examples_modlitexamples_subtract)
 experimental_tests(dumptest_module_literal_extrusion3d)
 experimental_tests(dumptest_module_literal_extrusions3d)

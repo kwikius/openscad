@@ -262,11 +262,8 @@ module_instantiation
                    case '!': $2->setRoot();break;
                    case '#': $2->setHighlight();break;
                    case '%': $2->setBackground();break;
-                   case '*': delete $2; $2 = nullptr;
-                   default : {
-                      assert(false);
-                      break;
-                   }
+                   case '*': delete $2; $2 = nullptr;break;
+                   default : assert(false);break;
                 }
              }
              $$ = $2;

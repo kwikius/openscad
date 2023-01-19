@@ -31,8 +31,10 @@ namespace {
    // These indices must match the BinaryOp::Op enums
    // converted to int as defined in the BinaryOp class
    constexpr binOpInfo_t  binOps[] = {
+       // N.B the logical op functions && || arent called
        {  "&&", [](Value&& lhs, Value&& rhs)->Value { return lhs.toBool() && rhs.toBool(); } }// LogicalAnd
       ,{  "||", [](Value&& lhs, Value&& rhs)->Value { return lhs.toBool() || rhs.toBool(); } }// LogicalOr
+      //--------------------------------------------------------------
       ,{   "^", [](Value&& lhs, Value&& rhs)->Value { return lhs ^ rhs; }  } // Exponent
       ,{   "*", [](Value&& lhs, Value&& rhs)->Value { return lhs * rhs; }  } // Multiply
       ,{   "/", [](Value&& lhs, Value&& rhs)->Value { return lhs / rhs; }  } // Divide
@@ -62,32 +64,28 @@ namespace {
 
 Value BinaryOp::evaluate(const std::shared_ptr<const Context>& context) const
 {
-   int const index = static_cast<int>(this->op);
-   if (binOpIndexInRange(index)){
-      return checkUndef(
-        binOps[index].fun(
-            std::move(this->left->evaluate(context)),
-            std::move(this->right->evaluate(context))
-        ),
-        this->location(), context->documentRoot()
-      );
-   }else{
-      exitBinopFail();
-      // never gets here
-      return Value::undefined.clone();
+   switch  (auto const opId = this->op) {
+      default:{
+         return checkUndef(
+            binOps[static_cast<int>(opId)].fun(
+               this->left->evaluate(context),
+               this->right->evaluate(context)
+            ),
+            this->location(), context->documentRoot()
+         );
+      }
+      // These two ops are shortcircuit evaluated in C++, so both sides of the expression
+      // arent necessarily evaluated
+      case Op::LogicalAnd:
+         return this->left->evaluate(context).toBool() && this->right->evaluate(context).toBool();
+      case Op::LogicalOr:
+         return this->left->evaluate(context).toBool() || this->right->evaluate(context).toBool();
    }
 }
 
 const char *BinaryOp::opString() const
 {
-   int const index = static_cast<int>(this->op);
-   if (binOpIndexInRange(index)){
-      return binOps[index].opStr;
-   }else{
-     exitBinopFail();
-     // never get here
-     return "";
-   }
+   return binOps[static_cast<int>(this->op)].opStr;
 }
 
 void BinaryOp::print(std::ostream& stream, const std::string&) const
