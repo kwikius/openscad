@@ -94,7 +94,7 @@ static void NOINLINE print_trace(const ModuleInstantiation *mod, const std::shar
   LOG(message_group::Trace, mod->location(), context->documentRoot(), "called by '%1$s'", mod->name());
 }
 
-namespace{
+//namespace{
 
    /**
    *  @brief expand a module expression into a module instantaiation using an existing moduleInstantatiation
@@ -103,27 +103,27 @@ namespace{
       @param context The context of the instantiation, which may be modified during the expansion
       @returns true if the Module expression was expanded successfully else false
    **/
-   [[nodiscard]] bool evalModuleExpr(ModuleInstantiation* modInst,
-      std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context);
+//   [[nodiscard]] bool evalModuleExpr(ModuleInstantiation* modInst,
+//      std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context);
 
-     /**
-   *  @brief expand a module expression into a module instantiation using an new moduleInstantatiation
-      @param expr The moduleExpression to expand
-      @param context The context of the instantiation, which may be modified during the expansion
-      @returns shared_ptr to the new ModuleInstantation if the Module expression was expanded successfully
-      else empty shared_ptr
-   **/
-   std::shared_ptr<ModuleInstantiation>
-   evalModuleExpr(std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context)
-   {
-      auto modInst = std::make_shared<ModuleInstantiation>("",AssignmentList(),expr->location());
-      bool res = evalModuleExpr(modInst.get(),expr,context);
-      if ( res){
-         return modInst;
-      }else{
-         return std::shared_ptr<ModuleInstantiation>();
-      }
+/**
+*  @brief expand a module expression into a module instantiation using an new moduleInstantatiation
+@param expr The moduleExpression to expand
+@param context The context of the instantiation, which may be modified during the expansion
+@returns shared_ptr to the new ModuleInstantation if the Module expression was expanded successfully
+else empty shared_ptr
+**/
+[[nodiscard]] std::shared_ptr<ModuleInstantiation>
+ABCModuleInstantiation::evalModuleExpr(std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context)
+{
+   auto modInst = std::make_shared<ModuleInstantiation>("",AssignmentList(),expr->location());
+   bool res = evalModuleExpr(modInst.get(),expr,context);
+   if ( res){
+      return modInst;
+   }else{
+      return std::shared_ptr<ModuleInstantiation>();
    }
+}
 /**
 *  @brief Turn the expression into a module instantiation
 *  @param modInst The ModuleInstantiation which will represent the resulting expression
@@ -132,109 +132,108 @@ namespace{
 *  @return true if the expression was succesfully converted, then the result has been metamorphised
 *  in modInst, else false
 **/
-   [[nodiscard]] bool evalModuleExpr(ModuleInstantiation* modInst,
-      std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context)
-   {
-      switch( expr->getID()){
-        using exprId = Expression::Id;
-        case exprId::BinaryOp: {
-          auto binOp = std::dynamic_pointer_cast<BinaryOp>(expr);
-          assert(static_cast<bool>(binOp)==true);
-          assert(modInst->getAssignmentList().empty());
-          assert(modInst->name() == "");
-          switch ( binOp->getOpID()) {
-            using Op = BinaryOp::Op;
-            case Op::Translate:
-            case Op::Rotate:{
-               auto arg_expr = binOp->getRight();
-               auto arg = std::make_shared<Assignment>("",arg_expr,arg_expr->location() );
-               modInst->getAssignmentListNC().emplace_back(arg);
-               std::shared_ptr<const Context> child_context = context;
-               auto childModInst = evalModuleExpr(binOp->getLeft(),child_context);
-               if ( childModInst){
-                  modInst->setName(
-                     (binOp->getOpID() == Op::Translate)
-                    ?"translate"
-                    :"rotate"
-                  );
-                  modInst->getScopeNC().addModuleInst(childModInst);
-                  return true;
-               }else{// something went wrong. evalModuleExpr has provided the diagnostic
-                  return false;
-               }
-            }// ~Op::Rotate Op::Translate
-            case Op::Minus:{ // difference
-               std::shared_ptr<const Context> child_context = context;
-               auto lhsInst = evalModuleExpr(binOp->getLeft(),child_context);
-               if ( ! lhsInst ){
-                  return false;
-               }
-               child_context = context;
-               auto rhsInst = evalModuleExpr(binOp->getRight(),child_context);
-               if (! rhsInst){
-                  return false;
-               }
-               modInst->setName("difference");
-               modInst->getScopeNC().addModuleInst(lhsInst);
-               modInst->getScopeNC().addModuleInst(rhsInst);
+[[nodiscard]] bool
+ABCModuleInstantiation::evalModuleExpr(ModuleInstantiation* modInst,
+   std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context)
+{
+   switch( expr->getID()){
+     using exprId = Expression::Id;
+     case exprId::BinaryOp: {
+       auto binOp = std::dynamic_pointer_cast<BinaryOp>(expr);
+       assert(static_cast<bool>(binOp)==true);
+       assert(modInst->getAssignmentList().empty());
+       assert(modInst->name() == "");
+       switch ( binOp->getOpID()) {
+         using Op = BinaryOp::Op;
+         case Op::Translate:
+         case Op::Rotate:{
+            auto arg_expr = binOp->getRight();
+            auto arg = std::make_shared<Assignment>("",arg_expr,arg_expr->location() );
+            modInst->getAssignmentListNC().emplace_back(arg);
+            std::shared_ptr<const Context> child_context = context;
+            auto childModInst = evalModuleExpr(binOp->getLeft(),child_context);
+            if ( childModInst){
+               modInst->setName(
+                  (binOp->getOpID() == Op::Translate)
+                 ?"translate"
+                 :"rotate"
+               );
+               modInst->getScopeNC().addModuleInst(childModInst);
                return true;
-            }// ~Op::Minus
-   /*
-   TODO
-            case Union:         // '|'
-            case LinearExtrude: // <->
-            case RotateExtrude:  // <^>
-            case Intersection:  // '&'
-   */
-           default:{ // Op::default
-              LOG(message_group::Warning, modInst->location(), context->documentRoot(),"invalid op");
-              return false;
-           }
-         } // ~switch binOp->getOpID()
-       } // ~case exprId::BinaryOp
-       default: {
-         auto const value = expr->evaluate(context);
-         if ( value.type() == Value::Type::MODULE){
-            auto const & modRef = value.toModuleReference();
-            AssignmentList argsOut;
-            if (modRef.transformToInstantiationArgs(
-               modInst->getAssignmentList(),
-               modInst->location(),
-               context,
-               argsOut
-            )){
-               modInst->setName(modRef.getModuleName());
-               modInst->setAssignmentList(std::move(argsOut));
-               context = modRef.getContext();
-               return true;
-            }else{
+            }else{// something went wrong. evalModuleExpr has provided the diagnostic
                return false;
             }
-         }else {
-              LOG(message_group::Warning, modInst->location(), context->documentRoot(),
-               "invalid module instantiation expression" );
-              return false;
+         }// ~Op::Rotate Op::Translate
+         case Op::Minus:{ // difference
+            std::shared_ptr<const Context> child_context = context;
+            auto lhsInst = evalModuleExpr(binOp->getLeft(),child_context);
+            if ( ! lhsInst ){
+               return false;
+            }
+            child_context = context;
+            auto rhsInst = evalModuleExpr(binOp->getRight(),child_context);
+            if (! rhsInst){
+               return false;
+            }
+            modInst->setName("difference");
+            modInst->getScopeNC().addModuleInst(lhsInst);
+            modInst->getScopeNC().addModuleInst(rhsInst);
+            return true;
+         }// ~Op::Minus
+/*
+TODO
+         case Union:         // '|'
+         case LinearExtrude: // <->
+         case RotateExtrude:  // <^>
+         case Intersection:  // '&'
+*/
+        default:{ // Op::default
+           LOG(message_group::Warning, modInst->location(), context->documentRoot(),"invalid op");
+           return false;
+        }
+      } // ~switch binOp->getOpID()
+    } // ~case exprId::BinaryOp
+    default: {
+      auto const value = expr->evaluate(context);
+      if ( value.type() == Value::Type::MODULE){
+         auto const & modRef = value.toModuleReference();
+         AssignmentList argsOut;
+         if (modRef.transformToInstantiationArgs(
+            modInst->getAssignmentList(),
+            modInst->location(),
+            context,
+            argsOut
+         )){
+            modInst->setName(modRef.getModuleName());
+            modInst->setAssignmentList(std::move(argsOut));
+            context = modRef.getContext();
+            return true;
+         }else{
+            return false;
          }
-        } // exprId::default
-      } // ~switch expr->getID()
-   } // ~()
-}// ~namespace
+      }else {
+           LOG(message_group::Warning, modInst->location(), context->documentRoot(),
+            "invalid module instantiation expression" );
+           return false;
+      }
+     } // exprId::default
+   } // ~switch expr->getID()
+} // ~()
 
-std::shared_ptr<AbstractNode>
+[[nodiscard]] std::shared_ptr<AbstractNode>
 ModuleInstantiation::ll_evaluate(
    std::shared_ptr<const Context> const & context,
    std::shared_ptr<const Context> & module_lookup_context ) const
 {
-   std::string old_name = this->modname;
-   AssignmentList old_args = this->getAssignmentList();
-   auto setTo = [this](std::string const & name , AssignmentList & args){
+   std::string const old_name = this->modname;
+   AssignmentList const old_args = this->getAssignmentList();
+   auto setTo = [this](std::string const & name , AssignmentList const & args){
       const_cast<ModuleInstantiation*>(this)->modname = name;
-      const_cast<ModuleInstantiation*>(this)->setAssignmentList(std::move(args));
+      const_cast<ModuleInstantiation*>(this)->setAssignmentList(args);
    };
 
-   auto restore = [this,&old_name,&old_args](){
-      const_cast<ModuleInstantiation*>(this)->modname = std::move(old_name);
-      const_cast<ModuleInstantiation*>(this)->setAssignmentList(std::move(old_args));
+   auto restore = [this,setTo,&old_name,&old_args]{
+     setTo(old_name,old_args);
    };
 
    // max number of references to reference
@@ -264,7 +263,7 @@ ModuleInstantiation::ll_evaluate(
             restore();
             return nullptr;
          }
-         auto const & modRef = maybe_modRef->toModuleReference();
+         auto const modRef = maybe_modRef->toModuleReference();
 
          AssignmentList argsOut;
          if (modRef.transformToInstantiationArgs(
@@ -290,32 +289,36 @@ ModuleInstantiation::ll_evaluate(
 namespace {
   std::stack<std::shared_ptr<ModuleInstantiation> > modstack;
 }
-std::shared_ptr<AbstractNode>
+[[nodiscard]] std::shared_ptr<AbstractNode>
 ExprModInst::evalInst(std::shared_ptr<const Context> const & context) const
 {
    std::shared_ptr<const Context> module_lookup_context = context;
-   std::shared_ptr<ModuleInstantiation> mi;
+  // std::shared_ptr<ModuleInstantiation> mi;
    // Has the expression already been expanded?
-   auto iter = this->instMap.find(context.get());
+  // auto iter = this->instMap.find(context.get());
    // If not then expand it and put it in the map
-   if (iter == std::end(instMap)){
+  // if (iter == std::end(instMap)){
       // N.B note this is a special converting constructor from ExprModInst to ModuleInstantiation
       // just slices off the useful parts
-      mi = std::make_shared<ModuleInstantiation>(*this);
+     auto mi = std::make_shared<ModuleInstantiation>(*this);
       if (evalModuleExpr(mi.get(),id_expr,module_lookup_context)){
-         instMap.insert({context.get(),mi});
+       //  instMap.insert({context.get(),mi});
+          modstack.push(mi);
       }else{
-        // evalModuleExpr has provided the diagnostic
-        return nullptr;
+          return nullptr;
       }
-   }else{
-      //already in map
-      mi = iter->second;
-   }
+//      }else{
+//        // evalModuleExpr has provided the diagnostic
+//        return nullptr;
+////      }
+//   }else{
+//      //already in map
+//      mi = iter->second;
+//   }
    return mi->ll_evaluate(context,module_lookup_context);
 }
 
-std::shared_ptr<AbstractNode>
+[[nodiscard]] std::shared_ptr<AbstractNode>
 ModuleInstantiation::evalInst(std::shared_ptr<const Context> const & context) const
 {
    std::shared_ptr<const Context> module_lookup_context = context;

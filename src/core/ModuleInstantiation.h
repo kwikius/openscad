@@ -21,6 +21,7 @@
 *    - module_literal
 *    - module_operation
 */
+class ModuleInstantiation;
 class ABCModuleInstantiation : public ASTNode
 {
 protected:
@@ -35,7 +36,7 @@ protected:
     : ASTNode(loc), arguments(args), tag_root(false), tag_highlight(false), tag_background(false){ }
 
 public:
-  ~ABCModuleInstantiation();
+  virtual ~ABCModuleInstantiation();
   /**
    * @brief output the instantiation params to the console
    */
@@ -44,11 +45,11 @@ public:
   /**
    * @brief evaluate the instantiation. IOW instantiate it int the CSG tree
    */
-  virtual std::shared_ptr<AbstractNode>
+  [[nodiscard]] virtual std::shared_ptr<AbstractNode>
   evalInst(std::shared_ptr<const Context> const & context) const =0;
-  bool isBackground() const { return this->tag_background; }
-  bool isHighlight() const { return this->tag_highlight; }
-  bool isRoot() const { return this->tag_root; }
+  [[nodiscard]] bool isBackground() const { return this->tag_background; }
+  [[nodiscard]] bool isHighlight() const { return this->tag_highlight; }
+  [[nodiscard]] bool isRoot() const { return this->tag_root; }
 
   void setRoot() { tag_root = true;}
   void setHighlight() { tag_highlight = true;}
@@ -58,18 +59,26 @@ public:
   * @todo Does this need to be a full scope?
   * Aren't the only entities it can contain child modules?
   **/
-  LocalScope const & getScope()const { return scope;}
-  LocalScope & getScopeNC() { return scope;}
-  void setAssignmentList(AssignmentList&& args)
-  { arguments = args;}
-  AssignmentList const & getAssignmentList() const
+  [[nodiscard]] LocalScope const & getScope()const { return scope;}
+  [[nodiscard]] LocalScope & getScopeNC() { return scope;}
+
+  [[nodiscard]] AssignmentList const & getAssignmentList() const
   { return arguments;}
-  AssignmentList & getAssignmentListNC()
-  { return arguments;}
+
 protected:
+
+  [[nodiscard]] AssignmentList & getAssignmentListNC()
+  { return arguments;}
+   void setAssignmentList(AssignmentList const & args)
+  { arguments = args;}
     void print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined)const;
+   [[nodiscard]] static  bool
+   evalModuleExpr(ModuleInstantiation* modInst,std::shared_ptr<Expression> const & expr,
+     std::shared_ptr<const Context> & context);
+   [[nodiscard]] static std::shared_ptr<ModuleInstantiation>
+   evalModuleExpr(std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context);
 private:
-  AssignmentList arguments;
+  mutable AssignmentList arguments;
   LocalScope scope;
   bool tag_root;
   bool tag_highlight;
@@ -86,7 +95,8 @@ public :
   {}
 public:
   void print(std::ostream& stream, const std::string& indent, const bool inlined) const override;
-  std::shared_ptr<AbstractNode> evalInst(std::shared_ptr<const Context> const & context) const override;
+  [[nodiscard]] std::shared_ptr<AbstractNode>
+  evalInst(std::shared_ptr<const Context> const & context) const override;
   private:
   std::shared_ptr<Expression> id_expr;
   mutable std::unordered_map<const Context*, std::shared_ptr<ModuleInstantiation> > instMap;
@@ -104,15 +114,15 @@ public:
   {
   }
   void print(std::ostream& stream, const std::string& indent, const bool inlined) const override;
-  std::shared_ptr<AbstractNode>
+  [[nodiscard]] std::shared_ptr<AbstractNode>
   evalInst(std::shared_ptr<const Context> const & context) const override;
   std::string const & name() const { return modname;}
   void setName(std::string const & name){ modname = name;}
-  std::shared_ptr<AbstractNode> ll_evaluate(
+  [[nodiscard]] std::shared_ptr<AbstractNode> ll_evaluate(
     std::shared_ptr<const Context> const & context,
     std::shared_ptr<const Context> & module_lookup_context) const;
   private:
-  std::string modname;
+  mutable std::string modname;
 };
 
 class IfElseModuleInstantiation : public ModuleInstantiation{
