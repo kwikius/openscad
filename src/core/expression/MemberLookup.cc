@@ -79,7 +79,7 @@ Value MemberLookup::evaluate(const std::shared_ptr<const Context>& context) cons
          // iModule->module  :  AbstractModule *  ==  UserModule * | BuiltinModule *
          if ( user_module){
             // push on static stack, pop at end of method!
-           // StaticModuleNameStack name{pModRef->getModuleName()};
+            StaticModuleNameStack name{pModRef->getModuleName()};
             ContextHandle<UserModuleContext> module_context{
                Context::create<UserModuleContext>(
                   iModule->defining_context,
