@@ -466,7 +466,9 @@ Response GeometryEvaluator::visit(State& state, const ListNode& node)
 {
   if (state.parent()) {
     if (state.isPrefix() && node.isBackground()) {
-      if (node.isBackground()) state.isBackground();
+      if (node.isBackground()) {
+         state.setBackground(true);
+      }
       return Response::PruneTraversal;
     }
     if (state.isPostfix()) {
@@ -496,7 +498,7 @@ Response GeometryEvaluator::visit(State& state, const GroupNode& node)
 Response GeometryEvaluator::lazyEvaluateRootNode(State& state, const AbstractNode& node) {
   if (state.isPrefix()) {
     if (node.isBackground()) {
-      state.isBackground();
+      state.setBackground(true);
       return Response::PruneTraversal;
     }
     if (isSmartCached(node)) {
