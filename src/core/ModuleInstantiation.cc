@@ -240,7 +240,7 @@ ModuleInstantiation::ll_evaluate(
    int32_t constexpr maxLoopCount = 1000;
    for(int32_t loopCount = 0;loopCount < maxLoopCount;++loopCount){
       if(auto maybe_module
-            = module_lookup_context->lookup_module(this->name(), this->loc){
+            = module_lookup_context->lookup_module(this->name(), this->loc)){
          try{
             auto node = maybe_module->module->instantiate(maybe_module->defining_context, this, context);
             restore();
