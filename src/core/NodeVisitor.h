@@ -16,6 +16,7 @@
 #include "RenderNode.h"
 #include "ProjectionNode.h"
 #include "SurfaceNode.h"
+#include "RootNode.h"
 
 template <typename VisitableType>
 class Visitor{

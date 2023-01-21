@@ -37,6 +37,7 @@
 
 #include "SourceFileCache.h"
 #include "AbstractNode.h"
+#include "RootNode.h"
 
 #include "FileContext.h"
 #include "Value.h"

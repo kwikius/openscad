@@ -139,7 +139,7 @@ ABCModuleInstantiation::evalModuleExpr(ModuleInstantiation* modInst,
    switch( expr->getID()){
      using exprId = Expression::Id;
      case exprId::BinaryOp: {
-       auto binOp = std::dynamic_pointer_cast<BinaryOp>(expr);
+       auto binOp = std::static_pointer_cast<BinaryOp>(expr);
        assert(static_cast<bool>(binOp)==true);
        assert(modInst->getAssignmentList().empty());
        assert(modInst->name() == "");
@@ -225,11 +225,11 @@ ModuleInstantiation::ll_evaluate(
    std::shared_ptr<const Context> const & context,
    std::shared_ptr<const Context> & module_lookup_context ) const
 {
-   std::string const old_name = this->modname;
-   AssignmentList const old_args = this->getAssignmentList();
-   auto setTo = [this](std::string const & name , AssignmentList const & args){
-      const_cast<ModuleInstantiation*>(this)->modname = name;
-      const_cast<ModuleInstantiation*>(this)->setAssignmentList(args);
+   std::string old_name = this->modname;
+   AssignmentList old_args = this->getAssignmentList();
+   auto setTo = [this](std::string name , AssignmentList & args){
+      const_cast<ModuleInstantiation*>(this)->modname = std::move(name);
+      const_cast<ModuleInstantiation*>(this)->setAssignmentList(std::move(args));
    };
 
    auto restore = [this,setTo,&old_name,&old_args]{
@@ -263,7 +263,7 @@ ModuleInstantiation::ll_evaluate(
             restore();
             return nullptr;
          }
-         auto const modRef = maybe_modRef->toModuleReference();
+         auto const & modRef = maybe_modRef->toModuleReference();
 
          AssignmentList argsOut;
          if (modRef.transformToInstantiationArgs(
@@ -286,36 +286,20 @@ ModuleInstantiation::ll_evaluate(
    return nullptr;
 }
 
-namespace {
-  std::stack<std::shared_ptr<ModuleInstantiation> > modstack;
-}
 [[nodiscard]] std::shared_ptr<AbstractNode>
 ExprModInst::evalInst(std::shared_ptr<const Context> const & context) const
 {
    std::shared_ptr<const Context> module_lookup_context = context;
-  // std::shared_ptr<ModuleInstantiation> mi;
-   // Has the expression already been expanded?
-  // auto iter = this->instMap.find(context.get());
-   // If not then expand it and put it in the map
-  // if (iter == std::end(instMap)){
-      // N.B note this is a special converting constructor from ExprModInst to ModuleInstantiation
-      // just slices off the useful parts
-     auto mi = std::make_shared<ModuleInstantiation>(*this);
-      if (evalModuleExpr(mi.get(),id_expr,module_lookup_context)){
-       //  instMap.insert({context.get(),mi});
-          modstack.push(mi);
-      }else{
-          return nullptr;
-      }
-//      }else{
-//        // evalModuleExpr has provided the diagnostic
-//        return nullptr;
-////      }
-//   }else{
-//      //already in map
-//      mi = iter->second;
-//   }
-   return mi->ll_evaluate(context,module_lookup_context);
+   // N.B note this is a special converting constructor
+   // from ExprModInst to ModuleInstantiation.
+   // It just slices off the useful parts.
+   auto mi = std::make_shared<ModuleInstantiation>(*this);
+   if (evalModuleExpr(mi.get(),id_expr,module_lookup_context)){
+      this->instStack.push_back(mi);
+      return mi->ll_evaluate(context,module_lookup_context);
+   }else{
+      return nullptr;
+   }
 }
 
 [[nodiscard]] std::shared_ptr<AbstractNode>

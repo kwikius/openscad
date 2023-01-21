@@ -8,11 +8,9 @@ Response NodeVisitor::traverse(const AbstractNode& node, const State& state)
 {
   State newstate = state;
   newstate.setNumChildren(node.getChildren().size());
-
-  Response response = Response::ContinueTraversal;
   newstate.setPrefix(true);
   newstate.setParent(state.parent());
-  response = node.accept(newstate, *this);
+  auto response = node.accept(newstate, *this);
 
   // Pruned traversals mean don't traverse children
   if (response == Response::ContinueTraversal) {
@@ -31,6 +29,8 @@ Response NodeVisitor::traverse(const AbstractNode& node, const State& state)
     response = node.accept(newstate, *this);
   }
 
-  if (response != Response::AbortTraversal) response = Response::ContinueTraversal;
-  return response;
+  return (response == Response::AbortTraversal)
+     ?  Response::AbortTraversal
+     :  Response::ContinueTraversal
+  ;
 }

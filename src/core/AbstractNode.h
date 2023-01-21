@@ -8,7 +8,8 @@
 
 #include "BaseVisitable.h"
 #include "AST.h"
-#include "ModuleInstantiation.h"
+
+class AbstractNode;
 
 extern int progress_report_count;
 extern void (*progress_report_f)(const std::shared_ptr<const AbstractNode>&, void *, int);
@@ -17,6 +18,8 @@ extern void *progress_report_vp;
 void progress_report_prep(const std::shared_ptr<AbstractNode>& root,
    void (*f)(const std::shared_ptr<const AbstractNode>& node, void *vp, int mark), void *vp);
 void progress_report_fin();
+
+class ModuleInstantiation;
 
 /*!
    The node tree is the result of evaluation of a module instantiation
@@ -54,13 +57,12 @@ public:
     return this->children;
   }
 
-  [[nodiscard]] Location const & getLocation() const { return getModInst().location();}
-  [[nodiscard]] bool isHighlight() const { return getModInst().isHighlight();}
-  [[nodiscard]] bool isRoot() const {return getModInst().isRoot();}
-  [[nodiscard]] bool isBackground() const { return getModInst().isBackground();}
+  [[nodiscard]] Location const & getLocation() const;
+  [[nodiscard]] bool isHighlight() const;
+  [[nodiscard]] bool isRoot() const;
+  [[nodiscard]] bool isBackground() const;
 
-  [[nodiscard]] bool hasSameModInst(std::shared_ptr<AbstractNode> const & other) const
-  { return &this->getModInst() == &other->getModInst();}
+  [[nodiscard]] bool hasSameModInst(std::shared_ptr<AbstractNode> const & other) const;
 
   [[nodiscard]] size_t index() const { return this->idx; }
 
@@ -120,17 +122,6 @@ public:
   std::string verbose_name() const override;
 private:
   const std::string _name;
-};
-
-/*!
-   Only instantiated once, for the top-level file.
- */
-class RootNode final : public Visitable<GroupNode, RootNode>{
-public:
-  RootNode() : Visitable(&mi), mi("group") { }
-  std::string name() const override;
-private:
-  ModuleInstantiation mi;
 };
 
 class LeafNode : public Visitable<AbstractPolyNode, LeafNode>{

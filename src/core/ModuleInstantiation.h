@@ -69,7 +69,7 @@ protected:
 
   [[nodiscard]] AssignmentList & getAssignmentListNC()
   { return arguments;}
-   void setAssignmentList(AssignmentList const & args)
+   void setAssignmentList(AssignmentList && args)
   { arguments = args;}
     void print_scope_args(std::ostream& stream, const std::string& indent, const bool inlined)const;
    [[nodiscard]] static  bool
@@ -99,7 +99,7 @@ public:
   evalInst(std::shared_ptr<const Context> const & context) const override;
   private:
   std::shared_ptr<Expression> id_expr;
-  mutable std::unordered_map<const Context*, std::shared_ptr<ModuleInstantiation> > instMap;
+  mutable std::vector<std::shared_ptr<ModuleInstantiation> > instStack;
 };
 
 class ModuleInstantiation : public ABCModuleInstantiation{

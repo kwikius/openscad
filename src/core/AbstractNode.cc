@@ -47,6 +47,14 @@ std::string AbstractNode::toString() const
   return this->name() + "()";
 }
 
+[[nodiscard]] Location const & AbstractNode::getLocation() const { return getModInst().location();}
+[[nodiscard]] bool AbstractNode::isHighlight() const { return getModInst().isHighlight();}
+[[nodiscard]] bool AbstractNode::isRoot() const {return getModInst().isRoot();}
+[[nodiscard]] bool AbstractNode::isBackground() const { return getModInst().isBackground();}
+
+[[nodiscard]] bool AbstractNode::hasSameModInst(std::shared_ptr<AbstractNode> const & other) const
+{ return &this->getModInst() == &other->getModInst();}
+
 std::shared_ptr<const AbstractNode>
 AbstractNode::getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const
 {
