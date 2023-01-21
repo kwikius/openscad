@@ -227,7 +227,7 @@ ModuleInstantiation::ll_evaluate(
 {
    std::string old_name = this->modname;
    AssignmentList old_args = this->getAssignmentList();
-   auto setTo = [this](std::string name , AssignmentList & args){
+   auto setTo = [this](std::string & name , AssignmentList & args){
       const_cast<ModuleInstantiation*>(this)->modname = std::move(name);
       const_cast<ModuleInstantiation*>(this)->setAssignmentList(std::move(args));
    };
@@ -239,9 +239,8 @@ ModuleInstantiation::ll_evaluate(
    // max number of references to reference
    int32_t constexpr maxLoopCount = 1000;
    for(int32_t loopCount = 0;loopCount < maxLoopCount;++loopCount){
-      boost::optional<InstantiableModule> maybe_module
-         = module_lookup_context->lookup_module(this->name(), this->loc);
-      if (maybe_module) {
+      if(auto maybe_module
+            = module_lookup_context->lookup_module(this->name(), this->loc){
          try{
             auto node = maybe_module->module->instantiate(maybe_module->defining_context, this, context);
             restore();
@@ -255,26 +254,26 @@ ModuleInstantiation::ll_evaluate(
             throw;
          }
       }else{
-         boost::optional<const Value&> maybe_modRef
-           = module_lookup_context->lookup_moduleReference(this->name());
-         if (!maybe_modRef ){
+         if (auto maybe_modRef
+                = module_lookup_context->lookup_moduleReference(this->name())){
+            auto const & modRef = maybe_modRef->toModuleReference();
+            AssignmentList argsOut;
+            if (modRef.transformToInstantiationArgs(
+               this->getAssignmentList(),
+               this->loc,
+               context,
+               argsOut
+            )){
+               std::string newName = modRef.getModuleName();
+               setTo(newName,argsOut);
+               module_lookup_context = modRef.getContext();
+            }else{
+               restore();
+               return nullptr;
+            }
+         }else{
             LOG(message_group::Warning, this->loc, context->documentRoot(),
               "Ignoring unknown module/ref '%1$s'", this->name());
-            restore();
-            return nullptr;
-         }
-         auto const & modRef = maybe_modRef->toModuleReference();
-
-         AssignmentList argsOut;
-         if (modRef.transformToInstantiationArgs(
-            this->getAssignmentList(),
-            this->loc,
-            context,
-            argsOut
-         )){
-            setTo(modRef.getModuleName(),argsOut);
-            module_lookup_context = modRef.getContext();
-         }else{
             restore();
             return nullptr;
          }

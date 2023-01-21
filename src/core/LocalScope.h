@@ -40,8 +40,8 @@ public:
   // Modules and functions are stored twice; once for lookup and once for AST serialization
   // FIXME: Should we split this class into an ASTNode and a run-time support class?
   std::unordered_map<std::string, std::shared_ptr<UserFunction>> functions;
-  std::vector<std::pair<std::string, std::shared_ptr<UserFunction>>> astFunctions;
-
   std::unordered_map<std::string, std::shared_ptr<UserModule>> modules;
+
+  std::vector<std::pair<std::string, std::shared_ptr<UserFunction>>> astFunctions;
   std::vector<std::pair<std::string, std::shared_ptr<UserModule>>> astModules;
 };

@@ -46,7 +46,7 @@ public:
   /*! Should return a Geometry instance describing the node. Returns nullptr if smth.
      goes wrong. This is only called by PolySetEvaluator, to make sure polysets
      are inserted into the cache*/
-  virtual class Geometry *evaluate_geometry(class PolySetEvaluator *) const { return nullptr; }
+  //virtual class Geometry *evaluate_geometry(class PolySetEvaluator *) const { return nullptr; }
 
   const std::vector<std::shared_ptr<AbstractNode>>& getChildren() const
   {
