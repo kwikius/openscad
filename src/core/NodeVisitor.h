@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BaseVisitable.h"
 #include "State.h"
 #include "AbstractNode.h"
 #include "CgalAdvNode.h"

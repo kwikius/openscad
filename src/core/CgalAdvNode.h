@@ -1,7 +1,6 @@
 #pragma once
 
 #include <geometry/linalg.h>
-#include "BaseVisitable.h"
 #include "AbstractNode.h"
 
 enum class CgalAdvType {
