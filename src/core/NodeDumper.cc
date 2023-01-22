@@ -5,6 +5,7 @@
 
 #include "NodeDumper.h"
 #include "State.h"
+#include "Visitables.h"
 #include "ModuleInstantiation.h"
 
 void GroupNodeChecker::incChildCount(int groupNodeIndex) {

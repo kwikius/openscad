@@ -39,7 +39,7 @@
 
 #include <glview/RenderSettings.h>
 
-#include <core/AbstractNode.h>
+#include <core/Visitables.h>
 #include <core/CSGNode.h>
 #include <core/Expression.h>
 #include <core/ScopeContext.h>

@@ -39,7 +39,8 @@
 #include "Builtins.h"
 #include "Value.h"
 #include "Parameters.h"
-#include "NodeVisitor.h"
+#include "Arguments.h"
+#include "Visitable_inline.h"
 #include "TransformNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
@@ -56,7 +57,7 @@ std::shared_ptr<AbstractNode> builtin_scale(const ModuleInstantiation *inst, Arg
 {
   auto node = std::make_shared<TransformNode>(inst, "scale");
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"v"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"v"});
 
   Vector3d scalevec(1, 1, 1);
   if (!parameters["v"].getVec3(scalevec[0], scalevec[1], scalevec[2], 1.0)) {
@@ -64,12 +65,12 @@ std::shared_ptr<AbstractNode> builtin_scale(const ModuleInstantiation *inst, Arg
     if (parameters["v"].getDouble(num)) {
       scalevec.setConstant(num);
     } else {
-      LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "Unable to convert scale(%1$s) parameter to a number, a vec3 or vec2 of numbers or a number", parameters["v"].toEchoStringNoThrow());
+      LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "Unable to convert scale(%1$s) parameter to a number, a vec3 or vec2 of numbers or a number", parameters["v"].toEchoStringNoThrow());
     }
   }
   if (OpenSCAD::rangeCheck) {
     if (scalevec[0] == 0 || scalevec[1] == 0 || scalevec[2] == 0 || !std::isfinite(scalevec[0])|| !std::isfinite(scalevec[1])|| !std::isfinite(scalevec[2])) {
-      LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "scale(%1$s)", parameters["v"].toEchoStringNoThrow());
+      LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "scale(%1$s)", parameters["v"].toEchoStringNoThrow());
     }
   }
   node->matrix.scale(scalevec);
@@ -81,7 +82,7 @@ std::shared_ptr<AbstractNode> builtin_rotate(const ModuleInstantiation *inst, Ar
 {
   auto node = std::make_shared<TransformNode>(inst, "rotate");
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"a", "v"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"a", "v"});
 
   const auto& val_a = parameters["a"];
   const auto& val_v = parameters["v"];
@@ -167,11 +168,11 @@ builtin_mirror(const ModuleInstantiation *inst, Arguments arguments, Children   
 {
   auto node = std::make_shared<TransformNode>(inst, "mirror");
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"v"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"v"});
 
   double x = 1.0, y = 0.0, z = 0.0;
   if (!parameters["v"].getVec3(x, y, z, 0.0)) {
-    LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(),
       "Unable to convert mirror(%1$s) parameter to a vec3 or vec2 of numbers", parameters["v"].toEchoStringNoThrow());
   }
 
@@ -200,7 +201,7 @@ builtin_translate(const ModuleInstantiation *inst, Arguments arguments, Children
 {
   auto node = std::make_shared<TransformNode>(inst, "translate");
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"v"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"v"});
 
   Vector3d translatevec(0, 0, 0);
   bool ok = parameters["v"].getVec3(translatevec[0], translatevec[1], translatevec[2], 0.0);
@@ -220,7 +221,7 @@ builtin_multmatrix(const ModuleInstantiation *inst, Arguments arguments, Childre
 {
   auto node = std::make_shared<TransformNode>(inst, "multmatrix");
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"m"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"m"});
 
   if (parameters["m"].type() == Value::Type::VECTOR) {
     Matrix4d rawmatrix{Matrix4d::Identity()};

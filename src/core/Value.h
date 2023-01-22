@@ -15,17 +15,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 
 #include <glib.h>
 
-#include "Assignment.h"
-
-#include <core/value/VectorType.h>
-#include <core/value/EmbeddedVectorType.h>
-#include <core/value/ValuePtr.h>
-#include <core/value/ModuleReference.h>
-#include <core/value/RangeType.h>
-#include <core/value/FunctionType.h>
-#include <core/value/ObjectType.h>
-#include <core/value/UndefType.h>
-#include <core/value/str_utf8_wrapper.h>
+#include "ValueTypes.h"
 
 class QuotedString;
 class VectorType;
@@ -35,12 +25,15 @@ class RangeType;
 class FunctionType;
 class ObjectType;
 class str_utf8_wrapper;
-
+class EmbeddedVectorType;
+class UndefType;
 class tostring_visitor;
 class tostream_visitor;
 class Context;
 class Expression;
 class Value;
+
+#include <core/value/str_utf8_wrapper.h>
 
 using FunctionPtr = ValuePtr<FunctionType>;
 using ModuleReferencePtr = ValuePtr<ModuleReference>;
@@ -152,12 +145,10 @@ public:
 
   friend std::ostream& operator<<(std::ostream& stream, const Value& value);
 
-  typedef std::variant<UndefType, bool, double, str_utf8_wrapper,
+  using Variant = std::variant<UndefType, bool, double, str_utf8_wrapper,
     VectorType, EmbeddedVectorType, RangePtr, FunctionPtr, ObjectType,
     ModuleReferencePtr
-   > Variant;
-
-  static_assert(sizeof(Value::Variant) <= 24, "Memory size of Value too big");
+  >;
   const Variant& getVariant() const { return value; }
   Variant & getVariant() { return value;}
 private:

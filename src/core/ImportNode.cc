@@ -50,12 +50,13 @@
 
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
+#include "Visitable_inline.h"
 #include "Builtins.h"
 #include "Children.h"
 #include "Parameters.h"
+#include "Arguments.h"
 #include "ImportNode.h"
-#include "Value.h"
-#include "NodeVisitor.h"
+
 
 namespace fs = boost::filesystem;
 

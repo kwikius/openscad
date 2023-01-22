@@ -31,8 +31,9 @@
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Parameters.h"
+#include "Arguments.h"
 #include "Builtins.h"
-#include "NodeVisitor.h"
+#include "Visitable_inline.h"
 #include "ProjectionNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
@@ -42,7 +43,7 @@ builtin_projection(const ModuleInstantiation *inst, Arguments arguments, Childre
 {
   auto node = std::make_shared<ProjectionNode>(inst);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"cut"}, {"convexity"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"cut"}, {"convexity"});
   node->convexity = static_cast<int>(parameters["convexity"].toDouble());
   if (parameters["cut"].type() == Value::Type::BOOL) {
     node->cut_mode = parameters["cut"].toBool();

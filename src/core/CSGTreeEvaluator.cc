@@ -12,14 +12,9 @@
 #include <geometry/PolySet.h>
 
 #include "CSGTreeEvaluator.h"
-#include "State.h"
-#include "CsgOpNode.h"
+#include  "Visitables.h"
 #include "ModuleInstantiation.h"
-#include "CSGNode.h"
-#include "TransformNode.h"
-#include "ColorNode.h"
-#include "RenderNode.h"
-#include "CgalAdvNode.h"
+
 
 /*!
    \class CSGTreeEvaluator

@@ -41,6 +41,7 @@
 #include <core/function.h>
 #include <core/Builtins.h>
 #include <core/Parameters.h>
+#include <core/Arguments.h>
 
 #include "DxfData.h"
 #include "dxfdim.h"

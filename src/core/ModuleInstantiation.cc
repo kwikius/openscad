@@ -94,18 +94,6 @@ static void NOINLINE print_trace(const ModuleInstantiation *mod, const std::shar
   LOG(message_group::Trace, mod->location(), context->documentRoot(), "called by '%1$s'", mod->name());
 }
 
-//namespace{
-
-   /**
-   *  @brief expand a module expression into a module instantaiation using an existing moduleInstantatiation
-      @param modInst The existing ModuleInstantiation that has been called on the ModuleExpression.
-      @param expr The moduleExpression to expand
-      @param context The context of the instantiation, which may be modified during the expansion
-      @returns true if the Module expression was expanded successfully else false
-   **/
-//   [[nodiscard]] bool evalModuleExpr(ModuleInstantiation* modInst,
-//      std::shared_ptr<Expression> const & expr,std::shared_ptr<const Context> & context);
-
 /**
 *  @brief expand a module expression into a module instantiation using an new moduleInstantatiation
 @param expr The moduleExpression to expand

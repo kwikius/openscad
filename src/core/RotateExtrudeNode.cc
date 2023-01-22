@@ -41,8 +41,9 @@
 #include "Children.h"
 #include "Parameters.h"
 #include "Builtins.h"
-#include "NodeVisitor.h"
+#include "Arguments.h"
 #include "RotateExtrudeNode.h"
+#include "Visitable_inline.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
@@ -52,7 +53,7 @@ static std::shared_ptr<AbstractNode> builtin_rotate_extrude(const ModuleInstanti
 {
   auto node = std::make_shared<RotateExtrudeNode>(inst);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(),
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(),
                                             {"file", "layer", "origin", "scale"},
                                             {"convexity", "angle"}
                                             );
@@ -63,7 +64,7 @@ static std::shared_ptr<AbstractNode> builtin_rotate_extrude(const ModuleInstanti
 
   if (!parameters["file"].isUndefined()) {
     LOG(message_group::Deprecated, Location::NONE, "", "Support for reading files in rotate_extrude will be removed in future releases. Use a child import() instead.");
-    auto filename = lookup_file(parameters["file"].toString(), inst->location().filePath().parent_path().string(), parameters.documentRoot());
+    auto filename = lookup_file(parameters["file"].toString(), node->getLocation().filePath().parent_path().string(), parameters.documentRoot());
     node->filename = filename;
     handle_dep(filename);
   }
@@ -73,7 +74,7 @@ static std::shared_ptr<AbstractNode> builtin_rotate_extrude(const ModuleInstanti
   bool originOk = parameters["origin"].getVec2(node->origin_x, node->origin_y);
   originOk &= std::isfinite(node->origin_x) && std::isfinite(node->origin_y);
   if (parameters["origin"].isDefined() && !originOk) {
-    LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "rotate_extrude(..., origin=%1$s) could not be converted", parameters["origin"].toEchoStringNoThrow());
+    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "rotate_extrude(..., origin=%1$s) could not be converted", parameters["origin"].toEchoStringNoThrow());
   }
   node->scale = parameters["scale"].toDouble();
   node->angle = 360;
@@ -88,7 +89,7 @@ static std::shared_ptr<AbstractNode> builtin_rotate_extrude(const ModuleInstanti
   if (node->filename.empty()) {
     children.instantiate(node);
   } else if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(),
         "module %1$s() does not support child modules when importing a file", inst->name());
   }
 

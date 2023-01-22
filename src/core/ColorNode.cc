@@ -38,11 +38,13 @@
 
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
+#include "Visitable_inline.h"
 #include "Builtins.h"
 #include "Children.h"
 #include "Parameters.h"
-#include "NodeVisitor.h"
+#include "Arguments.h"
 #include "ColorNode.h"
+
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
@@ -245,13 +247,13 @@ static std::shared_ptr<AbstractNode> builtin_color(const ModuleInstantiation *in
 {
   auto node = std::make_shared<ColorNode>(inst);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"c", "alpha"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"c", "alpha"});
   if (parameters["c"].type() == Value::Type::VECTOR) {
     const auto& vec = parameters["c"].toVector();
     for (size_t i = 0; i < 4; ++i) {
       node->color[i] = i < vec.size() ? (float)vec[i].toDouble() : 1.0f;
       if (node->color[i] > 1 || node->color[i] < 0) {
-        LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "color() expects numbers between 0.0 and 1.0. Value of %1$.1f is out of range", node->color[i]);
+        LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "color() expects numbers between 0.0 and 1.0. Value of %1$.1f is out of range", node->color[i]);
       }
     }
   } else if (parameters["c"].type() == Value::Type::STRING) {
@@ -265,7 +267,7 @@ static std::shared_ptr<AbstractNode> builtin_color(const ModuleInstantiation *in
       if (hexColor) {
         node->color = *hexColor;
       } else {
-        LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "Unable to parse color \"%1$s\"", colorname);
+        LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "Unable to parse color \"%1$s\"", colorname);
         LOG(message_group::None, Location::NONE, "", "Please see https://en.wikipedia.org/wiki/Web_colors");
       }
     }

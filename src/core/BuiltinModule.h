@@ -3,8 +3,9 @@
 #include <functional>
 
 #include "AbstractModule.h"
-#include "Arguments.h"
 #include "Children.h"
+
+class Arguments;
 
 /**
 * @brief BuiltinModules have 2 forms.

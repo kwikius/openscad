@@ -8,10 +8,12 @@
 
 #include "export.h"
 
+#include <core/Visitables.h>
 #ifndef NULLGL
 
 #ifdef ENABLE_CGAL
 #include <glview/cgal/CGALRenderer.h>
+
 
 static void setupCamera(Camera& cam, const BoundingBox& bbox)
 {

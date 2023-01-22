@@ -11,19 +11,7 @@
 #include <utils/boost-utils.h>
 
 #include <core/Tree.h>
-#include <core/ModuleInstantiation.h>
-#include <core/State.h>
-#include <core/OffsetNode.h>
-#include <core/TransformNode.h>
-#include <core/LinearExtrudeNode.h>
-#include <core/RoofNode.h>
-#include <core/RotateExtrudeNode.h>
-#include <core/CgalAdvNode.h>
-#include <core/ProjectionNode.h>
-#include <core/CsgOpNode.h>
-#include <core/TextNode.h>
-#include <core/RenderNode.h>
-#include <core/Value.h>
+#include <core/Visitables.h>
 
 #include <io/DxfData.h>
 

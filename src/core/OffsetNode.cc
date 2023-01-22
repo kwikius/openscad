@@ -32,10 +32,11 @@
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Parameters.h"
+#include "Arguments.h"
 #include "Builtins.h"
-
-#include "NodeVisitor.h"
+#include "Visitable_inline.h"
 #include "OffsetNode.h"
+
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
@@ -43,7 +44,7 @@ static std::shared_ptr<AbstractNode> builtin_offset(const ModuleInstantiation *i
 {
   auto node = std::make_shared<OffsetNode>(inst);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r"}, {"delta", "chamfer"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"r"}, {"delta", "chamfer"});
 
   node->fn = parameters["$fn"].toDouble();
   node->fs = parameters["$fs"].toDouble();

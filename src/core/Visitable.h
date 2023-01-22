@@ -3,10 +3,20 @@
 #include <iostream>
 #include <type_traits>
 
-enum class Response {ContinueTraversal, AbortTraversal, PruneTraversal};
+#include "Response.h"
 
 class State;
 class NodeVisitor;
+
+template <typename B , typename D>
+class Visitable ;
+
+template <typename Root>
+class Visitable<void,Root>{
+public:
+  virtual ~Visitable() = default;
+  [[nodiscard]] virtual Response accept(State& state , NodeVisitor& visitor) const = 0;
+};
 
 template <typename B , typename D>
 class Visitable : public B {
@@ -17,11 +27,4 @@ public:
    Visitable(Args&&... args) : B{std::forward<Args>(args)...}{}
 public:
    [[nodiscard]] Response accept(State &state, NodeVisitor &visitor) const override;
-};
-
-template <typename Root>
-class Visitable<void,Root>{
-public:
-  virtual ~Visitable() = default;
-  [[nodiscard]] virtual Response accept(State& state , NodeVisitor& visitor) const = 0;
 };

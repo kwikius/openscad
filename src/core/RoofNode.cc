@@ -5,17 +5,18 @@
 
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
+#include "Visitable_inline.h"
 #include "Builtins.h"
 #include "Parameters.h"
 #include "Children.h"
-#include "NodeVisitor.h"
+#include "Arguments.h"
 #include "RoofNode.h"
 
 static std::shared_ptr<AbstractNode> builtin_roof(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
 {
   auto node = std::make_shared<RoofNode>(inst);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(),
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(),
                                             {"method"},
                                             {"convexity"}
                                             );
@@ -37,7 +38,7 @@ static std::shared_ptr<AbstractNode> builtin_roof(const ModuleInstantiation *ins
     node->method = parameters["method"].toString();
     // method can only be one of...
     if (node->method != "voronoi" && node->method != "straight") {
-      LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+      LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(),
           "Unknown roof method '" + node->method + "'. Using 'voronoi'.");
       node->method = "voronoi";
     }

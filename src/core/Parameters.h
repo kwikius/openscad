@@ -4,8 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "Arguments.h"
-#include "ContextFrame.h"
+#include "ContextFrameHandle.h"
+
+class Arguments;
 
 /**
  * @brief The parameters of a builtin function or module do not form a true Context

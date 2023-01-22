@@ -38,10 +38,11 @@
 #include "ModuleInstantiation.h"
 #include "Children.h"
 #include "Parameters.h"
+#include "Arguments.h"
 #include "Builtins.h"
+#include "Visitable_inline.h"
 #include "LinearExtrudeNode.h"
-#include "NodeVisitor.h"
-#include "Value.h"
+
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
@@ -79,7 +80,7 @@ builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, con
 {
   auto node = std::make_shared<LinearExtrudeNode>(inst);
 
-  Parameters parameters = parse_parameters(std::move(arguments), inst->location());
+  Parameters parameters = parse_parameters(std::move(arguments), node->getLocation());
   parameters.set_caller("linear_extrude");
 
   node->fn = parameters["$fn"].toDouble();
@@ -88,7 +89,7 @@ builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, con
 
   if (!parameters["file"].isUndefined() && parameters["file"].type() == Value::Type::STRING) {
     LOG(message_group::Deprecated, Location::NONE, "", "Support for reading files in linear_extrude will be removed in future releases. Use a child import() instead.");
-    auto filename = lookup_file(parameters["file"].toString(), inst->location().filePath().parent_path().string(), parameters.documentRoot());
+    auto filename = lookup_file(parameters["file"].toString(), node->getLocation().filePath().parent_path().string(), parameters.documentRoot());
     node->filename = filename;
     handle_dep(filename);
   }
@@ -104,14 +105,14 @@ builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, con
   bool originOk = parameters["origin"].getVec2(node->origin_x, node->origin_y);
   originOk &= std::isfinite(node->origin_x) && std::isfinite(node->origin_y);
   if (parameters["origin"].isDefined() && !originOk) {
-    LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "linear_extrude(..., origin=%1$s) could not be converted", parameters["origin"].toEchoStringNoThrow());
+    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "linear_extrude(..., origin=%1$s) could not be converted", parameters["origin"].toEchoStringNoThrow());
   }
   node->scale_x = node->scale_y = 1;
   bool scaleOK = parameters["scale"].getFiniteDouble(node->scale_x);
   scaleOK &= parameters["scale"].getFiniteDouble(node->scale_y);
   scaleOK |= parameters["scale"].getVec2(node->scale_x, node->scale_y, true);
   if ((parameters["scale"].isDefined()) && (!scaleOK || !std::isfinite(node->scale_x) || !std::isfinite(node->scale_y))) {
-    LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "linear_extrude(..., scale=%1$s) could not be converted", parameters["scale"].toEchoStringNoThrow());
+    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "linear_extrude(..., scale=%1$s) could not be converted", parameters["scale"].toEchoStringNoThrow());
   }
 
   if (parameters["center"].type() == Value::Type::BOOL) node->center = parameters["center"].toBool();
@@ -133,7 +134,7 @@ builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, con
   if (node->filename.empty()) {
     children.instantiate(node);
   } else if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(),
         "module %1$s() does not support child modules when importing a file", inst->name());
   }
 

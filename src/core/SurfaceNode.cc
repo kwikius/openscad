@@ -49,8 +49,9 @@
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
 #include "SurfaceNode.h"
-#include "NodeVisitor.h"
+#include "Visitable_inline.h"
 #include "Parameters.h"
+#include "Arguments.h"
 #include "Builtins.h"
 #include "Children.h"
 
@@ -68,10 +69,10 @@ static std::shared_ptr<AbstractNode> builtin_surface(const ModuleInstantiation *
 
   auto node = std::make_shared<SurfaceNode>(inst);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"file", "center", "convexity"}, {"invert"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"file", "center", "convexity"}, {"invert"});
 
   std::string fileval = parameters["file"].isUndefined() ? "" : parameters["file"].toString();
-  auto filename = lookup_file(fileval, inst->location().filePath().parent_path().string(), parameters.documentRoot());
+  auto filename = lookup_file(fileval, node->getLocation().filePath().parent_path().string(), parameters.documentRoot());
   node->filename = filename;
   handle_dep(fs::path(filename).generic_string());
 

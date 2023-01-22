@@ -245,7 +245,7 @@ builtin_intersection_for(const ModuleInstantiation *inst, const std::shared_ptr<
 {
   auto node = std::make_shared<AbstractIntersectionNode>(inst);
   if (!inst->getAssignmentList().empty()) {
-    LcFor::forEach(inst->getAssignmentList(), inst->location(), context,
+    LcFor::forEach(inst->getAssignmentList(), node->getLocation(), context,
                    [inst, node] (const std::shared_ptr<const Context>& iterationContext) {
       Children(&inst->getScope(), iterationContext).instantiate(node);
     }

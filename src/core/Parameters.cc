@@ -29,6 +29,7 @@
 
 #include "Expression.h"
 #include "Parameters.h"
+#include "Arguments.h"
 
 Parameters::Parameters(ContextFrame&& frame, Location loc) :
   loc(std::move(loc)),
