@@ -1,21 +1,7 @@
 #pragma once
 
+#include "Response.h"
 #include "State.h"
-#include "AbstractNode.h"
-#include "CgalAdvNode.h"
-#include "CsgOpNode.h"
-#include "TransformNode.h"
-#include "TextNode.h"
-#include "ColorNode.h"
-#include "LinearExtrudeNode.h"
-#include "RotateExtrudeNode.h"
-#include "OffsetNode.h"
-#include "RoofNode.h"
-#include "ImportNode.h"
-#include "RenderNode.h"
-#include "ProjectionNode.h"
-#include "SurfaceNode.h"
-#include "RootNode.h"
 
 template <typename VisitableType>
 class Visitor{
@@ -53,38 +39,29 @@ struct VisitorList : BaseVisitor<A>, DerivedVisitor<T, VisitorList<A,T...> >... 
 };
 
 struct NodeVisitor : VisitorList<
-   AbstractNode,
-   AbstractIntersectionNode,
-   AbstractPolyNode,
-   ListNode,
-   GroupNode,
-   RootNode,
-   LeafNode,
-   CgalAdvNode,
-   CsgOpNode,
-   LinearExtrudeNode,
-   RotateExtrudeNode,
-   RoofNode,
-   ImportNode,
-   TextNode,
-   ProjectionNode,
-   RenderNode,
-   SurfaceNode,
-   TransformNode,
-   ColorNode,
-   OffsetNode
+   class AbstractNode,
+   class AbstractIntersectionNode,
+   class AbstractPolyNode,
+   class ListNode,
+   class GroupNode,
+   class RootNode,
+   class LeafNode,
+   class CgalAdvNode,
+   class CsgOpNode,
+   class LinearExtrudeNode,
+   class RotateExtrudeNode,
+   class RoofNode,
+   class ImportNode,
+   class TextNode,
+   class ProjectionNode,
+   class RenderNode,
+   class SurfaceNode,
+   class TransformNode,
+   class ColorNode,
+   class OffsetNode
   >{
     NodeVisitor() = default;
     Response traverse(const AbstractNode& node, const State& state = NodeVisitor::nullstate);
     private:
     static State nullstate;
 };
-
-template <typename B , typename D>
-[[nodiscard]]  inline Response
-Visitable<B,D>::accept(State &state, NodeVisitor &visitor) const
-{
-   return static_cast<Visitor<D>&>(visitor).visit(
-      state, static_cast<D const &>(*this)
-   );
-}

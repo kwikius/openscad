@@ -29,9 +29,11 @@
 #include <algorithm>
 
 #include "AbstractNode.h"
-#include "NodeVisitor.h"
 #include "ModuleInstantiation.h"
 #include "progress.h"
+#include "RootNode.h"
+
+#include "Visitable_inline.h"
 
 size_t AbstractNode::idx_counter;
 

@@ -7,7 +7,7 @@
 
 #include <core/Tree.h>
 #include <core/progress.h>
-
+#include <core/Visitables.h>
 #include <geometry/GeometryEvaluator.h>
 
 #include "CGALWorker.h"

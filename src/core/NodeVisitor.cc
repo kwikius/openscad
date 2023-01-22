@@ -1,5 +1,6 @@
 
 #include "NodeVisitor.h"
+#include "Visitables.h"
 #include "State.h"
 
 State NodeVisitor::nullstate(nullptr);

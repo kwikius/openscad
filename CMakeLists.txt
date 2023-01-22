@@ -426,11 +426,11 @@ if(NOT MSVC)
   find_package(Lib3MF QUIET)
   if (LIB3MF_FOUND)
     message(STATUS "lib3mf: ${LIB3MF_VERSION}")
-    foreach(library ${openscadEXECUTABLE} openscadGUI openscadIO)
+    foreach(library ${openscadALLTARGETS})
        target_compile_definitions(${library} PRIVATE ${LIB3MF_DEFINITIONS})
        target_include_directories(${library} SYSTEM PRIVATE ${LIB3MF_INCLUDE_DIRS})
        target_link_libraries(${library} PRIVATE ${LIB3MF_LIBRARIES})
-       endforeach(library)
+    endforeach(library)
   else()
     message(STATUS "lib3mf: disabled")
   endif()
@@ -439,40 +439,11 @@ endif()
 # Automatically add the current source and build directories to the include path.
 set(CMAKE_INCLUDE_CURRENT_DIR ON) # (does not propagate down to subdirectories)
 
-target_include_directories(openscadCGAL PRIVATE
-  "src"
-)
-
-#  "src/core"
-#  "src/core/customizer"
-#  "src/ext/json"
-#  "src/ext/lexertl/include"
-#  "src/ext/libtess2/Include"
-#  "src/geometry"
-#  "src/geometry/cgal"
-#  "src/glview"
-#  "src/glview/preview"
-#  "src/glview/cgal"
-#  "src/gui"
-#  "src/io"
-#  "src/platform"
-#  "src/utils"
-
-target_include_directories(openscadGUI PRIVATE
-  "src"
-)
-
-target_include_directories(openscadIO PRIVATE
-  "src"
-)
-
-target_include_directories(openscadCORE PRIVATE
-  "src"
-)
-
-target_include_directories(${openscadEXECUTABLE} PRIVATE
-  "src"
-)
+foreach(library ${openscadALLTARGETS})
+   target_include_directories(${library} PRIVATE
+     "src"
+   )
+endforeach(library)
 
 FLEX_TARGET(openscad_lexer src/core/lexer.l ${OPENSCAD_LIB_OUTPUT_DIR}/lexer.cxx DEFINES_FILE ${OPENSCAD_LIB_OUTPUT_DIR}/lexer.hxx COMPILE_FLAGS ${WINCOMPAT})
 BISON_TARGET(openscad_parser src/core/parser.y ${OPENSCAD_LIB_OUTPUT_DIR}/parser.cxx DEFINES_FILE ${OPENSCAD_LIB_OUTPUT_DIR}/parser.hxx COMPILE_FLAGS "-d -p parser")

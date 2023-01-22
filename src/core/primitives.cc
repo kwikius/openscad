@@ -39,11 +39,13 @@
 
 #include "BuiltinModule.h"
 #include "AbstractNode.h"
-#include "NodeVisitor.h"
+
 #include "Children.h"
 #include "Builtins.h"
 #include "Parameters.h"
+#include "Arguments.h"
 #include "ModuleInstantiation.h"
+#include "Visitable_inline.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
@@ -208,11 +210,11 @@ static std::shared_ptr<AbstractNode> builtin_cube(const ModuleInstantiation *ins
   auto node = std::make_shared<CubeNode>(inst);
 
   if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), arguments.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), arguments.documentRoot(),
         "module %1$s() does not support child modules", node->name());
   }
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"size", "center"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"size", "center"});
 
   const auto& size = parameters["size"];
   if (size.isDefined()) {
@@ -339,18 +341,18 @@ static std::shared_ptr<AbstractNode> builtin_sphere(const ModuleInstantiation *i
   auto node = std::make_shared<SphereNode>(inst);
 
   if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), arguments.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), arguments.documentRoot(),
         "module %1$s() does not support child modules", node->name());
   }
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r"}, {"d"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"r"}, {"d"});
 
   set_fragments(parameters, inst, node->fn, node->fs, node->fa);
   const auto r = lookup_radius(parameters, inst, "d", "r");
   if (r.type() == Value::Type::NUMBER) {
     node->r = r.toDouble();
     if (OpenSCAD::rangeCheck && (node->r <= 0 || !std::isfinite(node->r))) {
-      LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+      LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(),
           "sphere(r=%1$s)", r.toEchoStringNoThrow());
     }
   }
@@ -459,11 +461,11 @@ static std::shared_ptr<AbstractNode> builtin_cylinder(const ModuleInstantiation 
   auto node = std::make_shared<CylinderNode>(inst);
 
   if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), arguments.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), arguments.documentRoot(),
         "module %1$s() does not support child modules", node->name());
   }
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"h", "r1", "r2", "center"}, {"r", "d", "d1", "d2"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"h", "r1", "r2", "center"}, {"r", "d", "d1", "d2"});
 
   set_fragments(parameters, inst, node->fn, node->fs, node->fa);
   if (parameters["h"].type() == Value::Type::NUMBER) {
@@ -476,7 +478,7 @@ static std::shared_ptr<AbstractNode> builtin_cylinder(const ModuleInstantiation 
   if (r.type() == Value::Type::NUMBER &&
       (r1.type() == Value::Type::NUMBER || r2.type() == Value::Type::NUMBER)
       ) {
-    LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "Cylinder parameters ambiguous");
+    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "Cylinder parameters ambiguous");
   }
 
   if (r.type() == Value::Type::NUMBER) {
@@ -492,10 +494,10 @@ static std::shared_ptr<AbstractNode> builtin_cylinder(const ModuleInstantiation 
 
   if (OpenSCAD::rangeCheck) {
     if (node->h <= 0 || !std::isfinite(node->h)) {
-      LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "cylinder(h=%1$s, ...)", parameters["h"].toEchoStringNoThrow());
+      LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "cylinder(h=%1$s, ...)", parameters["h"].toEchoStringNoThrow());
     }
     if (node->r1 < 0 || node->r2 < 0 || (node->r1 == 0 && node->r2 == 0) || !std::isfinite(node->r1) || !std::isfinite(node->r2)) {
-      LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+      LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(),
           "cylinder(r1=%1$s, r2=%2$s, ...)",
           (r1.type() == Value::Type::NUMBER ? r1.toEchoStringNoThrow() : r.toEchoStringNoThrow()),
           (r2.type() == Value::Type::NUMBER ? r2.toEchoStringNoThrow() : r.toEchoStringNoThrow()));
@@ -581,14 +583,14 @@ static std::shared_ptr<AbstractNode> builtin_polyhedron(const ModuleInstantiatio
   auto node = std::make_shared<PolyhedronNode>(inst);
 
   if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), arguments.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), arguments.documentRoot(),
         "module %1$s() does not support child modules", node->name());
   }
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"points", "faces", "convexity"}, {"triangles"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"points", "faces", "convexity"}, {"triangles"});
 
   if (parameters["points"].type() != Value::Type::VECTOR) {
-    LOG(message_group::Error, inst->location(), parameters.documentRoot(), "Unable to convert points = %1$s to a vector of coordinates", parameters["points"].toEchoStringNoThrow());
+    LOG(message_group::Error, node->getLocation(), parameters.documentRoot(), "Unable to convert points = %1$s to a vector of coordinates", parameters["points"].toEchoStringNoThrow());
     return node;
   }
   for (const Value& pointValue : parameters["points"].toVector()) {
@@ -699,11 +701,11 @@ static std::shared_ptr<AbstractNode> builtin_square(const ModuleInstantiation *i
   auto node = std::make_shared<SquareNode>(inst);
 
   if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), arguments.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), arguments.documentRoot(),
         "module %1$s() does not support child modules", node->name());
   }
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"size", "center"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"size", "center"});
 
   const auto& size = parameters["size"];
   if (size.isDefined()) {
@@ -718,7 +720,7 @@ static std::shared_ptr<AbstractNode> builtin_square(const ModuleInstantiation *i
       ok &= (node->x > 0) && (node->y > 0);
       ok &= std::isfinite(node->x) && std::isfinite(node->y);
       if (!ok) {
-        LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "square(size=%1$s, ...)", size.toEchoStringNoThrow());
+        LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "square(size=%1$s, ...)", size.toEchoStringNoThrow());
       }
     }
   }
@@ -778,11 +780,11 @@ static std::shared_ptr<AbstractNode> builtin_circle(const ModuleInstantiation *i
   auto node = std::make_shared<CircleNode>(inst);
 
   if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), arguments.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), arguments.documentRoot(),
         "module %1$s() does not support child modules", node->name());
   }
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r"}, {"d"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"r"}, {"d"});
 
   set_fragments(parameters, inst, node->fn, node->fs, node->fa);
   const auto r = lookup_radius(parameters, inst, "d", "r");
@@ -886,14 +888,14 @@ static std::shared_ptr<AbstractNode> builtin_polygon(const ModuleInstantiation *
   auto node = std::make_shared<PolygonNode>(inst);
 
   if (!children.empty()) {
-    LOG(message_group::Warning, inst->location(), arguments.documentRoot(),
+    LOG(message_group::Warning, node->getLocation(), arguments.documentRoot(),
         "module %1$s() does not support child modules", node->name());
   }
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"points", "paths", "convexity"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"points", "paths", "convexity"});
 
   if (parameters["points"].type() != Value::Type::VECTOR) {
-    LOG(message_group::Error, inst->location(), parameters.documentRoot(), "Unable to convert points = %1$s to a vector of coordinates", parameters["points"].toEchoStringNoThrow());
+    LOG(message_group::Error, node->getLocation(), parameters.documentRoot(), "Unable to convert points = %1$s to a vector of coordinates", parameters["points"].toEchoStringNoThrow());
     return node;
   }
   for (const Value& pointValue : parameters["points"].toVector()) {
@@ -901,7 +903,7 @@ static std::shared_ptr<AbstractNode> builtin_polygon(const ModuleInstantiation *
     if (!pointValue.getVec2(point.x, point.y) ||
         !std::isfinite(point.x) || !std::isfinite(point.y)
         ) {
-      LOG(message_group::Error, inst->location(), parameters.documentRoot(), "Unable to convert points[%1$d] = %2$s to a vec2 of numbers", node->points.size(), pointValue.toEchoStringNoThrow());
+      LOG(message_group::Error, node->getLocation(), parameters.documentRoot(), "Unable to convert points[%1$d] = %2$s to a vec2 of numbers", node->points.size(), pointValue.toEchoStringNoThrow());
       node->points.push_back({0, 0});
     } else {
       node->points.push_back(point);
@@ -912,19 +914,19 @@ static std::shared_ptr<AbstractNode> builtin_polygon(const ModuleInstantiation *
     size_t pathIndex = 0;
     for (const Value& pathValue : parameters["paths"].toVector()) {
       if (pathValue.type() != Value::Type::VECTOR) {
-        LOG(message_group::Error, inst->location(), parameters.documentRoot(), "Unable to convert paths[%1$d] = %2$s to a vector of numbers", pathIndex, pathValue.toEchoStringNoThrow());
+        LOG(message_group::Error, node->getLocation(), parameters.documentRoot(), "Unable to convert paths[%1$d] = %2$s to a vector of numbers", pathIndex, pathValue.toEchoStringNoThrow());
       } else {
         size_t pointIndexIndex = 0;
         std::vector<size_t> path;
         for (const Value& pointIndexValue : pathValue.toVector()) {
           if (pointIndexValue.type() != Value::Type::NUMBER) {
-            LOG(message_group::Error, inst->location(), parameters.documentRoot(), "Unable to convert paths[%1$d][%2$d] = %3$s to a number", pathIndex, pointIndexIndex, pointIndexValue.toEchoStringNoThrow());
+            LOG(message_group::Error, node->getLocation(), parameters.documentRoot(), "Unable to convert paths[%1$d][%2$d] = %3$s to a number", pathIndex, pointIndexIndex, pointIndexValue.toEchoStringNoThrow());
           } else {
             auto pointIndex = (size_t)pointIndexValue.toDouble();
             if (pointIndex < node->points.size()) {
               path.push_back(pointIndex);
             } else {
-              LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "Point index %1$d is out of bounds (from paths[%2$d][%3$d])", pointIndex, pathIndex, pointIndexIndex);
+              LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "Point index %1$d is out of bounds (from paths[%2$d][%3$d])", pointIndex, pathIndex, pointIndexIndex);
             }
           }
           pointIndexIndex++;
@@ -934,7 +936,7 @@ static std::shared_ptr<AbstractNode> builtin_polygon(const ModuleInstantiation *
       pathIndex++;
     }
   } else if (parameters["paths"].type() != Value::Type::UNDEFINED) {
-    LOG(message_group::Error, inst->location(), parameters.documentRoot(), "Unable to convert paths = %1$s to a vector of vector of point indices", parameters["paths"].toEchoStringNoThrow());
+    LOG(message_group::Error, node->getLocation(), parameters.documentRoot(), "Unable to convert paths = %1$s to a vector of vector of point indices", parameters["paths"].toEchoStringNoThrow());
     return node;
   }
 

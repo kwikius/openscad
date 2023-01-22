@@ -1,10 +1,13 @@
-#include "Tree.h"
-#include "NodeDumper.h"
+
 
 #include <cassert>
 #include <algorithm>
 #include <sstream>
 #include <tuple>
+
+#include "Tree.h"
+#include "NodeDumper.h"
+#include "Visitables.h"
 
 Tree::~Tree()
 {

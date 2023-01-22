@@ -5,7 +5,7 @@
 
 #include <geometry/linalg.h>
 
-#include "AbstractNode.h"
+class AbstractNode;
 
 /**
   * &brief struct for returning various AbstractNode state

@@ -35,8 +35,9 @@
 #include "Builtins.h"
 #include "Children.h"
 #include "Parameters.h"
-#include "NodeVisitor.h"
+#include "Arguments.h"
 #include "CgalAdvNode.h"
+#include "Visitable_inline.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
@@ -45,7 +46,7 @@ builtin_minkowski(const ModuleInstantiation *inst, Arguments arguments, Children
 {
   auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::MINKOWSKI);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"convexity"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"convexity"});
   node->convexity = static_cast<int>(parameters["convexity"].toDouble());
 
   return children.instantiate(node);
@@ -57,7 +58,7 @@ builtin_hull(const ModuleInstantiation *inst, Arguments arguments, Children cons
 {
   auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::HULL);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {});
   node->convexity = 0;
 
   return children.instantiate(node);
@@ -68,7 +69,7 @@ builtin_fill(const ModuleInstantiation *inst, Arguments arguments, Children cons
 {
   auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::FILL);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {});
 
   return children.instantiate(node);
 }
@@ -79,7 +80,7 @@ builtin_resize(const ModuleInstantiation *inst, Arguments arguments, Children co
 {
   auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::RESIZE);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"newsize", "auto", "convexity"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"newsize", "auto", "convexity"});
   node->convexity = static_cast<int>(parameters["convexity"].toDouble());
   node->newsize << 0, 0, 0;
   if (parameters["newsize"].type() == Value::Type::VECTOR) {

@@ -29,11 +29,11 @@
 
 #include "BuiltinModule.h"
 #include "ModuleInstantiation.h"
+#include "Visitable_inline.h"
 #include "Builtins.h"
 #include "Children.h"
 #include "Parameters.h"
-
-#include "NodeVisitor.h"
+#include "Arguments.h"
 #include "RenderNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
@@ -42,7 +42,7 @@ static std::shared_ptr<AbstractNode> builtin_render(const ModuleInstantiation *i
 {
   auto node = std::make_shared<RenderNode>(inst);
 
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"convexity"});
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"convexity"});
   if (parameters["convexity"].type() == Value::Type::NUMBER) {
     node->convexity = static_cast<int>(parameters["convexity"].toDouble());
   }

@@ -24,9 +24,13 @@
  *
  */
 
+#include <string>
+#include <vector>
+#include <fstream>
+
 #include "openscad.h"
 #include <core/customizer/CommentParser.h>
-#include <core/AbstractNode.h>
+#include <core/Visitables.h>
 #include <core/SourceFile.h>
 #include <core/BuiltinContext.h>
 #include <core/Value.h>
@@ -47,9 +51,6 @@
 #include <core/customizer/ParameterObject.h>
 #include <core/customizer/ParameterSet.h>
 #include "openscad_mimalloc.h"
-#include <string>
-#include <vector>
-#include <fstream>
 
 #ifdef ENABLE_CGAL
 

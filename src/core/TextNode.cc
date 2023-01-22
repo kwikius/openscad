@@ -34,7 +34,8 @@
 #include "Parameters.h"
 #include "Builtins.h"
 #include "FreetypeRenderer.h"
-#include "NodeVisitor.h"
+#include "Arguments.h"
+#include "Visitable_inline.h"
 #include "TextNode.h"
 
 using namespace boost::assign; // bring 'operator+=()' into scope
@@ -49,13 +50,13 @@ static std::shared_ptr<AbstractNode> builtin_text(const ModuleInstantiation *ins
   auto node = std::make_shared<TextNode>(inst);
 
   auto *session = arguments.session();
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(),
+  Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(),
                                             {"text", "size", "font"},
                                             {"direction", "language", "script", "halign", "valign", "spacing"}
                                             );
   parameters.set_caller("text");
 
-  node->params.set_loc(inst->location());
+  node->params.set_loc(node->getLocation());
   node->params.set_documentPath(session->documentRoot());
   node->params.set(parameters);
   node->params.detect_properties();
