@@ -16,6 +16,7 @@ class InstantiatedModule{
   bool tag_background;
   public:
   InstantiatedModule(ModuleInstantiation const & m);
+  InstantiatedModule(Location const & loc);
   [[nodiscard]] bool isBackground() const { return this->tag_background; }
   [[nodiscard]] bool isHighlight() const { return this->tag_highlight; }
   [[nodiscard]] bool isRoot() const { return this->tag_root; }

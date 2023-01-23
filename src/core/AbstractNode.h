@@ -35,6 +35,7 @@ class AbstractNode : public Visitable<void,AbstractNode>,
   static size_t idx_counter; // Node instantiation index
 public:
   AbstractNode(const ModuleInstantiation *mi);
+  AbstractNode(InstantiatedModule const & im);
   virtual std::string toString() const;
   /*! The 'OpenSCAD name' of this node, defaults to classname, but can be
       overloaded to provide specialization for e.g. CSG nodes, primitive nodes etc.
@@ -113,6 +114,8 @@ class GroupNode : public Visitable<AbstractNode,GroupNode>{
 public:
   GroupNode(const ModuleInstantiation *mi, std::string name = "")
  : Visitable(mi), _name(std::move(name)) { }
+  GroupNode(InstantiatedModule const & im, std::string name = "")
+ : Visitable(im), _name(std::move(name)) { }
   std::string name() const override;
   std::string verbose_name() const override;
 private:

@@ -36,7 +36,6 @@
 #include "Visitable_inline.h"
 
 InstantiatedModule::InstantiatedModule(ModuleInstantiation const & mi)
-
  : loc{mi.location()}
   ,idx{static_cast<const void* const>(&mi)}
   ,tag_root{mi.isRoot()}
@@ -44,10 +43,24 @@ InstantiatedModule::InstantiatedModule(ModuleInstantiation const & mi)
   ,tag_background{mi.isBackground()}
 {}
 
+InstantiatedModule::InstantiatedModule(Location const & loc)
+ : loc{loc}
+  ,idx{nullptr}
+  ,tag_root{false}
+  ,tag_highlight{false}
+  ,tag_background{false}
+{}
+
 size_t AbstractNode::idx_counter;
 
 AbstractNode::AbstractNode(const ModuleInstantiation *mi) :
   modinst(*mi),
+  idx(idx_counter++)
+{
+}
+
+AbstractNode::AbstractNode(InstantiatedModule const & im) :
+  modinst(im),
   idx(idx_counter++)
 {
 }

@@ -178,7 +178,7 @@ std::shared_ptr<AbstractNode>
 SourceFile::instantiate(const std::shared_ptr<const Context>& context,
   std::shared_ptr<const FileContext> *resulting_file_context) const
 {
-  auto node = std::make_shared<RootNode>(std::make_shared<const ModuleInstantiation>("group"));
+  auto node = std::make_shared<RootNode>(InstantiatedModule(Location::NONE));
   try {
     ContextHandle<FileContext> file_context{Context::create<FileContext>(context, this)};
     *resulting_file_context = *file_context;
