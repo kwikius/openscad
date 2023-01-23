@@ -45,7 +45,7 @@ InstantiatedModule::InstantiatedModule(ModuleInstantiation const & mi)
 
 InstantiatedModule::InstantiatedModule(Location const & loc)
  : loc{loc}
-  ,idx{nullptr}
+  ,idx{static_cast<const void* const>(this)}
   ,tag_root{false}
   ,tag_highlight{false}
   ,tag_background{false}
