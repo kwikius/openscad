@@ -3,7 +3,7 @@
 #include "Visitables.h"
 #include "State.h"
 
-State NodeVisitor::nullstate(nullptr);
+const State NodeVisitor::nullstate(nullptr);
 
 Response NodeVisitor::traverse(const AbstractNode& node, const State& state)
 {

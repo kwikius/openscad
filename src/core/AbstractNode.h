@@ -7,6 +7,8 @@
 #include "Visitable.h"
 #include "Location.h"
 
+#include "InstantiatedModule.h"
+
 class AbstractNode;
 
 extern int progress_report_count;
@@ -62,9 +64,9 @@ public:
   static void resetIndexCounter() { idx_counter = 1; }
 private:
   std::vector<std::shared_ptr<AbstractNode>> children;
-  const ModuleInstantiation *modinst;
+  const InstantiatedModule modinst;
   int idx; // Node index (unique per tree)
-  ModuleInstantiation const & getModInst() const { return *modinst;}
+ // ModuleInstantiation const & getModInst() const { return *modinst;}
 public:
   // progress_mark is a running number used for progress indication
   // FIXME: Make all progress handling external, put it in the traverser class?

@@ -63,5 +63,5 @@ struct NodeVisitor : VisitorList<
     NodeVisitor() = default;
     Response traverse(const AbstractNode& node, const State& state = NodeVisitor::nullstate);
     private:
-    static State nullstate;
+    static const State nullstate;
 };

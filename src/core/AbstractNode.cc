@@ -35,13 +35,21 @@
 
 #include "Visitable_inline.h"
 
+InstantiatedModule::InstantiatedModule(ModuleInstantiation const & mi)
+
+ : loc{mi.location()}
+  ,idx{static_cast<const void* const>(&mi)}
+  ,tag_root{mi.isRoot()}
+  ,tag_highlight{mi.isHighlight()}
+  ,tag_background{mi.isBackground()}
+{}
+
 size_t AbstractNode::idx_counter;
 
 AbstractNode::AbstractNode(const ModuleInstantiation *mi) :
-  modinst(mi),
+  modinst(*mi),
   idx(idx_counter++)
 {
-   assert(modinst);
 }
 
 std::string AbstractNode::toString() const
@@ -49,13 +57,13 @@ std::string AbstractNode::toString() const
   return this->name() + "()";
 }
 
-[[nodiscard]] Location const & AbstractNode::getLocation() const { return getModInst().location();}
-[[nodiscard]] bool AbstractNode::isHighlight() const { return getModInst().isHighlight();}
-[[nodiscard]] bool AbstractNode::isRoot() const {return getModInst().isRoot();}
-[[nodiscard]] bool AbstractNode::isBackground() const { return getModInst().isBackground();}
+[[nodiscard]] Location const & AbstractNode::getLocation() const { return modinst.getLocation();}
+[[nodiscard]] bool AbstractNode::isRoot() const {return modinst.isRoot();}
+[[nodiscard]] bool AbstractNode::isBackground() const { return modinst.isBackground();}
+[[nodiscard]] bool AbstractNode::isHighlight() const { return modinst.isHighlight();}
 
 [[nodiscard]] bool AbstractNode::hasSameModInst(std::shared_ptr<AbstractNode> const & other) const
-{ return &this->getModInst() == &other->getModInst();}
+{ return this->modinst.getIdx() == other->modinst.getIdx();}
 
 std::shared_ptr<const AbstractNode>
 AbstractNode::getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const

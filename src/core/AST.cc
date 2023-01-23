@@ -7,22 +7,23 @@
 
 const Location Location::NONE(0, 0, 0, 0, std::make_shared<fs::path>(fs::path{}));
 
-bool operator==(Location const& lhs, Location const& rhs){
+bool Location::operator==(Location const& rhs)const
+{
   return
-    lhs.firstLine() == rhs.firstLine() &&
-    lhs.firstColumn() == rhs.firstColumn() &&
-    lhs.lastLine() == rhs.lastLine() &&
-    lhs.lastColumn() == rhs.lastColumn() &&
-    lhs.filePath() == rhs.filePath();
+    this->firstLine() == rhs.firstLine() &&
+    this->firstColumn() == rhs.firstColumn() &&
+    this->lastLine() == rhs.lastLine() &&
+    this->lastColumn() == rhs.lastColumn() &&
+    this->filePath() == rhs.filePath();
 }
 
-bool operator!=(Location const& lhs, Location const& rhs)
+bool Location::operator!=(Location const& rhs)const
 {
-  return !(lhs == rhs);
+  return !(*this == rhs);
 }
 
 bool Location::isNone() const {
-  return ((*this) == Location::NONE);
+  return (*this == Location::NONE);
 }
 
 std::string Location::toRelativeString(const std::string& docPath) const {

@@ -7,10 +7,11 @@
  */
 class RootNode final : public Visitable<GroupNode, RootNode>{
 public:
-  RootNode() : Visitable(&mi), mi("group") { }
+  RootNode( std::shared_ptr<const ModuleInstantiation> && rootIn)
+  : Visitable{rootIn.get()},root_mi{rootIn}{ }
   std::string name() const override;
 private:
-  ModuleInstantiation mi;
+  std::shared_ptr<const ModuleInstantiation> root_mi;
 };
 
 
