@@ -23,8 +23,13 @@ namespace {
 
    using binOpFun = Value(Value&&, Value&& );
    struct binOpInfo_t{
-      constexpr binOpInfo_t(const char str[], binOpFun f) : opStr{str},fun{f}{};
+      constexpr binOpInfo_t(
+         const char str[],
+         const char miStr[],
+         binOpFun f
+      ) : opStr{str}, miStr{miStr},fun{f}{};
       const char * opStr;
+      const char * miStr;
       const binOpFun * const fun;
    };
 
@@ -32,23 +37,23 @@ namespace {
    // converted to int as defined in the BinaryOp class
    constexpr binOpInfo_t  binOps[] = {
        // N.B the logical op functions && || arent called
-       {  "&&", [](Value&& lhs, Value&& rhs)->Value { return lhs.toBool() && rhs.toBool(); } }// LogicalAnd
-      ,{  "||", [](Value&& lhs, Value&& rhs)->Value { return lhs.toBool() || rhs.toBool(); } }// LogicalOr
+       {  "&&", "", [](Value&& lhs, Value&& rhs)->Value { return lhs.toBool() && rhs.toBool(); } }// LogicalAnd
+      ,{  "||", "", [](Value&& lhs, Value&& rhs)->Value { return lhs.toBool() || rhs.toBool(); } }// LogicalOr
       //--------------------------------------------------------------
-      ,{   "^", [](Value&& lhs, Value&& rhs)->Value { return lhs ^ rhs; }  } // Exponent
-      ,{   "*", [](Value&& lhs, Value&& rhs)->Value { return lhs * rhs; }  } // Multiply
-      ,{   "/", [](Value&& lhs, Value&& rhs)->Value { return lhs / rhs; }  } // Divide
-      ,{   "%", [](Value&& lhs, Value&& rhs)->Value { return lhs % rhs; }  } // Modulo
-      ,{   "+", [](Value&& lhs, Value&& rhs)->Value { return lhs + rhs; }  } // Plus
-      ,{   "-", [](Value&& lhs, Value&& rhs)->Value { return lhs - rhs; }  } // Minus
-      ,{   "<", [](Value&& lhs, Value&& rhs)->Value { return lhs < rhs; }  } // Less
-      ,{  "<=", [](Value&& lhs, Value&& rhs)->Value { return lhs <= rhs; } } // LessEqual
-      ,{   ">", [](Value&& lhs, Value&& rhs)->Value { return lhs > rhs; }  }  // Greater
-      ,{  ">=", [](Value&& lhs, Value&& rhs)->Value { return lhs >= rhs; } }  // GreaterEqual
-      ,{  "==", [](Value&& lhs, Value&& rhs)->Value { return lhs == rhs; } } // Equal
-      ,{  "!=", [](Value&& lhs, Value&& rhs)->Value { return lhs != rhs; } } // NotEqual
-      ,{  "->", [](Value&& lhs, Value&& rhs)->Value { return Value::undefined.clone(); } }  // Translate
-      ,{  "^>", [](Value&& lhs, Value&& rhs)->Value { return Value::undefined.clone(); } }  // Rotate
+      ,{   "^", "", [](Value&& lhs, Value&& rhs)->Value { return lhs ^ rhs; }  } // Exponent
+      ,{   "*", "scale", [](Value&& lhs, Value&& rhs)->Value { return lhs * rhs; }  } // Multiply
+      ,{   "/", "", [](Value&& lhs, Value&& rhs)->Value { return lhs / rhs; }  } // Divide
+      ,{   "%", "", [](Value&& lhs, Value&& rhs)->Value { return lhs % rhs; }  } // Modulo
+      ,{   "+", "", [](Value&& lhs, Value&& rhs)->Value { return lhs + rhs; }  } // Plus
+      ,{   "-", "difference", [](Value&& lhs, Value&& rhs)->Value { return lhs - rhs; }  } // Minus
+      ,{   "<", "", [](Value&& lhs, Value&& rhs)->Value { return lhs < rhs; }  } // Less
+      ,{  "<=", "", [](Value&& lhs, Value&& rhs)->Value { return lhs <= rhs; } } // LessEqual
+      ,{   ">", "", [](Value&& lhs, Value&& rhs)->Value { return lhs > rhs; }  }  // Greater
+      ,{  ">=", "", [](Value&& lhs, Value&& rhs)->Value { return lhs >= rhs; } }  // GreaterEqual
+      ,{  "==", "", [](Value&& lhs, Value&& rhs)->Value { return lhs == rhs; } } // Equal
+      ,{  "!=", "", [](Value&& lhs, Value&& rhs)->Value { return lhs != rhs; } } // NotEqual
+      ,{  "->", "translate", [](Value&& lhs, Value&& rhs)->Value { return Value::undefined.clone(); } }  // Translate
+      ,{  "^>", "rotate", [](Value&& lhs, Value&& rhs)->Value { return Value::undefined.clone(); } }  // Rotate
    };
 
    void exitBinopFail() {
@@ -86,6 +91,11 @@ Value BinaryOp::evaluate(const std::shared_ptr<const Context>& context) const
 const char *BinaryOp::opString() const
 {
    return binOps[static_cast<int>(this->op)].opStr;
+}
+
+const char *BinaryOp::miName() const
+{
+   return binOps[static_cast<int>(this->op)].miStr;
 }
 
 void BinaryOp::print(std::ostream& stream, const std::string&) const

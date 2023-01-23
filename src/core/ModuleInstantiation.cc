@@ -133,40 +133,33 @@ ABCModuleInstantiation::evalModuleExpr(ModuleInstantiation* modInst,
        assert(modInst->name() == "");
        switch ( binOp->getOpID()) {
          using Op = BinaryOp::Op;
-         case Op::Translate:
-         case Op::Rotate:{
+         case Op::Translate:[[fallthrough]];
+         case Op::Rotate:[[fallthrough]];
+         case Op::Multiply:{
             auto arg_expr = binOp->getRight();
             auto arg = std::make_shared<Assignment>("",arg_expr,arg_expr->location() );
             modInst->getAssignmentListNC().emplace_back(arg);
             std::shared_ptr<const Context> child_context = context;
-            auto childModInst = evalModuleExpr(binOp->getLeft(),child_context);
-            if ( childModInst){
-               modInst->setName(
-                  (binOp->getOpID() == Op::Translate)
-                 ?"translate"
-                 :"rotate"
-               );
+            if (auto childModInst = evalModuleExpr(binOp->getLeft(),child_context)){
+               modInst->setName(binOp->miName());
                modInst->getScopeNC().addModuleInst(childModInst);
                return true;
             }else{// something went wrong. evalModuleExpr has provided the diagnostic
                return false;
             }
-         }// ~Op::Rotate Op::Translate
+         }// ~Op::Rotate Op::Translate Op::Multiply
          case Op::Minus:{ // difference
             std::shared_ptr<const Context> child_context = context;
-            auto lhsInst = evalModuleExpr(binOp->getLeft(),child_context);
-            if ( ! lhsInst ){
-               return false;
+            if (auto lhsInst = evalModuleExpr(binOp->getLeft(),child_context)){
+               child_context = context;
+               if( auto rhsInst = evalModuleExpr(binOp->getRight(),child_context)){
+                  modInst->setName(binOp->miName());
+                  modInst->getScopeNC().addModuleInst(lhsInst);
+                  modInst->getScopeNC().addModuleInst(rhsInst);
+                  return true;
+               }
             }
-            child_context = context;
-            auto rhsInst = evalModuleExpr(binOp->getRight(),child_context);
-            if (! rhsInst){
-               return false;
-            }
-            modInst->setName("difference");
-            modInst->getScopeNC().addModuleInst(lhsInst);
-            modInst->getScopeNC().addModuleInst(rhsInst);
-            return true;
+            return false;
          }// ~Op::Minus
 /*
 TODO
@@ -183,7 +176,7 @@ TODO
     } // ~case exprId::BinaryOp
     default: {
       auto const value = expr->evaluate(context);
-      if ( value.type() == Value::Type::MODULE){
+      if ( value.type() == Value::Type::MODULE ){
          auto const & modRef = value.toModuleReference();
          AssignmentList argsOut;
          if (modRef.transformToInstantiationArgs(

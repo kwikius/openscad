@@ -33,7 +33,8 @@ public:
   std::shared_ptr<Expression> const & getLeft() const { return left;}
   std::shared_ptr<Expression> const &  getRight() const { return right;}
 
-  const char *opString() const;
+  const char* opString() const;
+  const char* miName() const;
 private:
   Op op;
   std::shared_ptr<Expression> left;
