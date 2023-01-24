@@ -43,103 +43,103 @@
 #include "Visitable_inline.h"
 #include "LinearExtrudeNode.h"
 
-
 using namespace boost::assign; // bring 'operator+=()' into scope
 
 namespace fs = boost::filesystem;
 
+namespace {
 /*
  * Historic linear_extrude argument parsing is quirky. To remain bug-compatible,
  * try two different parses depending on conditions.
  */
-Parameters parse_parameters(Arguments arguments, const Location& location)
-{
-  {
-    Parameters normal_parse = Parameters::parse(arguments.clone(), location,
-                                                {"file", "layer", "height", "origin", "scale", "center", "twist", "slices", "segments"},
-                                                {"convexity"}
-                                                );
-    if (normal_parse["height"].isDefined()) {
-      return normal_parse;
-    }
-    if (!(arguments.size() > 0 && !arguments[0].name && arguments[0]->type() == Value::Type::NUMBER)) {
-      return normal_parse;
-    }
-  }
+   Parameters parse_parameters(Arguments arguments, const Location& location)
+   {
+     {
+       Parameters normal_parse = Parameters::parse(arguments.clone(), location,
+                                                   {"file", "layer", "height", "origin", "scale", "center", "twist", "slices", "segments"},
+                                                   {"convexity"}
+                                                   );
+       if (normal_parse["height"].isDefined()) {
+         return normal_parse;
+       }
+       if (!(arguments.size() > 0 && !arguments[0].name && arguments[0]->type() == Value::Type::NUMBER)) {
+         return normal_parse;
+       }
+     }
 
-  // if height not given, and first argument is a number,
-  // then assume it should be the height.
-  return Parameters::parse(std::move(arguments), location,
-                           {"height", "file", "layer", "origin", "scale", "center", "twist", "slices", "segments"},
-                           {"convexity"}
-                           );
-}
+     // if height not given, and first argument is a number,
+     // then assume it should be the height.
+     return Parameters::parse(std::move(arguments), location,
+      {"height", "file", "layer", "origin", "scale", "center", "twist", "slices", "segments"},
+      {"convexity"}
+      );
+   }
+   std::shared_ptr<AbstractNode>
+   builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
+   {
+     auto node = std::make_shared<LinearExtrudeNode>(inst);
 
-static std::shared_ptr<AbstractNode>
-builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
-{
-  auto node = std::make_shared<LinearExtrudeNode>(inst);
+     Parameters parameters = parse_parameters(std::move(arguments), node->getLocation());
+     parameters.set_caller("linear_extrude");
 
-  Parameters parameters = parse_parameters(std::move(arguments), node->getLocation());
-  parameters.set_caller("linear_extrude");
+     node->fn = parameters["$fn"].toDouble();
+     node->fs = parameters["$fs"].toDouble();
+     node->fa = parameters["$fa"].toDouble();
 
-  node->fn = parameters["$fn"].toDouble();
-  node->fs = parameters["$fs"].toDouble();
-  node->fa = parameters["$fa"].toDouble();
+     if (!parameters["file"].isUndefined() && parameters["file"].type() == Value::Type::STRING) {
+       LOG(message_group::Deprecated, Location::NONE, "", "Support for reading files in linear_extrude will be removed in future releases. Use a child import() instead.");
+       auto filename = lookup_file(parameters["file"].toString(), node->getLocation().filePath().parent_path().string(), parameters.documentRoot());
+       node->filename = filename;
+       handle_dep(filename);
+     }
 
-  if (!parameters["file"].isUndefined() && parameters["file"].type() == Value::Type::STRING) {
-    LOG(message_group::Deprecated, Location::NONE, "", "Support for reading files in linear_extrude will be removed in future releases. Use a child import() instead.");
-    auto filename = lookup_file(parameters["file"].toString(), node->getLocation().filePath().parent_path().string(), parameters.documentRoot());
-    node->filename = filename;
-    handle_dep(filename);
-  }
+     if (parameters["height"].isDefined()) {
+       parameters["height"].getFiniteDouble(node->height);
+     }
 
-  if (parameters["height"].isDefined()) {
-    parameters["height"].getFiniteDouble(node->height);
-  }
+     node->layername = parameters["layer"].isUndefined() ? "" : parameters["layer"].toString();
 
-  node->layername = parameters["layer"].isUndefined() ? "" : parameters["layer"].toString();
+     parameters["convexity"].getPositiveInt(node->convexity);
 
-  parameters["convexity"].getPositiveInt(node->convexity);
+     bool originOk = parameters["origin"].getVec2(node->origin_x, node->origin_y);
+     originOk &= std::isfinite(node->origin_x) && std::isfinite(node->origin_y);
+     if (parameters["origin"].isDefined() && !originOk) {
+       LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "linear_extrude(..., origin=%1$s) could not be converted", parameters["origin"].toEchoStringNoThrow());
+     }
+     node->scale_x = node->scale_y = 1;
+     bool scaleOK = parameters["scale"].getFiniteDouble(node->scale_x);
+     scaleOK &= parameters["scale"].getFiniteDouble(node->scale_y);
+     scaleOK |= parameters["scale"].getVec2(node->scale_x, node->scale_y, true);
+     if ((parameters["scale"].isDefined()) && (!scaleOK || !std::isfinite(node->scale_x) || !std::isfinite(node->scale_y))) {
+       LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "linear_extrude(..., scale=%1$s) could not be converted", parameters["scale"].toEchoStringNoThrow());
+     }
 
-  bool originOk = parameters["origin"].getVec2(node->origin_x, node->origin_y);
-  originOk &= std::isfinite(node->origin_x) && std::isfinite(node->origin_y);
-  if (parameters["origin"].isDefined() && !originOk) {
-    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "linear_extrude(..., origin=%1$s) could not be converted", parameters["origin"].toEchoStringNoThrow());
-  }
-  node->scale_x = node->scale_y = 1;
-  bool scaleOK = parameters["scale"].getFiniteDouble(node->scale_x);
-  scaleOK &= parameters["scale"].getFiniteDouble(node->scale_y);
-  scaleOK |= parameters["scale"].getVec2(node->scale_x, node->scale_y, true);
-  if ((parameters["scale"].isDefined()) && (!scaleOK || !std::isfinite(node->scale_x) || !std::isfinite(node->scale_y))) {
-    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(), "linear_extrude(..., scale=%1$s) could not be converted", parameters["scale"].toEchoStringNoThrow());
-  }
+     if (parameters["center"].type() == Value::Type::BOOL) node->center = parameters["center"].toBool();
 
-  if (parameters["center"].type() == Value::Type::BOOL) node->center = parameters["center"].toBool();
+     if (node->height <= 0) node->height = 0;
 
-  if (node->height <= 0) node->height = 0;
+     if (node->scale_x < 0) node->scale_x = 0;
+     if (node->scale_y < 0) node->scale_y = 0;
 
-  if (node->scale_x < 0) node->scale_x = 0;
-  if (node->scale_y < 0) node->scale_y = 0;
+     node->has_slices = parameters.validate_integral("slices", node->slices, 1u);
+     node->has_segments = parameters.validate_integral("segments", node->segments, 0u);
 
-  node->has_slices = parameters.validate_integral("slices", node->slices, 1u);
-  node->has_segments = parameters.validate_integral("segments", node->segments, 0u);
+     node->twist = 0.0;
+     parameters["twist"].getFiniteDouble(node->twist);
+     if (node->twist != 0.0) {
+       node->has_twist = true;
+     }
 
-  node->twist = 0.0;
-  parameters["twist"].getFiniteDouble(node->twist);
-  if (node->twist != 0.0) {
-    node->has_twist = true;
-  }
+     if (node->filename.empty()) {
+       children.instantiate(node);
+     } else if (!children.empty()) {
+       LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(),
+           "module %1$s() does not support child modules when importing a file", inst->name());
+     }
 
-  if (node->filename.empty()) {
-    children.instantiate(node);
-  } else if (!children.empty()) {
-    LOG(message_group::Warning, node->getLocation(), parameters.documentRoot(),
-        "module %1$s() does not support child modules when importing a file", inst->name());
-  }
-
-  return node;
-}
+     return node;
+   }
+}//~namespace
 
 std::string LinearExtrudeNode::toString() const
 {

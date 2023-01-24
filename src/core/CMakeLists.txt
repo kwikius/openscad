@@ -2,6 +2,13 @@
 
 set(CORE_LIB_SOURCES
   AbstractNode.cc
+  primitives/CubeNode.cc
+  primitives/SphereNode.cc
+  primitives/CylinderNode.cc
+  primitives/PolyhedronNode.cc
+  primitives/SquareNode.cc
+  primitives/CircleNode.cc
+  primitives/PolygonNode.cc
   Filename.cc
   QuotedString.cc
   Arguments.cc

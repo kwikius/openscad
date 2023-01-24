@@ -32,12 +32,14 @@
 #include "Parameters.h"
 #include "Arguments.h"
 
-std::shared_ptr<AbstractNode> builtin_group(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
-{
-  Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {});
-  return children.instantiate(std::make_shared<GroupNode>(inst));
+namespace {
+   std::shared_ptr<AbstractNode>
+   builtin_group(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
+   {
+     Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {});
+     return children.instantiate(std::make_shared<GroupNode>(inst));
+   }
 }
-
 void register_builtin_group()
 {
   Builtins::init("group", new BuiltinModule(builtin_group),
