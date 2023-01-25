@@ -3,19 +3,18 @@
 #include <string>
 
 #include <core/AbstractNode.h>
+#include "primitives.h"
 
 class Geometry;
 
 class SquareNode : public LeafNode{
 public:
-  SquareNode(const ModuleInstantiation *mi, double x, double y, bool center)
-  : LeafNode(mi),x{x},y{y},center{center} {}
+  SquareNode(const ModuleInstantiation *mi,
+  primitives::square_params_t && params)
+  : LeafNode(mi),params{params} {}
   std::string toString() const override;
   std::string name() const override { return "square"; }
   const Geometry *createGeometry() const override;
-
-  double const x;
-  double const y;
-  bool const center;
+  primitives::square_params_t const params;
 };
 

@@ -4,18 +4,15 @@
 #include <string>
 
 #include <core/AbstractNode.h>
+#include "primitives.h"
 
 class CircleNode : public LeafNode{
 public:
   CircleNode(const ModuleInstantiation *mi,
-    double fn, double fa, double fs, double r
-  ) : LeafNode(mi),fn{fn},fa{fa},fs{fs},r{r} {}
+    primitives::circle_params_t && params
+  ) : LeafNode(mi), params{params}{}
   std::string toString() const override;
   std::string name() const override { return "circle"; }
   const Geometry* createGeometry() const override;
-
-  double const fn;
-  double const fa;
-  double const fs;
-  double const r;
+  primitives::circle_params_t const params;
 };

@@ -441,7 +441,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON) # (does not propagate down to subdirectories)
 
 foreach(library ${openscadALLTARGETS})
    target_include_directories(${library} PRIVATE
-     "src"
+     "src" "../quan-trunk"
    )
 endforeach(library)
 

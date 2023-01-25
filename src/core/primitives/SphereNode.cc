@@ -4,30 +4,38 @@
 #include <cassert>
 #include <cmath>
 
-#include "SphereNode.h"
-#include "primitives.h"
+#include <utils/calc.h>
+
+#include <core/Children.h>
+#include <core/Value.h>
+#include <core/Parameters.h>
+#include <core/Arguments.h>
+#include <core/ModuleInstantiation.h>
+#include <core/Visitable_inline.h>
 
 #include <geometry/Geometry.h>
-#include <utils/calc.h>
 #include <geometry/PolySet.h>
-#include <core/Visitable_inline.h>
+
+#include "primitives.h"
+#include "SphereNode.h"
 
 std::string SphereNode::toString() const
 {
  std::ostringstream stream;
  stream << "sphere"
-        << "($fn = " << fn
-        << ", $fa = " << fa
-        << ", $fs = " << fs
-        << ", r = " << r
+        << "($fn = " << this->params.fp.fn
+        << ", $fa = " << this->params.fp.fa
+        << ", $fs = " << this->params.fp.fs
+        << ", r = " << this->params.r
         << ")";
  return stream.str();
 }
 
 const Geometry *SphereNode::createGeometry() const
 {
-  double const circle_radius = this->r;
-  int const fragments = Calc::get_fragments_from_r(this->r, this->fn, this->fs, this->fa);
+  double const circle_radius = this->params.r;
+  int const fragments =
+     primitives::get_fragments_from_r(this->params.r,this->params.fp);
   int const numRings = (fragments + 1) / 2;
   struct ring_t {
     std::vector<primitives::point2d> points;
@@ -84,4 +92,31 @@ sphere_next_r2:
   return p;
 }
 
+namespace primitives{
 
+   std::shared_ptr<AbstractNode>
+   builtin_sphere(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
+   {
+     if (!children.empty()) {
+       LOG(message_group::Warning, inst->location(), arguments.documentRoot(),
+           "module %1$s() does not support child modules", inst->name());
+     }
+
+     Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r"}, {"d"});
+     primitives::sphere_params_t sphere;
+     // set from The "global special variables"
+     primitives::set_fragments(parameters, inst, sphere.fp);
+     const auto sphereRadiusValue = primitives::lookup_radius(parameters, inst, "d", "r");
+
+     if (sphereRadiusValue.type() == Value::Type::NUMBER) {
+       double const r = sphereRadiusValue.toDouble();
+       if (OpenSCAD::rangeCheck && (r <= 0 || !std::isfinite(r))) {
+         LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+             "sphere(r=%1$s)", sphereRadiusValue.toEchoStringNoThrow());
+       }else{
+         sphere.r = r;
+       }
+     }// TODO else warn?
+     return std::make_shared<SphereNode>(inst, std::move(sphere));
+   }
+}
