@@ -33,10 +33,10 @@ std::string SphereNode::toString() const
 
 const Geometry *SphereNode::createGeometry() const
 {
-  auto p = new PolySet(3, true);
+  auto poly = new PolySet(3, true);
 
   if (!OpenSCAD::rangeCheck && !isPositiveFinite(this->params.r)) {
-    return p;
+    return poly;
   }
   double const circle_radius = this->params.r;
   int const fragments =
@@ -46,70 +46,68 @@ const Geometry *SphereNode::createGeometry() const
     std::vector<primitives::point2d> points;
     double z;
   };
-  auto ring = std::vector<ring_t>(numRings);
-  #if (1)
+  // make a prototype ring
   auto const proto_ring = primitives::generate_circle(circle_radius,fragments);
-  std::generate(ring.begin(),ring.end() ,
-    [&proto_ring, circle_radius,numRings,idx=0] () mutable{
-       double const phi = (180.0 * (idx++ + 0.5)) / numRings;
+  // and generate the sphere rings by scaling from the prototype
+  auto ring = std::vector<ring_t>(numRings);
+  std::ranges::generate(ring,[&proto_ring, circle_radius, numRings, i=0] () mutable{
+       double const phi = (180.0 * (i++ + 0.5)) / numRings;
        double const scale = sin_degrees(phi);
        double const z = circle_radius * cos_degrees(phi);
        auto v = std::vector<primitives::point2d>(proto_ring.size());
-       std::ranges::generate(v, [&proto_ring,scale,idx1 = 0]() mutable{
-          return proto_ring[idx1++] * scale;
+       std::ranges::generate(v, [&proto_ring,scale,j = 0]() mutable{
+          return proto_ring[j++] * scale;
        });
        return ring_t{std::move(v),z};
     }
   );
-  #else
-  std::ranges::generate(ring,[circle_radius,numRings,fragments,idx=0] () mutable {
-       double const phi = (180.0 * (idx++ + 0.5)) / numRings;
-       double const ring_radius = circle_radius * sin_degrees(phi);
-       double const z = circle_radius * cos_degrees(phi);
-       return ring_t{primitives::generate_circle(ring_radius,fragments),z};
+  using primitives::point2d;
+
+  auto add_pt = [&poly](ring_t const & ri, int i)
+  {
+     auto const & pt = ri.points[i];
+     poly->append_vertex(pt.x,pt.y,ri.z);
+  };
+
+  auto add_ring = [add_pt,&poly](ring_t const & ri)
+  {
+     int const size = ri.points.size();
+     poly->append_poly();
+     for (int i = 0; i < size;++i){
+       add_pt(ri,i);
      }
-  );
-  #endif
-  p->append_poly();
-  for (int i = 0; i < fragments; ++i){
-    p->append_vertex(ring[0].points[i].x, ring[0].points[i].y, ring[0].z);
-  }
+  };
+
+  add_ring(ring[0]);
+
   for (int i = 0; i < numRings - 1; ++i) {
-    auto r1 = &ring[i];
-    auto r2 = &ring[i + 1];
+    auto const & r1 = ring[i];
+    auto const & r2 = ring[i + 1];
     int r1i = 0, r2i = 0;
     while (r1i < fragments || r2i < fragments) {
       if (r1i >= fragments) goto sphere_next_r2;
       if (r2i >= fragments) goto sphere_next_r1;
       if ((double)r1i / fragments < (double)r2i / fragments) {
 sphere_next_r1:
-        p->append_poly();
-        int r1j = (r1i + 1) % fragments;
-        p->insert_vertex(r1->points[r1i].x, r1->points[r1i].y, r1->z);
-        p->insert_vertex(r1->points[r1j].x, r1->points[r1j].y, r1->z);
-        p->insert_vertex(r2->points[r2i % fragments].x, r2->points[r2i % fragments].y, r2->z);
-        r1i++;
+        poly->append_poly();
+        int const r1j = (r1i + 1) % fragments;
+        add_pt(r1,r1i);
+        add_pt(r1,r1j);
+        add_pt(r2,r2i % fragments);
+        ++r1i;
       } else {
 sphere_next_r2:
-        p->append_poly();
-        int r2j = (r2i + 1) % fragments;
-        p->append_vertex(r2->points[r2i].x, r2->points[r2i].y, r2->z);
-        p->append_vertex(r2->points[r2j].x, r2->points[r2j].y, r2->z);
-        p->append_vertex(r1->points[r1i % fragments].x, r1->points[r1i % fragments].y, r1->z);
-        r2i++;
+        poly->append_poly();
+        int const r2j = (r2i + 1) % fragments;
+        add_pt(r2,r2i);
+        add_pt(r2,r2j);
+        add_pt(r1,r1i % fragments);
+        ++r2i;
       }
     }
   }
-
-  p->append_poly();
-  for (int i = 0; i < fragments; ++i) {
-    p->insert_vertex(
-      ring[numRings - 1].points[i].x,
-      ring[numRings - 1].points[i].y,
-      ring[numRings - 1].z
-      );
-  }
-  return p;
+  add_ring(ring[numRings - 1]);
+  return poly;
 }
 
 namespace primitives{
