@@ -94,17 +94,17 @@ namespace primitives{
            "module %1$s() does not support child modules", inst->name());
      }
 
+     polygon_params_t polygon;
+
      Parameters parameters = Parameters::parse(std::move(arguments), inst->location(),
        {"points", "paths", "convexity"});
 
-     if (parameters["points"].type() != Value::Type::VECTOR) {
+     if (! isVector(parameters["points"])) {
        LOG(message_group::Error, inst->location(), parameters.documentRoot(),
           "Unable to convert points = %1$s to a vector of coordinates",
              parameters["points"].toEchoStringNoThrow());
-       return  std::make_shared<PolygonNode>(inst);
+        return  std::make_shared<PolygonNode>(inst,std::move(polygon));
      }
-
-     polygon_params_t polygon;
 
      auto const & pointsVect = parameters["points"].toVector();
      for (const Value& pointValue : pointsVect) {
@@ -121,11 +121,11 @@ namespace primitives{
        }
      }
 
-     if (parameters["paths"].type() == Value::Type::VECTOR) {
+     if (isVector(parameters["paths"])) {
        size_t pathIndex = 0;
        auto const & pathsVect = parameters["paths"].toVector();
        for (const Value& pathValue : pathsVect) {
-         if (pathValue.type() != Value::Type::VECTOR) {
+         if (!isVector(pathValue)) {
            LOG(message_group::Error, inst->location(), parameters.documentRoot(),
               "Unable to convert paths[%1$d] = %2$s to a vector of numbers",
                pathIndex, pathValue.toEchoStringNoThrow());
@@ -134,7 +134,7 @@ namespace primitives{
            std::vector<size_t> path;
            auto const & pathValueVect = pathValue.toVector();
            for (const Value& pointIndexValue : pathValueVect) {
-             if (pointIndexValue.type() != Value::Type::NUMBER) {
+             if ( !isNumber(pointIndexValue)) {
                LOG(message_group::Error, inst->location(), parameters.documentRoot(),
                  "Unable to convert paths[%1$d][%2$d] = %3$s to a number",
                   pathIndex, pointIndexIdx, pointIndexValue.toEchoStringNoThrow());
@@ -158,7 +158,7 @@ namespace primitives{
        LOG(message_group::Error, inst->location(), parameters.documentRoot(),
           "Unable to convert paths = %1$s to a vector of vector of point indices",
              parameters["paths"].toEchoStringNoThrow());
-       return std::make_shared<PolygonNode>(inst);
+       return std::make_shared<PolygonNode>(inst,std::move(polygon));
      }
      polygon.convexity = std::max(static_cast<int>(parameters["convexity"].toDouble()),1);
 

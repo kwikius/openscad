@@ -6,6 +6,16 @@
 #include <core/AbstractNode.h>
 #include "primitives.h"
 
+class Geometry;
+
+namespace primitives{
+
+   struct circle_params_t{
+      double r = 1 ;
+      facet_params_t fp;
+   };
+}
+
 class CircleNode : public LeafNode{
 public:
   CircleNode(const ModuleInstantiation *mi,

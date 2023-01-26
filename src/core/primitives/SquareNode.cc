@@ -22,6 +22,10 @@
 
 const Geometry *SquareNode::createGeometry() const
 {
+  auto p = new Polygon2d();
+  if ( !OpenSCAD::rangeCheck && ! isPositiveFinite(this->params.size) ) {
+    return p;
+  }
   using primitives::point2d;
 
   point2d const p1 = (this->params.center)
@@ -33,7 +37,7 @@ const Geometry *SquareNode::createGeometry() const
 
   Outline2d o;
   o.vertices = {v1, {v2[0], v1[1]}, v2, {v1[0], v2[1]}};
-  auto p = new Polygon2d();
+
   p->addOutline(o);
   p->setSanitized(true);
   return p;
@@ -74,13 +78,9 @@ namespace primitives{
          LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
             "Unable to convert square(size=%1$s, ...) parameter to a number or a vec2 of numbers",
                size.toEchoStringNoThrow());
-       } else if (OpenSCAD::rangeCheck) {
-         bool const ok =  (square.size.x > 0) && (square.size.y > 0)
-             && std::isfinite(square.size.x) && std::isfinite(square.size.y);
-         if (!ok) {
+       }else if ( OpenSCAD::rangeCheck && ! isPositiveFinite(square.size) ) {
            LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
              "square(size=%1$s, ...)", size.toEchoStringNoThrow());
-         }
        }
      }
      if (parameters["center"].type() == Value::Type::BOOL) {

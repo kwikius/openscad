@@ -6,6 +6,15 @@
 #include <core/AbstractNode.h>
 #include "primitives.h"
 
+namespace primitives{
+
+   struct polyhedron_params_t {
+      std::vector<primitives::point3d> points;
+      std::vector<std::vector<size_t>> faces;
+      int convexity = 1;
+   };
+}
+
 class PolyhedronNode : public LeafNode{
 public:
   PolyhedronNode (const ModuleInstantiation *mi)

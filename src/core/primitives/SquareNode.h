@@ -7,6 +7,14 @@
 
 class Geometry;
 
+namespace primitives{
+
+   struct square_params_t{
+      point2d size = point2d{1,1};
+      bool center = false;
+   };
+}
+
 class SquareNode : public LeafNode{
 public:
   SquareNode(const ModuleInstantiation *mi,

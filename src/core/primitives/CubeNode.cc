@@ -27,6 +27,12 @@ std::string CubeNode::toString() const
 
 const Geometry *CubeNode::createGeometry() const
 {
+   auto p = new PolySet(3, true);
+
+   if (!OpenSCAD::rangeCheck && !isPositiveFinite(this->params.size) ){
+     return p;
+   }
+
    using primitives::point3d;
 
    point3d const p1 =
@@ -35,8 +41,6 @@ const Geometry *CubeNode::createGeometry() const
     : point3d()
    ;
    point3d const p2 = p1 + this->params.size;
-
-   auto p = new PolySet(3, true);
 
    double const x1 = p1.x;
    double const y1 = p1.y;
@@ -117,16 +121,13 @@ namespace primitives{
        if (!converted) {
          LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
          "Unable to convert cube(size=%1$s, ...) parameter to a number or a vec3 of numbers", size.toEchoStringNoThrow());
-       } else if (OpenSCAD::rangeCheck) {
-         bool const ok = (cube.size.x > 0) && (cube.size.y > 0) && (cube.size.z > 0)
-           && std::isfinite(cube.size.x) && std::isfinite(cube.size.y) && std::isfinite(cube.size.z);
-         if (!ok) {
+          // TODO absolute invariant
+       } else if (OpenSCAD::rangeCheck && ! isPositiveFinite(cube.size)) {
            LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
                "cube(size=%1$s, ...)", size.toEchoStringNoThrow());
-         }
        }
      }
-     if (parameters["center"].type() == Value::Type::BOOL) {
+     if (isBool(parameters["center"]) ) {
          cube.center = parameters["center"].toBool();
      }
      return std::make_shared<CubeNode>(inst,std::move(cube));

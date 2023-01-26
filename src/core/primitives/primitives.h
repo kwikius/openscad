@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cmath>
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <type_traits>
 
 #include <quan/two_d/vect.hpp>
 #include <quan/three_d/vect.hpp>
@@ -11,9 +13,52 @@
 #include "utils/degree_trig.h"
 #include <utils/calc.h>
 
+
 class Value;
 class Parameters;
 class ModuleInstantiation;
+
+template <typename T>
+  requires std::is_arithmetic_v<T>
+[[nodiscard]] inline bool isPositiveFinite(T const & v)
+{
+   return (v > 0) && std::isfinite(v);
+}
+
+template <typename T>
+  requires std::is_arithmetic_v<T>
+[[nodiscard]] inline bool isNonNegativeFinite(T const & v)
+{
+   return (v >= 0) && std::isfinite(v);
+}
+
+
+
+template <typename T, typename ... R>
+[[nodiscard]] inline bool isPositiveFinite(T const & v, R const & ... r )
+{
+   return isPositiveFinite(v) && isPositiveFinite(r...);
+}
+
+template <typename T>
+  requires std::is_arithmetic_v<T>
+[[nodiscard]] inline bool isPositiveFinite(quan::three_d::vect<T> const & v)
+{
+   return isPositiveFinite(v.x,v.y,v.z);
+}
+
+template <typename T>
+  requires std::is_arithmetic_v<T>
+[[nodiscard]] inline bool isPositiveFinite(quan::two_d::vect<T> const & v)
+{
+   return isPositiveFinite(v.x,v.y);
+}
+
+[[nodiscard]] bool isNumber(Value const & v);
+[[nodiscard]] bool isVector(Value const & v);
+[[nodiscard]] bool isBool(Value const & v);
+[[nodiscard]] bool isDefined(Value const & v);
+[[nodiscard]] bool isUndefined(Value const & v);
 
 namespace primitives{
 
@@ -33,46 +78,6 @@ namespace primitives{
 
       static constexpr double fsMin = 0.01;
       static constexpr double faMin = 0.01;
-   };
-
-   struct square_params_t{
-      point2d size = point2d{1,1};
-      bool center = false;
-   };
-
-   struct circle_params_t{
-      double r = 1 ;
-      facet_params_t fp;
-   };
-
-   struct sphere_params_t{
-      double r = 1 ;
-      facet_params_t fp;
-   };
-
-   struct cube_params_t {
-      point3d size = point3d{1,1,1};
-      bool center = false;
-   };
-
-   struct cylinder_params_t{
-      double r1 = 1;
-      double r2 = 1;
-      double  h = 1;
-      facet_params_t fp;
-      bool center = false;
-   };
-
-   struct polyhedron_params_t {
-      std::vector<primitives::point3d> points;
-      std::vector<std::vector<size_t>> faces;
-      int convexity = 1;
-   };
-
-   struct polygon_params_t{
-      std::vector<primitives::point2d> points;
-      std::vector<std::vector<size_t>> paths;
-      int convexity = 1;
    };
 
    inline std::vector<point2d>

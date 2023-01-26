@@ -6,8 +6,18 @@
 #include <core/AbstractNode.h>
 #include "primitives.h"
 
-class PolygonNode : public LeafNode
-{
+class Geometry;
+
+namespace primitives{
+
+   struct polygon_params_t{
+      std::vector<primitives::point2d> points;
+      std::vector<std::vector<size_t>> paths;
+      int convexity = 1;
+   };
+}
+
+class PolygonNode : public LeafNode{
 public:
    PolygonNode (const ModuleInstantiation *mi)
    : LeafNode(mi){}

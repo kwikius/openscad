@@ -6,6 +6,17 @@
 
 class Geometry;
 
+namespace primitives{
+
+   struct cylinder_params_t{
+      double r1 = 1;
+      double r2 = 1;
+      double  h = 1;
+      facet_params_t fp;
+      bool center = false;
+   };
+}
+
 class CylinderNode : public LeafNode{
 public:
   CylinderNode(const ModuleInstantiation *mi,

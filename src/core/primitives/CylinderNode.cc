@@ -20,8 +20,21 @@
 
 const Geometry *CylinderNode::createGeometry() const
 {
+  auto p = new PolySet(3, true);
+
+  if(!OpenSCAD::rangeCheck){
+     if ( !isPositiveFinite(this->params.h) ||
+          !isNonNegativeFinite(this->params.r1) ||
+          !isNonNegativeFinite(this->params.r2) ||
+          (this->params.r1 == 0 && this->params.r2 == 0)
+       ) {
+       return p;
+     }
+  }
+
   auto const fragments =
-     primitives::get_fragments_from_r( std::fmax(this->params.r1, this->params.r2), this->params.fp);
+     primitives::get_fragments_from_r(
+       std::fmax(this->params.r1, this->params.r2), this->params.fp);
 
   auto const circle1 = primitives::generate_circle( this->params.r1, fragments);
   auto const & circle2 = (this->params.r2 == this->params.r1)
@@ -31,7 +44,6 @@ const Geometry *CylinderNode::createGeometry() const
   double const z1 = this->params.center ? -this->params.h / 2 : 0 ;
   double const z2 = z1 + this->params.h;
 
-  auto p = new PolySet(3, true);
   for (int i = 0; i < fragments; ++i) {
     int j = (i + 1) % fragments;
     if (this->params.r1 == this->params.r2) {
@@ -101,47 +113,45 @@ namespace primitives{
      primitives::cylinder_params_t cyl;
 
      primitives::set_fragments(parameters, inst, cyl.fp);
-     if (parameters["h"].type() == Value::Type::NUMBER) {
-       cyl.h = parameters["h"].toDouble();
+     if (isNumber(parameters["h"])) {
+         cyl.h = parameters["h"].toDouble();
      }
 
      auto r = primitives::lookup_radius(parameters, inst, "d", "r");
      auto r1 = primitives::lookup_radius(parameters, inst, "d1", "r1");
      auto r2 = primitives::lookup_radius(parameters, inst, "d2", "r2");
-     if (r.type() == Value::Type::NUMBER &&
-         (r1.type() == Value::Type::NUMBER || r2.type() == Value::Type::NUMBER)
-         ) {
-       LOG(message_group::Warning, inst->location(), parameters.documentRoot(), "Cylinder parameters ambiguous");
+     if (isNumber(r) && ( isNumber(r1) || isNumber(r2))) {
+       LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+         "Cylinder parameters ambiguous");
      }
 
-     if (r.type() == Value::Type::NUMBER) {
+     if (isNumber(r)){
        cyl.r1 = r.toDouble();
        cyl.r2 = r.toDouble();
      }
-     if (r1.type() == Value::Type::NUMBER) {
+     if (isNumber(r1)) {
        cyl.r1 = r1.toDouble();
      }
-     if (r2.type() == Value::Type::NUMBER) {
+     if (isNumber(r2)) {
        cyl.r2 = r2.toDouble();
      }
 
      if (OpenSCAD::rangeCheck) {
-       if (cyl.h <= 0 || !std::isfinite(cyl.h)) {
-         LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
-            "cylinder(h=%1$s, ...)", parameters["h"].toEchoStringNoThrow());
-       }
-       if (cyl.r1 < 0 || cyl.r2 < 0 ||
-             (cyl.r1 == 0 && cyl.r2 == 0) ||
-                !std::isfinite(cyl.r1) || !std::isfinite(cyl.r2)) {
-         LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
-             "cylinder(r1=%1$s, r2=%2$s, ...)",
-             (r1.type() == Value::Type::NUMBER ? r1.toEchoStringNoThrow() : r.toEchoStringNoThrow()),
-             (r2.type() == Value::Type::NUMBER ? r2.toEchoStringNoThrow() : r.toEchoStringNoThrow()));
-       }
+        if (!isPositiveFinite(cyl.h)) {
+            LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+               "cylinder(h=%1$s, ...)", parameters["h"].toEchoStringNoThrow());
+        }
+        if (cyl.r1 < 0 || cyl.r2 < 0 ||
+          (cyl.r1 == 0 && cyl.r2 == 0) ||
+          !std::isfinite(cyl.r1) || !std::isfinite(cyl.r2)) {
+            LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
+           "cylinder(r1=%1$s, r2=%2$s, ...)",
+           (isNumber(r1) ? r1.toEchoStringNoThrow() : r.toEchoStringNoThrow()),
+           (isNumber(r2) ? r2.toEchoStringNoThrow() : r.toEchoStringNoThrow()));
+        }
      }
-
-     if (parameters["center"].type() == Value::Type::BOOL) {
-       cyl.center = parameters["center"].toBool();
+     if (isBool(parameters["center"])) {
+        cyl.center = parameters["center"].toBool();
      }
      return  std::make_shared<CylinderNode>(inst,std::move(cyl));
    }

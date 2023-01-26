@@ -23,6 +23,12 @@
 
 const Geometry* CircleNode::createGeometry() const
 {
+   auto p = new Polygon2d();
+   // TODO should be invariant
+   if (!OpenSCAD::rangeCheck && !isPositiveFinite(this->params.r)){
+      // TODO add warning
+      return p;
+   }
    auto const fragments =
       primitives::get_fragments_from_r( this->params.r, this->params.fp);
    auto const r = this->params.r;
@@ -35,7 +41,7 @@ const Geometry* CircleNode::createGeometry() const
    );
    Outline2d outline;
    outline.vertices = std::move(circle);
-   auto p = new Polygon2d();
+
    p->addOutline(outline);
    p->setSanitized(true);
    return p;
@@ -66,11 +72,16 @@ namespace primitives{
       Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r"}, {"d"});
 
       primitives::circle_params_t circle;
+
       primitives::set_fragments(parameters, inst, circle.fp);
       const auto rv = primitives::lookup_radius(parameters, inst, "d", "r");
-      if (rv.type() == Value::Type::NUMBER) {
+      if (isNumber(rv)) {
+         // TODO RangeCheck here not in the CircleNode
+         // for now this is how Vanilla does it
+         // but rangeCheckis set to false
+         // Then warn and set r to 1
          circle.r = rv.toDouble();
-         if (OpenSCAD::rangeCheck && ((circle.r <= 0) || !std::isfinite(circle.r))) {
+         if ( OpenSCAD::rangeCheck && !isPositiveFinite(circle.r) ){
             LOG(message_group::Warning, inst->location(), parameters.documentRoot(),
             "circle(r=%1$s)", rv.toEchoStringNoThrow());
          }

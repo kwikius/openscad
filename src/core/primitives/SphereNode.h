@@ -5,7 +5,16 @@
 
 #include <core/AbstractNode.h>
 #include "primitives.h"
+
 class Geometry;
+
+namespace primitives{
+
+   struct sphere_params_t{
+      double r = 1 ;
+      facet_params_t fp;
+   };
+}
 
 class SphereNode : public LeafNode{
 public:

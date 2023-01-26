@@ -24,27 +24,12 @@
  *
  */
 
-#include <sstream>
-#include <cassert>
-#include <cmath>
-#include <vector>
-
-#include <boost/assign/std/vector.hpp>
-
-#include "utils/printutils.h"
-#include "utils/calc.h"
-#include "utils/degree_trig.h"
-
-#include <geometry/Polygon2d.h>
-#include <geometry/PolySet.h>
-
 #include "BuiltinModule.h"
-#include "AbstractNode.h"
 
 #include "Children.h"
 #include "Builtins.h"
 #include "Parameters.h"
-#include "Arguments.h"
+#include "Value.h"
 #include "ModuleInstantiation.h"
 
 #include <core/primitives/primitives.h>
@@ -56,7 +41,28 @@
 #include <core/primitives/CircleNode.h>
 #include <core/primitives/PolygonNode.h>
 
-//using namespace boost::assign; // bring 'operator+=()' into scope
+[[nodiscard]] bool isNumber(Value const & v)
+{
+  return v.type() == Value::Type::NUMBER;
+}
+
+[[nodiscard]] bool isVector(Value const & v)
+{
+  return v.type() == Value::Type::VECTOR;
+}
+[[nodiscard]] bool isBool(Value const & v)
+{
+  return v.type() == Value::Type::BOOL;
+}
+
+[[nodiscard]] bool isDefined(Value const & v)
+{
+  return v.type() != Value::Type::UNDEFINED;
+}
+[[nodiscard]] bool isUndefined(Value const & v)
+{
+  return v.type() == Value::Type::UNDEFINED;
+}
 
 namespace primitives{
    /**

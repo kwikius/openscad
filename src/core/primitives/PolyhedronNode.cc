@@ -75,6 +75,8 @@ const Geometry *PolyhedronNode::createGeometry() const
 
 namespace primitives{
 
+
+
    std::shared_ptr<AbstractNode>
    builtin_polyhedron(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
    {
@@ -83,17 +85,17 @@ namespace primitives{
            "module %1$s() does not support child modules", inst->name());
      }
 
+     polyhedron_params_t polyhedron;
+
      Parameters parameters = Parameters::parse(std::move(arguments), inst->location(),
        {"points", "faces", "convexity"}, {"triangles"});
 
-     if (parameters["points"].type() != Value::Type::VECTOR) {
+     if (!isVector(parameters["points"])) {
        LOG(message_group::Error, inst->location(), parameters.documentRoot(),
         "Unable to convert points = %1$s to a vector of coordinates",
            parameters["points"].toEchoStringNoThrow());
-       return std::make_shared<PolyhedronNode>(inst);
+       return std::make_shared<PolyhedronNode>(inst, std::move(polyhedron));
      }
-
-     polyhedron_params_t polyhedron;
 
      auto const & pointsVect = parameters["points"].toVector();
      for (const Value& pointValue : pointsVect ) {
@@ -111,8 +113,8 @@ namespace primitives{
      }
 
      const Value *pFaceVect = nullptr;
-     if ( parameters["faces"].type() == Value::Type::UNDEFINED &&
-           parameters["triangles"].type() != Value::Type::UNDEFINED) {
+     if ( isUndefined(parameters["faces"]) &&
+           isDefined(parameters["triangles"]) ) {
        // backwards compatible
        LOG(message_group::Deprecated, inst->location(), parameters.documentRoot(),
          "polyhedron(triangles=[]) will be removed in future releases. Use polyhedron(faces=[]) instead.");
@@ -120,16 +122,16 @@ namespace primitives{
      } else {
        pFaceVect = &parameters["faces"];
      }
-     if (pFaceVect->type() != Value::Type::VECTOR) {
+     if (!isVector(*pFaceVect)) {
        LOG(message_group::Error, inst->location(), parameters.documentRoot(),
          "Unable to convert faces = %1$s to a vector of vector of point indices", pFaceVect->toEchoStringNoThrow());
-       return std::make_shared<PolyhedronNode>(inst);
+       return std::make_shared<PolyhedronNode>(inst, std::move(polyhedron));
      }
 
      size_t faceIndex = 0;
      auto const & faceValues = pFaceVect->toVector();
      for (const Value& faceValue :faceValues) {
-       if (faceValue.type() != Value::Type::VECTOR) {
+       if (!isVector(faceValue)) {
          LOG(message_group::Error, inst->location(), parameters.documentRoot(),
             "Unable to convert faces[%1$d] = %2$s to a vector of numbers",
                 faceIndex, faceValue.toEchoStringNoThrow());
@@ -138,7 +140,7 @@ namespace primitives{
          std::vector<size_t> face;
          auto const & faceValueVect = faceValue.toVector();
          for (const Value& pointIndexValue : faceValueVect) {
-           if (pointIndexValue.type() != Value::Type::NUMBER) {
+           if (!isNumber(pointIndexValue)) {
              LOG(message_group::Error, inst->location(), parameters.documentRoot(),
                 "Unable to convert faces[%1$d][%2$d] = %3$s to a number",
                     faceIndex, pointIndexIdx, pointIndexValue.toEchoStringNoThrow());

@@ -7,6 +7,14 @@
 
 class Geometry;
 
+namespace primitives{
+
+   struct cube_params_t {
+      point3d size = point3d{1,1,1};
+      bool center = false;
+   };
+}
+
 class CubeNode : public LeafNode{
 public:
   CubeNode(const ModuleInstantiation *mi,
