@@ -71,21 +71,15 @@ const Geometry *SphereNode::createGeometry() const
     auto r2 = &ring[i + 1];
     int r1i = 0, r2i = 0;
     while (r1i < fragments || r2i < fragments) {
-      if (r1i >= fragments) goto sphere_next_r2;
-      if (r2i >= fragments) goto sphere_next_r1;
-     // if ((double)r1i / fragments < (double)r2i / fragments) {
-        if (r1i < r2i ) {
-sphere_next_r1:
-        p->append_poly();
-        int r1j = (r1i + 1) % fragments;
+      p->append_poly();
+      if ( (r1i < fragments) && ( (r2i >= fragments) || (r1i < r2i) )){
+        int const r1j = (r1i + 1) % fragments;
         p->insert_vertex(r1->points[r1i].x, r1->points[r1i].y, r1->z);
         p->insert_vertex(r1->points[r1j].x, r1->points[r1j].y, r1->z);
         p->insert_vertex(r2->points[r2i % fragments].x, r2->points[r2i % fragments].y, r2->z);
         r1i++;
       } else {
-sphere_next_r2:
-        p->append_poly();
-        int r2j = (r2i + 1) % fragments;
+        int const r2j = (r2i + 1) % fragments;
         p->append_vertex(r2->points[r2i].x, r2->points[r2i].y, r2->z);
         p->append_vertex(r2->points[r2j].x, r2->points[r2j].y, r2->z);
         p->append_vertex(r1->points[r1i % fragments].x, r1->points[r1i % fragments].y, r1->z);
