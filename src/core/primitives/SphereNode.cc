@@ -46,9 +46,9 @@ const Geometry *SphereNode::createGeometry() const
     std::vector<primitives::point2d> points;
     double z;
   };
-  auto ring = std::vector<ring_t>(numRings);
-  #if (1)
+
   auto const proto_ring = primitives::generate_circle(circle_radius,fragments);
+  auto ring = std::vector<ring_t>(numRings);
   std::generate(ring.begin(),ring.end() ,
     [&proto_ring, circle_radius,numRings,idx=0] () mutable{
        double const phi = (180.0 * (idx++ + 0.5)) / numRings;
@@ -61,15 +61,7 @@ const Geometry *SphereNode::createGeometry() const
        return ring_t{std::move(v),z};
     }
   );
-  #else
-  std::ranges::generate(ring,[circle_radius,numRings,fragments,idx=0] () mutable {
-       double const phi = (180.0 * (idx++ + 0.5)) / numRings;
-       double const ring_radius = circle_radius * sin_degrees(phi);
-       double const z = circle_radius * cos_degrees(phi);
-       return ring_t{primitives::generate_circle(ring_radius,fragments),z};
-     }
-  );
-  #endif
+
   p->append_poly();
   for (int i = 0; i < fragments; ++i){
     p->append_vertex(ring[0].points[i].x, ring[0].points[i].y, ring[0].z);
@@ -81,7 +73,8 @@ const Geometry *SphereNode::createGeometry() const
     while (r1i < fragments || r2i < fragments) {
       if (r1i >= fragments) goto sphere_next_r2;
       if (r2i >= fragments) goto sphere_next_r1;
-      if ((double)r1i / fragments < (double)r2i / fragments) {
+     // if ((double)r1i / fragments < (double)r2i / fragments) {
+        if (r1i < r2i ) {
 sphere_next_r1:
         p->append_poly();
         int r1j = (r1i + 1) % fragments;
