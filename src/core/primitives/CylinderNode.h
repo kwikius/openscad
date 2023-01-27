@@ -19,9 +19,9 @@ namespace primitives{
 
 class CylinderNode : public LeafNode{
 public:
-  CylinderNode(const ModuleInstantiation *mi,
+  CylinderNode(NodeParams const & np,
     primitives::cylinder_params_t && params
-  ) : LeafNode(mi),params{params}{}
+  ) : LeafNode{np},params{params}{}
   std::string toString() const override;
   std::string name() const override { return "cylinder"; }
   const Geometry *createGeometry() const override;

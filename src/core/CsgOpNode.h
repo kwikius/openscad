@@ -9,8 +9,8 @@ class CsgOpNode final : public Visitable<AbstractNode, CsgOpNode>{
 public:
 
   OpenSCADOperator type;
-  CsgOpNode(const ModuleInstantiation *mi, OpenSCADOperator type)
-  : Visitable(mi), type(type) { }
+  CsgOpNode(NodeParams const & np, OpenSCADOperator type)
+  : Visitable{np}, type(type) { }
   std::string toString() const override;
   std::string name() const override;
 };

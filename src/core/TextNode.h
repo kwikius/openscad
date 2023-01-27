@@ -8,7 +8,7 @@ class TextModule;
 class TextNode final : public Visitable< AbstractPolyNode, TextNode>{
 public:
  // VISITABLE();
-  TextNode(const ModuleInstantiation *mi) : Visitable(mi) {}
+  TextNode(NodeParams const & np) : Visitable{np} {}
 
   std::string toString() const override;
   std::string name() const override { return "text"; }

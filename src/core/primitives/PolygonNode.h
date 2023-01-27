@@ -19,12 +19,9 @@ namespace primitives{
 
 class PolygonNode : public LeafNode{
 public:
-   PolygonNode (const ModuleInstantiation *mi)
-   : LeafNode(mi){}
-
-   PolygonNode (const ModuleInstantiation *mi,
+   PolygonNode (NodeParams const & np,
      primitives::polygon_params_t && params
-   ): LeafNode(mi), params{params} {}
+   ): LeafNode{np}, params{params} {}
    std::string toString() const override;
    std::string name() const override { return "polygon"; }
    const Geometry *createGeometry() const override;

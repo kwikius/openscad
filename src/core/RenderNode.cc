@@ -38,9 +38,10 @@
 
 using namespace boost::assign; // bring 'operator+=()' into scope
 
-static std::shared_ptr<AbstractNode> builtin_render(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
+static std::shared_ptr<AbstractNode>
+builtin_render(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
 {
-  auto node = std::make_shared<RenderNode>(inst);
+  auto node = std::make_shared<RenderNode>(*inst);
 
   Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"convexity"});
   if (parameters["convexity"].type() == Value::Type::NUMBER) {

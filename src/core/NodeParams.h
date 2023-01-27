@@ -2,21 +2,18 @@
 
 #include "Location.h"
 
-/**
-*  @brief usefule bits of moduleInstantiation in AbstractModule
-**/
-
-class ModuleInstantiation;
-
-class InstantiatedModule{
+class NodeParams{
   Location loc;
   const void * const idx;
   bool tag_root;
   bool tag_highlight;
   bool tag_background;
   public:
-  InstantiatedModule(ModuleInstantiation const & m);
-  InstantiatedModule(Location const & loc);
+
+  NodeParams(Location const & loc, const void* const idx,
+    bool root,bool highlight, bool background);
+
+  NodeParams(Location const & loc);
   [[nodiscard]] bool isBackground() const { return this->tag_background; }
   [[nodiscard]] bool isHighlight() const { return this->tag_highlight; }
   [[nodiscard]] bool isRoot() const { return this->tag_root; }

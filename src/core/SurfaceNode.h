@@ -35,7 +35,8 @@ public:
 
 class SurfaceNode final : public Visitable<LeafNode, SurfaceNode>{
 public:
-  SurfaceNode(const ModuleInstantiation *mi) : Visitable(mi), center(false), invert(false), convexity(1) { }
+  SurfaceNode(NodeParams const & np)
+  : Visitable{np}, center(false), invert(false), convexity(1) { }
   std::string toString() const override;
   std::string name() const override { return "surface"; }
 

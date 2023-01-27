@@ -5,7 +5,7 @@
 
 class OffsetNode final : public Visitable<AbstractPolyNode, OffsetNode>{
 public:
-  OffsetNode(const ModuleInstantiation *mi) : Visitable(mi) { }
+  OffsetNode(NodeParams const & np) : Visitable{np} { }
   std::string toString() const override;
   std::string name() const override { return "offset"; }
 

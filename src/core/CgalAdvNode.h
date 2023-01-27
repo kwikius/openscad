@@ -12,8 +12,8 @@ enum class CgalAdvType {
 
 class CgalAdvNode : public Visitable<AbstractNode, CgalAdvNode>{
 public:
-  CgalAdvNode(const ModuleInstantiation *mi, CgalAdvType type)
-  : Visitable(mi), type(type) {}
+  CgalAdvNode(NodeParams const & np, CgalAdvType type)
+  : Visitable{np}, type(type) {}
   std::string toString() const override;
   std::string name() const override;
 

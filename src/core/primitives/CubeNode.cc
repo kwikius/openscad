@@ -130,6 +130,6 @@ namespace primitives{
      if (isBool(parameters["center"]) ) {
          cube.center = parameters["center"].toBool();
      }
-     return std::make_shared<CubeNode>(inst,std::move(cube));
+     return std::make_shared<CubeNode>(*inst,std::move(cube));
    }
 }

@@ -103,7 +103,7 @@ namespace primitives{
        LOG(message_group::Error, inst->location(), parameters.documentRoot(),
           "Unable to convert points = %1$s to a vector of coordinates",
              parameters["points"].toEchoStringNoThrow());
-        return  std::make_shared<PolygonNode>(inst,std::move(polygon));
+        return  std::make_shared<PolygonNode>(*inst,std::move(polygon));
      }
 
      auto const & pointsVect = parameters["points"].toVector();
@@ -158,11 +158,11 @@ namespace primitives{
        LOG(message_group::Error, inst->location(), parameters.documentRoot(),
           "Unable to convert paths = %1$s to a vector of vector of point indices",
              parameters["paths"].toEchoStringNoThrow());
-       return std::make_shared<PolygonNode>(inst,std::move(polygon));
+       return std::make_shared<PolygonNode>(*inst,std::move(polygon));
      }
      polygon.convexity = std::max(static_cast<int>(parameters["convexity"].toDouble()),1);
 
-     return  std::make_shared<PolygonNode>(inst,std::move(polygon));
+     return  std::make_shared<PolygonNode>(*inst,std::move(polygon));
    }
 }
 

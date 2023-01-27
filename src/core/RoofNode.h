@@ -10,7 +10,7 @@
 
 class RoofNode final : public Visitable<AbstractPolyNode, RoofNode>{
 public:
-  RoofNode(const ModuleInstantiation *mi) : Visitable(mi) {}
+  RoofNode(NodeParams const & np) : Visitable{np} {}
   std::string toString() const override;
   std::string name() const override { return "roof"; }
 

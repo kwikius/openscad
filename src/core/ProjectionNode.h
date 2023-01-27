@@ -5,7 +5,8 @@
 
 class ProjectionNode final : public Visitable<AbstractPolyNode, ProjectionNode>{
 public:
-  ProjectionNode(const ModuleInstantiation *mi) : Visitable(mi), convexity(1), cut_mode(false) { }
+  ProjectionNode(NodeParams const & np)
+  : Visitable{np}, convexity(1), cut_mode(false) { }
   std::string toString() const override;
   std::string name() const override { return "projection"; }
 

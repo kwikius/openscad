@@ -40,9 +40,9 @@ static std::shared_ptr<AbstractNode>
 lazyUnionNode(const ModuleInstantiation *inst)
 {
   if (Feature::ExperimentalLazyUnion.is_enabled()) {
-    return std::make_shared<ListNode>(inst);
+    return std::make_shared<ListNode>(*inst);
   } else {
-    return std::make_shared<GroupNode>(inst);
+    return std::make_shared<GroupNode>(*inst);
   }
 }
 
@@ -243,7 +243,7 @@ builtin_for(const ModuleInstantiation *inst, const std::shared_ptr<const Context
 static std::shared_ptr<AbstractNode>
 builtin_intersection_for(const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context)
 {
-  auto node = std::make_shared<AbstractIntersectionNode>(inst);
+  auto node = std::make_shared<AbstractIntersectionNode>(*inst);
   if (!inst->getAssignmentList().empty()) {
     LcFor::forEach(inst->getAssignmentList(), node->getLocation(), context,
                    [inst, node] (const std::shared_ptr<const Context>& iterationContext) {

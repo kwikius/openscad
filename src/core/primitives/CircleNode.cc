@@ -87,7 +87,7 @@ namespace primitives{
          }
       }
       return std::make_shared<CircleNode>(
-         inst, std::move(circle)
+         *inst, std::move(circle)
       );
    }
 }

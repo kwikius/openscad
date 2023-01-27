@@ -135,6 +135,6 @@ namespace primitives{
          sphere.r = r;
        }
      }// TODO else warn?
-     return std::make_shared<SphereNode>(inst, std::move(sphere));
+     return std::make_shared<SphereNode>(*inst, std::move(sphere));
    }
 }

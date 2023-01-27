@@ -19,8 +19,8 @@ enum class ImportType {
 class ImportNode final : public Visitable<LeafNode, ImportNode>{
 public:
   constexpr static double SVG_DEFAULT_DPI = 72.0;
-  ImportNode(const ModuleInstantiation *mi, ImportType type)
-  : Visitable(mi), type(type) { }
+  ImportNode(NodeParams const & np, ImportType type)
+  : Visitable{np}, type(type) { }
   std::string toString() const override;
   std::string name() const override;
 

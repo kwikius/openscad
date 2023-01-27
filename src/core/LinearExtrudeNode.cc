@@ -77,7 +77,7 @@ namespace {
    std::shared_ptr<AbstractNode>
    builtin_linear_extrude(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
    {
-     auto node = std::make_shared<LinearExtrudeNode>(inst);
+     auto node = std::make_shared<LinearExtrudeNode>(*inst);
 
      Parameters parameters = parse_parameters(std::move(arguments), node->getLocation());
      parameters.set_caller("linear_extrude");

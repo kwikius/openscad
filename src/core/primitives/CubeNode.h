@@ -17,9 +17,9 @@ namespace primitives{
 
 class CubeNode : public LeafNode{
 public:
-  CubeNode(const ModuleInstantiation *mi,
+  CubeNode(NodeParams const & np,
     primitives::cube_params_t && params)
-  : LeafNode(mi),params{params}{}
+  : LeafNode{np},params{params}{}
 
   std::string toString() const override;
   std::string name() const override { return "cube"; }

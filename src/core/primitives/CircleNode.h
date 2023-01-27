@@ -18,9 +18,9 @@ namespace primitives{
 
 class CircleNode : public LeafNode{
 public:
-  CircleNode(const ModuleInstantiation *mi,
+  CircleNode(NodeParams const & np,
     primitives::circle_params_t && params
-  ) : LeafNode(mi), params{params}{}
+  ) : LeafNode{np}, params{params}{}
   std::string toString() const override;
   std::string name() const override { return "circle"; }
   const Geometry* createGeometry() const override;

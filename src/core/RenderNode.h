@@ -5,7 +5,7 @@
 
 class RenderNode final : public Visitable<AbstractNode, RenderNode>{
 public:
-  RenderNode(const ModuleInstantiation *mi) : Visitable(mi) { }
+  RenderNode(NodeParams const & np) : Visitable{np} { }
   std::string toString() const override;
   std::string name() const override { return "render"; }
 

@@ -21,9 +21,9 @@
 *    - module_literal
 *    - module_operation
 */
+class NodeParams;
 class ModuleInstantiation;
-class ABCModuleInstantiation : public ASTNode
-{
+class ABCModuleInstantiation : public ASTNode{
 protected:
 
  /**
@@ -113,6 +113,8 @@ public:
    : ABCModuleInstantiation{static_cast<ABCModuleInstantiation const &>(exprMi) }
   {
   }
+
+  operator NodeParams() const;
   void print(std::ostream& stream, const std::string& indent, const bool inlined) const override;
   [[nodiscard]] std::shared_ptr<AbstractNode>
   evalInst(std::shared_ptr<const Context> const & context) const override;

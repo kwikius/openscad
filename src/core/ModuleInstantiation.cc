@@ -14,6 +14,7 @@ https://github.com/openscad/openscad/blob/master/COPYING
 #include "InstantiableModule.h"
 #include "Context.h"
 #include "ModuleInstantiation.h"
+#include "NodeParams.h"
 #include "Value.h"
 #include <core/expression/ModuleLiteral.h>
 #include <core/expression/BinaryOp.h>
@@ -200,6 +201,12 @@ TODO
      } // exprId::default
    } // ~switch expr->getID()
 } // ~()
+
+// NodeParams(Location const & loc, const void* const idx,bool root,bool highlight, bool background)
+ModuleInstantiation::operator NodeParams() const
+{
+   return  {this->location(),this,this->isRoot(),this->isHighlight(),this->isBackground()};
+}
 
 [[nodiscard]] std::shared_ptr<AbstractNode>
 ModuleInstantiation::ll_evaluate(

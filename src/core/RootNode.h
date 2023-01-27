@@ -7,8 +7,8 @@
  */
 class RootNode final : public Visitable<GroupNode, RootNode>{
 public:
-  RootNode( InstantiatedModule const & im)
-  : Visitable{im}{}
+  RootNode( NodeParams const & np)
+  : Visitable{np}{}
   std::string name() const override;
 };
 

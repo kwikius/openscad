@@ -5,7 +5,7 @@
 
 class LinearExtrudeNode final : public Visitable<AbstractPolyNode, LinearExtrudeNode>{
 public:
-  LinearExtrudeNode(const ModuleInstantiation *mi) : Visitable(mi) {}
+  LinearExtrudeNode(NodeParams const & np) : Visitable{np} {}
   std::string toString() const override;
   std::string name() const override { return "linear_extrude"; }
 

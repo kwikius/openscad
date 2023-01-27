@@ -5,7 +5,8 @@
 
 class RotateExtrudeNode final : public Visitable<AbstractPolyNode,RotateExtrudeNode>{
 public:
-  RotateExtrudeNode(const ModuleInstantiation *mi) : Visitable(mi) {
+  RotateExtrudeNode(NodeParams const & np)
+  : Visitable{np} {
     convexity = 0;
     fn = fs = fa = 0;
     origin_x = origin_y = scale = 0;

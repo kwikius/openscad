@@ -44,7 +44,7 @@ using namespace boost::assign; // bring 'operator+=()' into scope
 static std::shared_ptr<AbstractNode>
 builtin_minkowski(const ModuleInstantiation *inst, Arguments arguments, Children const & children)
 {
-  auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::MINKOWSKI);
+  auto node = std::make_shared<CgalAdvNode>(*inst, CgalAdvType::MINKOWSKI);
 
   Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"convexity"});
   node->convexity = static_cast<int>(parameters["convexity"].toDouble());
@@ -56,7 +56,7 @@ static std::shared_ptr<AbstractNode>
 builtin_hull(const ModuleInstantiation *inst, Arguments arguments, Children const & children)
 
 {
-  auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::HULL);
+  auto node = std::make_shared<CgalAdvNode>(*inst, CgalAdvType::HULL);
 
   Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {});
   node->convexity = 0;
@@ -67,18 +67,17 @@ builtin_hull(const ModuleInstantiation *inst, Arguments arguments, Children cons
 static std::shared_ptr<AbstractNode>
 builtin_fill(const ModuleInstantiation *inst, Arguments arguments, Children const & children)
 {
-  auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::FILL);
+  auto node = std::make_shared<CgalAdvNode>(*inst, CgalAdvType::FILL);
 
   Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {});
 
   return children.instantiate(node);
 }
 
-
 static std::shared_ptr<AbstractNode>
 builtin_resize(const ModuleInstantiation *inst, Arguments arguments, Children const & children)
 {
-  auto node = std::make_shared<CgalAdvNode>(inst, CgalAdvType::RESIZE);
+  auto node = std::make_shared<CgalAdvNode>(*inst, CgalAdvType::RESIZE);
 
   Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(), {"newsize", "auto", "convexity"});
   node->convexity = static_cast<int>(parameters["convexity"].toDouble());

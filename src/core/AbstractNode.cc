@@ -29,21 +29,13 @@
 #include <algorithm>
 
 #include "AbstractNode.h"
-#include "ModuleInstantiation.h"
+
 #include "progress.h"
 #include "RootNode.h"
 
 #include "Visitable_inline.h"
 
-InstantiatedModule::InstantiatedModule(ModuleInstantiation const & mi)
- : loc{mi.location()}
-  ,idx{static_cast<const void* const>(&mi)}
-  ,tag_root{mi.isRoot()}
-  ,tag_highlight{mi.isHighlight()}
-  ,tag_background{mi.isBackground()}
-{}
-
-InstantiatedModule::InstantiatedModule(Location const & loc)
+NodeParams::NodeParams(Location const & loc)
  : loc{loc}
   ,idx{static_cast<const void* const>(this)}
   ,tag_root{false}
@@ -51,16 +43,19 @@ InstantiatedModule::InstantiatedModule(Location const & loc)
   ,tag_background{false}
 {}
 
+NodeParams::NodeParams(Location const & loc, const void* const idx,
+   bool root,bool highlight, bool background)
+: loc{loc}
+  ,idx{idx}
+  ,tag_root{root}
+  ,tag_highlight{highlight}
+  ,tag_background{background}
+{}
+
 size_t AbstractNode::idx_counter;
 
-AbstractNode::AbstractNode(const ModuleInstantiation *mi) :
-  modinst(*mi),
-  idx(idx_counter++)
-{
-}
-
-AbstractNode::AbstractNode(InstantiatedModule const & im) :
-  modinst(im),
+AbstractNode::AbstractNode(NodeParams const & np) :
+  nodeParams{np},
   idx(idx_counter++)
 {
 }
@@ -70,13 +65,13 @@ std::string AbstractNode::toString() const
   return this->name() + "()";
 }
 
-[[nodiscard]] Location const & AbstractNode::getLocation() const { return modinst.getLocation();}
-[[nodiscard]] bool AbstractNode::isRoot() const {return modinst.isRoot();}
-[[nodiscard]] bool AbstractNode::isBackground() const { return modinst.isBackground();}
-[[nodiscard]] bool AbstractNode::isHighlight() const { return modinst.isHighlight();}
+[[nodiscard]] Location const & AbstractNode::getLocation() const { return nodeParams.getLocation();}
+[[nodiscard]] bool AbstractNode::isRoot() const {return nodeParams.isRoot();}
+[[nodiscard]] bool AbstractNode::isBackground() const { return nodeParams.isBackground();}
+[[nodiscard]] bool AbstractNode::isHighlight() const { return nodeParams.isHighlight();}
 
 [[nodiscard]] bool AbstractNode::hasSameModInst(std::shared_ptr<AbstractNode> const & other) const
-{ return this->modinst.getIdx() == other->modinst.getIdx();}
+{ return this->nodeParams.getIdx() == other->nodeParams.getIdx();}
 
 std::shared_ptr<const AbstractNode>
 AbstractNode::getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const
@@ -151,7 +146,8 @@ std::ostream& operator<<(std::ostream& stream, const AbstractNode& node)
    If a second root modifier was found, nextLocation (if non-zero) will be set to point to
    the location of that second modifier.
  */
-std::shared_ptr<const AbstractNode> find_root_tag(const std::shared_ptr<const AbstractNode>& node, const Location **nextLocation)
+std::shared_ptr<const AbstractNode>
+find_root_tag(const std::shared_ptr<const AbstractNode>& node, const Location **nextLocation)
 {
   std::shared_ptr<const AbstractNode> rootTag;
 

@@ -17,9 +17,9 @@ namespace primitives{
 
 class SquareNode : public LeafNode{
 public:
-  SquareNode(const ModuleInstantiation *mi,
+  SquareNode(NodeParams const & np,
   primitives::square_params_t && params)
-  : LeafNode(mi),params{params} {}
+  : LeafNode{np},params{params} {}
   std::string toString() const override;
   std::string name() const override { return "square"; }
   const Geometry *createGeometry() const override;

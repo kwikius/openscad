@@ -49,9 +49,10 @@ using namespace boost::assign; // bring 'operator+=()' into scope
 
 namespace fs = boost::filesystem;
 
-static std::shared_ptr<AbstractNode> builtin_rotate_extrude(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
+static std::shared_ptr<AbstractNode>
+builtin_rotate_extrude(const ModuleInstantiation *inst, Arguments arguments, const Children& children)
 {
-  auto node = std::make_shared<RotateExtrudeNode>(inst);
+  auto node = std::make_shared<RotateExtrudeNode>(*inst);
 
   Parameters parameters = Parameters::parse(std::move(arguments), node->getLocation(),
                                             {"file", "layer", "origin", "scale"},

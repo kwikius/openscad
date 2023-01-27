@@ -86,6 +86,6 @@ namespace primitives{
      if (parameters["center"].type() == Value::Type::BOOL) {
        square.center = parameters["center"].toBool();
      }
-     return std::make_shared<SquareNode>(inst,std::move(square));
+     return std::make_shared<SquareNode>(*inst,std::move(square));
    }
 }

@@ -7,7 +7,7 @@
 #include "Visitable.h"
 #include "Location.h"
 
-#include "InstantiatedModule.h"
+#include "NodeParams.h"
 
 class AbstractNode;
 
@@ -19,7 +19,7 @@ void progress_report_prep(const std::shared_ptr<AbstractNode>& root,
    void (*f)(const std::shared_ptr<const AbstractNode>& node, void *vp, int mark), void *vp);
 void progress_report_fin();
 
-class ModuleInstantiation;
+class NodeParams;
 
 /*!
    The node tree is the result of evaluation of a module instantiation
@@ -34,8 +34,8 @@ class AbstractNode : public Visitable<void,AbstractNode>,
   // use smth. else to display node identifier in CSG tree output?
   static size_t idx_counter; // Node instantiation index
 public:
-  AbstractNode(const ModuleInstantiation *mi);
-  AbstractNode(InstantiatedModule const & im);
+ // AbstractNode(NodeParams const & np);
+  AbstractNode(NodeParams const & im);
   virtual std::string toString() const;
   /*! The 'OpenSCAD name' of this node, defaults to classname, but can be
       overloaded to provide specialization for e.g. CSG nodes, primitive nodes etc.
@@ -65,7 +65,7 @@ public:
   static void resetIndexCounter() { idx_counter = 1; }
 private:
   std::vector<std::shared_ptr<AbstractNode>> children;
-  const InstantiatedModule modinst;
+  const NodeParams nodeParams;
   int idx; // Node index (unique per tree)
  // ModuleInstantiation const & getModInst() const { return *modinst;}
 public:
@@ -76,19 +76,19 @@ public:
   void progress_report() const;
 
   std::shared_ptr<const AbstractNode>
-   getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const;
+  getNodeByID(int idx, std::deque<std::shared_ptr<const AbstractNode>>& path) const;
 };
 
 class AbstractIntersectionNode final : public Visitable<AbstractNode, AbstractIntersectionNode>{
 public:
-  AbstractIntersectionNode(const ModuleInstantiation *mi) : Visitable(mi) { }
+  AbstractIntersectionNode(NodeParams const & np) : Visitable{np} { }
   std::string toString() const override;
   std::string name() const override;
 };
 
 class AbstractPolyNode : public Visitable<AbstractNode, AbstractPolyNode>{
 public:
-  AbstractPolyNode(const ModuleInstantiation *mi) : Visitable(mi) { }
+  AbstractPolyNode(NodeParams const & np) : Visitable{np} { }
 
   enum class render_mode_e {
     RENDER_CGAL,
@@ -102,7 +102,7 @@ public:
  */
 class ListNode final : public Visitable<AbstractNode,ListNode>{
 public:
-  ListNode(const ModuleInstantiation *mi) : Visitable(mi) { }
+  ListNode(NodeParams const & np) : Visitable{np} { }
   std::string name() const override;
 };
 
@@ -112,10 +112,9 @@ public:
  */
 class GroupNode : public Visitable<AbstractNode,GroupNode>{
 public:
-  GroupNode(const ModuleInstantiation *mi, std::string name = "")
- : Visitable(mi), _name(std::move(name)) { }
-  GroupNode(InstantiatedModule const & im, std::string name = "")
- : Visitable(im), _name(std::move(name)) { }
+  GroupNode(NodeParams const & np, std::string name = "")
+ : Visitable{np}, _name(std::move(name)) { }
+
   std::string name() const override;
   std::string verbose_name() const override;
 private:
@@ -124,7 +123,7 @@ private:
 
 class LeafNode : public Visitable<AbstractPolyNode, LeafNode>{
 public:
-  LeafNode(const ModuleInstantiation *mi) : Visitable(mi) { }
+  LeafNode(NodeParams const & np) : Visitable{np} { }
   virtual const class Geometry *createGeometry() const = 0;
 };
 

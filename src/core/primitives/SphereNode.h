@@ -18,9 +18,9 @@ namespace primitives{
 
 class SphereNode : public LeafNode{
 public:
-  SphereNode(const ModuleInstantiation *mi,
+  SphereNode(NodeParams const & np,
     primitives::sphere_params_t && params
-  ) : LeafNode(mi),params{params} {}
+  ) : LeafNode(np),params{params} {}
   std::string toString() const override;
   std::string name() const override { return "sphere"; }
   const Geometry *createGeometry() const override;

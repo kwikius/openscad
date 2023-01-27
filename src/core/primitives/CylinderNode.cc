@@ -153,6 +153,6 @@ namespace primitives{
      if (isBool(parameters["center"])) {
         cyl.center = parameters["center"].toBool();
      }
-     return  std::make_shared<CylinderNode>(inst,std::move(cyl));
+     return  std::make_shared<CylinderNode>(*inst,std::move(cyl));
    }
 }
