@@ -34,6 +34,7 @@
 #include <core/Location.h>
 
 #ifdef ENABLE_LIB3MF
+#define LIB3MF_API_2
 #ifndef LIB3MF_API_2
 #include <Model/COM/NMR_DLLInterfaces.h>
 #undef BOOL
@@ -237,7 +238,7 @@ const std::string get_lib3mf_version() {
 }
 
 #ifdef ENABLE_CGAL
-#include "cgalutils.h"
+#include <geometry/cgal/cgalutils.h>
 #endif
 
 typedef std::list<std::shared_ptr<PolySet>> polysets_t;

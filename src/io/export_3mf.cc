@@ -31,9 +31,12 @@
 #include <geometry/cgal/cgal.h>
 #include <geometry/cgal/CGALHybridPolyhedron.h>
 
+
+
 #include "export.h"
 
 #ifdef ENABLE_LIB3MF
+#define LIB3MF_API_2
 
 static uint32_t lib3mf_write_callback(const char *data, uint32_t bytes, std::ostream *stream)
 {
@@ -216,9 +219,9 @@ void export_3mf(const std::shared_ptr<const Geometry>& geom, std::ostream& outpu
 
 #ifdef ENABLE_CGAL
 
-#include "cgal.h"
-#include "cgalutils.h"
-#include "CGAL_Nef_polyhedron.h"
+#include <geometry/cgal/cgal.h>
+#include <geometry/cgal/cgalutils.h>
+#include <geometry/cgal/CGAL_Nef_polyhedron.h>
 
 static void export_3mf_error(const std::string& msg)
 {
