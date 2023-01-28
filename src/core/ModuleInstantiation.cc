@@ -261,7 +261,7 @@ ModuleInstantiation::ll_evaluate(
             }
          }else{
             LOG(message_group::Warning, this->loc, context->documentRoot(),
-              "Ignoring unknown module/ref '%1$s'", this->name());
+              "Ignoring unknown module '%1$s'", this->name());
             restore();
             return nullptr;
          }
