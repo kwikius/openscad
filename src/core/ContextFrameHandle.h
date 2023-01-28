@@ -23,9 +23,7 @@ protected:
   {
   }
 
-  // This isnt virtual on main branch. Should it be?
- //~ContextFrameHandle()
-  virtual ~ContextFrameHandle()
+  ~ContextFrameHandle()
   {
      release();
   }
