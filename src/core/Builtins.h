@@ -10,8 +10,7 @@
 class AbstractModule;
 class BuiltinFunction;
 
-class Builtins
-{
+class Builtins{
 public:
   static Builtins *instance(bool erase = false);
   static void init(const std::string& name, AbstractModule *module);

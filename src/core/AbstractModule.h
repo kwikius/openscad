@@ -11,8 +11,7 @@ class ModuleInstantiation;
 /**
 * @brief abstract base class for UserModule and BuiltinModule
 **/
-class AbstractModule
-{
+class AbstractModule{
 public:
 
    using abstractNodePtr = std::shared_ptr<AbstractNode>;

@@ -1,9 +1,8 @@
 
 module subtract(a,b){
-  difference(){
-    a();
-    b();
-  }
+   // N.B to prevent recursion
+   // difference(){a(); b();}
+   (a-b)();
 };
 
 diff = module subtract(
@@ -11,16 +10,18 @@ diff = module subtract(
       translate([-20,0,-20])
          cube([40,40,40]);
    }, 
-   module sphere(d=20)
+   module{ 
+     translate([0,5,0]){
+      sphere(d=20);
+     }
+   }
 );
 
-// diff();
-
 subtract(
-   diff,
+   module diff,
    module {
-      translate([40,0,0]){
-         cube([20,20,20],center = true);
+      translate([0,20,5]){
+         cube([20,20,40],center = true);
       }
    }
 );

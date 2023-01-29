@@ -82,6 +82,7 @@ std::shared_ptr<AbstractNode>
 UserModule::instantiate(const std::shared_ptr<const Context>& defining_context,
    const ModuleInstantiation *inst, const std::shared_ptr<const Context>& context) const
 {
+
   if (StackCheck::inst().check()) {
     print_err(inst->name(), loc, context);
     throw RecursionException::create("module", inst->name(), loc);
