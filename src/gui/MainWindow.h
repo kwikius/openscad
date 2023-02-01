@@ -158,6 +158,10 @@ private slots:
   void convertTabsToSpaces();
   void copyText();
 
+private:
+  void resetRootForInstantiate();
+public:
+
   void instantiateRoot();
   void compileDone(bool didchange);
   void compileEnded();

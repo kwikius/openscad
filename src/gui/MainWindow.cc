@@ -1197,12 +1197,11 @@ void MainWindow::compileEnded()
   if (designActionAutoReload->isChecked()) autoReloadTimer->start();
 }
 
-void MainWindow::instantiateRoot()
+void MainWindow::resetRootForInstantiate()
 {
-  // Go on and instantiate root_node, then call the continuation slot
-
-  // Invalidate renderers before we kill the CSG tree
+    // Invalidate renderers before we kill the CSG tree
   this->qglview->setRenderer(nullptr);
+
 #ifdef ENABLE_OPENCSG
   delete this->opencsgRenderer;
   this->opencsgRenderer = nullptr;
@@ -1219,6 +1218,12 @@ void MainWindow::instantiateRoot()
 
   this->root_node.reset();
   this->tree.setRoot(nullptr);
+}
+
+void MainWindow::instantiateRoot()
+{
+  this->resetRootForInstantiate();
+  // instantiate root_node, then call the continuation slot
 
   boost::filesystem::path doc(activeEditor->filepath.toStdString());
   this->tree.setDocumentPath(doc.parent_path().string());
