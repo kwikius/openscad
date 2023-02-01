@@ -1,7 +1,6 @@
 
 module subtract(a,b){
-   // N.B to prevent recursion
-   // difference(){a(); b();}
+   // N.B to prevent recursion don't use difference(){a(); b();}
    (a-b)();
 };
 
