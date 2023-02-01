@@ -1266,7 +1266,7 @@ set_tests_properties(
   # Problems with recursion when
   # a module reference is used as a recursive argument
   # Should work, but disbale dfor now
-  dumptest-examples_modlitexamples_subtract
+  # dumptest-examples_modlitexamples_subtract
   # These don't output anything
   dxfpngtest_text-empty-tests
   dxfpngtest_nothing-decimal-comma-separated
