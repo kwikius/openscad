@@ -65,6 +65,9 @@ namespace primitives{
    using point2d = quan::two_d::vect<double>;
    using point3d = quan::three_d::vect<double>;
 
+   using point2di = quan::two_d::vect<int>;
+   using point3di = quan::three_d::vect<int>;
+
    struct facet_params_t{
 /**
 * @brief $fn is number of fragments and usually has the default value of 0.
@@ -97,6 +100,8 @@ namespace primitives{
    {
       return Calc::get_fragments_from_r(r,fp.fn,fp.fs,fp.fa);
    }
+
+   bool get_center(Parameters const & parameters,std::variant<bool, point3di>& center);
 
    Value lookup_radius(const Parameters& parameters, const ModuleInstantiation *inst,
      const std::string& diameter_var, const std::string& radius_var);

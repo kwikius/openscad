@@ -65,6 +65,45 @@
 }
 
 namespace primitives{
+
+    bool get_center(Parameters const & parameters,std::variant<bool, point3di>& centerOut)
+    {
+     const auto& centerValue = parameters["center"];
+     if ( centerValue.isDefined()){
+        bool converted = false;
+        switch(centerValue.type()){
+          case Value::Type::BOOL:
+            centerOut = centerValue.toBool();
+            converted = true;
+            break;
+          case Value::Type::VECTOR:{
+           point3d c1;
+           converted = centerValue.getVec3(c1.x,c1.y,c1.z);
+           if ( converted){
+              auto sign = [] (double v) {
+                 int const vi = static_cast<int>(v);
+                 return (vi < 0)
+                   ? -1
+                   : ((vi > 0)?1:0)
+                ;
+              };
+              centerOut = point3di{sign(c1.x),sign(c1.y),sign(c1.z)};
+           }
+           break;
+        }
+        default:
+            LOG(message_group::Warning, parameters.location(),parameters.documentRoot(),"cube center unknown type");
+           break;
+        }
+        if (!converted){
+            LOG(message_group::Warning,parameters.location(),parameters.documentRoot(),
+           "Unable to convert cube(.../center=%1$s, ...) parameter to a bool or a vec3 of signs", centerValue.toEchoStringNoThrow());
+        }
+        return converted;
+     }
+     return false;
+   }
+
    /**
     * Return a radius value by looking up both a diameter and radius variable.
     * The diameter has higher priority, so if found an additionally set radius

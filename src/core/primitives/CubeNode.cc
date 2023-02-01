@@ -11,18 +11,25 @@
 #include <geometry/Geometry.h>
 #include <geometry/PolySet.h>
 
-#include "primitives.h"
+
 #include "CubeNode.h"
 
 std::string CubeNode::toString() const
 {
- std::ostringstream stream;
- stream << "cube(size = ["
-        << this->params.size.x << ", "
-        << this->params.size.y << ", "
-        << this->params.size.z << "], center = "
-        << (this->params.center ? "true" : "false") << ")";
- return stream.str();
+   std::ostringstream stream;
+   stream << "cube(size = ["
+   << this->params.size.x << ", "
+   << this->params.size.y << ", "
+   << this->params.size.z << "], center = ";
+   if (std::holds_alternative<bool>(this->params.center)){
+      bool const center = std::get<bool>(this->params.center);
+      stream << (center ? "true" : "false") << ")";
+   }else{
+      using primitives::point3di;
+      point3di center = std::get<point3di>(this->params.center);
+      stream << "[" << center.x <<", " << center.y << ", " << center.z << "])";
+   }
+   return stream.str();
 }
 
 const Geometry *CubeNode::createGeometry() const
@@ -34,13 +41,18 @@ const Geometry *CubeNode::createGeometry() const
    }
 
    using primitives::point3d;
-
-   point3d const p1 =
-   (this->params.center)
-    ? -this->params.size/2
-    : point3d()
-   ;
-   point3d const p2 = p1 + this->params.size;
+   using primitives::point3di;
+   point3di center;
+   if ( std::holds_alternative<bool>(this->params.center)){
+     int const c = std::get<bool>(this->params.center)?0:1;
+     center = point3di{c,c,c};
+   }else{
+     center = std::get<point3di>(this->params.center);
+   }
+   point3d const size = this->params.size;
+   point3d const tx = point3d{ size.x * center.x, size.y * center.y, size.z * center.z};
+   point3d const p1 = (tx - size) / 2;
+   point3d const p2 = (tx + size) / 2;
 
    double const x1 = p1.x;
    double const y1 = p1.y;
@@ -97,7 +109,7 @@ namespace primitives{
            "module %1$s() does not support child modules", inst->name());
      }
 
-     Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"size", "center"});
+     Parameters const parameters = Parameters::parse(std::move(arguments), inst->location(), {"size", "center"});
 
      cube_params_t cube;
 
@@ -127,9 +139,7 @@ namespace primitives{
                "cube(size=%1$s, ...)", size.toEchoStringNoThrow());
        }
      }
-     if (isBool(parameters["center"]) ) {
-         cube.center = parameters["center"].toBool();
-     }
+     primitives::get_center(parameters,cube.center);
      return std::make_shared<CubeNode>(*inst,std::move(cube));
    }
-}
+}//~namespace
