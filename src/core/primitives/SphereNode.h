@@ -13,6 +13,7 @@ namespace primitives{
    struct sphere_params_t{
       double r = 1 ;
       facet_params_t fp;
+      std::variant<bool, point3di> center = true;
    };
 }
 

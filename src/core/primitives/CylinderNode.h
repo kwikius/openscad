@@ -13,7 +13,7 @@ namespace primitives{
       double r2 = 1;
       double  h = 1;
       facet_params_t fp;
-      bool center = false;
+      std::variant<bool, point3di> center = false;
    };
 }
 

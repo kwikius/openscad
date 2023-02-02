@@ -26,9 +26,22 @@ std::string SphereNode::toString() const
         << "($fn = " << this->params.fp.fn
         << ", $fa = " << this->params.fp.fa
         << ", $fs = " << this->params.fp.fs
-        << ", r = " << this->params.r
-        << ")";
- return stream.str();
+        << ", r = " << this->params.r;
+
+   if (std::holds_alternative<bool>(this->params.center)){
+      bool const center = std::get<bool>(this->params.center);
+      if ( center == true){
+         stream  << ")"; // default
+      }else{
+        stream << ", center = false)";
+      }
+   }else{
+      using primitives::point3di;
+      point3di center = std::get<point3di>(this->params.center);
+      stream << ", center = " << "[" << center.x <<", "
+        << center.y << ", " << center.z << "])";
+   }
+   return stream.str();
 }
 
 const Geometry *SphereNode::createGeometry() const
@@ -38,26 +51,42 @@ const Geometry *SphereNode::createGeometry() const
   if (!OpenSCAD::rangeCheck && !isPositiveFinite(this->params.r)) {
     return p;
   }
+   using primitives::point3di;
+   using primitives::point2di;
+   using primitives::point3d;
+   using primitives::point2d;
+
+   point3di center;
+   if ( std::holds_alternative<bool>(this->params.center)){
+      bool b = std::get<bool>(this->params.center);
+      center = point3di{0,0,b?0:1};
+   }else{
+      center = std::get<point3di>(this->params.center);
+   }
+
   double const circle_radius = this->params.r;
   int const fragments =
      primitives::get_fragments_from_r(this->params.r,this->params.fp);
+
   int const numRings = (fragments + 1) / 2;
   struct ring_t {
-    std::vector<primitives::point2d> points;
+    std::vector<point2d> points;
     double z;
   };
 
   auto const proto_ring = primitives::generate_circle(circle_radius,fragments);
+
+  auto const offset = center * this->params.r;
   auto ring = std::vector<ring_t>(numRings);
   std::generate(ring.begin(),ring.end() ,
-    [&proto_ring, circle_radius,numRings,idx=0] () mutable{
+    [&proto_ring, circle_radius,numRings,offset,idx=0] () mutable{
        double const phi = (180.0 * (idx++ + 0.5)) / numRings;
        double const scale = sin_degrees(phi);
-       double const z = circle_radius * cos_degrees(phi);
-       auto v = std::vector<primitives::point2d>(proto_ring.size());
-       std::ranges::generate(v, [&proto_ring,scale,idx1 = 0]() mutable{
-          return proto_ring[idx1++] * scale;
+       auto v = std::vector<point2d>(proto_ring.size());
+       std::ranges::generate(v, [&proto_ring,scale,offset,idx1 = 0]() mutable{
+          return proto_ring[idx1++] * scale + point2di{offset.x,offset.y};
        });
+       double const z = circle_radius * cos_degrees(phi) + offset.z;
        return ring_t{std::move(v),z};
     }
   );
@@ -109,7 +138,7 @@ namespace primitives{
            "module %1$s() does not support child modules", inst->name());
      }
 
-     Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r"}, {"d"});
+     Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r","center"}, {"d"});
      primitives::sphere_params_t sphere;
      // set from The "global special variables"
      primitives::set_fragments(parameters, inst, sphere.fp);
@@ -124,6 +153,7 @@ namespace primitives{
          sphere.r = r;
        }
      }// TODO else warn?
+     primitives::get_center(parameters,sphere.center);
      return std::make_shared<SphereNode>(*inst, std::move(sphere));
    }
 }

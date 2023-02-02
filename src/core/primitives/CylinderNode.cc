@@ -32,16 +32,28 @@ const Geometry *CylinderNode::createGeometry() const
      }
   }
 
+   using primitives::point3di;
+   point3di center;
+   if ( std::holds_alternative<bool>(this->params.center)){
+      bool b = std::get<bool>(this->params.center);
+      center = point3di{0,0,b?0:1};
+   }else{
+      center = std::get<point3di>(this->params.center);
+   }
+
   auto const fragments =
      primitives::get_fragments_from_r(
        std::fmax(this->params.r1, this->params.r2), this->params.fp);
 
-  auto const circle1 = primitives::generate_circle( this->params.r1, fragments);
+  auto const offset = primitives::point2d{center.x,center.y}
+      * std::max(this->params.r1,this->params.r2);
+
+  auto const circle1 = primitives::generate_circle( this->params.r1, fragments,offset);
   auto const & circle2 = (this->params.r2 == this->params.r1)
     ? circle1
-    : primitives::generate_circle( this->params.r2, fragments);
+    : primitives::generate_circle( this->params.r2, fragments,offset);
 
-  double const z1 = this->params.center ? -this->params.h / 2 : 0 ;
+  double const z1 = ((center.z - 1) * this->params.h) / 2;
   double const z2 = z1 + this->params.h;
 
   for (int i = 0; i < fragments; ++i) {
@@ -93,9 +105,16 @@ std::string CylinderNode::toString() const
         << ", h = " << this->params.h
         << ", r1 = " << this->params.r1
         << ", r2 = " << this->params.r2
-        << ", center = " << (this->params.center ? "true" : "false")
-        << ")";
- return stream.str();
+        << ", center = ";
+   if (std::holds_alternative<bool>(this->params.center)){
+      bool const center = std::get<bool>(this->params.center);
+      stream << (center ? "true" : "false") << ")";
+   }else{
+      using primitives::point3di;
+      point3di center = std::get<point3di>(this->params.center);
+      stream << "[" << center.x <<", " << center.y << ", " << center.z << "])";
+   }
+   return stream.str();
 }
 
 namespace primitives{
@@ -150,9 +169,7 @@ namespace primitives{
            (isNumber(r2) ? r2.toEchoStringNoThrow() : r.toEchoStringNoThrow()));
         }
      }
-     if (isBool(parameters["center"])) {
-        cyl.center = parameters["center"].toBool();
-     }
+     primitives::get_center(parameters,cyl.center);
      return  std::make_shared<CylinderNode>(*inst,std::move(cyl));
    }
 }

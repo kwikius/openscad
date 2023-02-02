@@ -11,7 +11,6 @@
 #include <geometry/Geometry.h>
 #include <geometry/PolySet.h>
 
-
 #include "CubeNode.h"
 
 std::string CubeNode::toString() const

@@ -84,13 +84,13 @@ namespace primitives{
    };
 
    inline std::vector<point2d>
-   generate_circle(double r, int fragments)
+   generate_circle(double r, int fragments, point2d const & offset = point2d{0,0})
    {
       std::vector<point2d> circle(fragments);
       std::ranges::generate(circle,
-         [r,fragments,i=0] () mutable {
+         [r,offset,fragments,i=0] () mutable {
             double const phi = (360.0 * i++) / fragments;
-            return point2d{r * cos_degrees(phi),r * sin_degrees(phi)};
+            return point2d{r * cos_degrees(phi),r * sin_degrees(phi)} + offset;
          }
       );
       return circle;
