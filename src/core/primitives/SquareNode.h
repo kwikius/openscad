@@ -11,7 +11,7 @@ namespace primitives{
 
    struct square_params_t{
       point2d size = point2d{1,1};
-      bool center = false;
+      std::variant<bool, point2di> center = false;
    };
 }
 

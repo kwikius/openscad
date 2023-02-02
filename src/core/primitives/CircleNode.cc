@@ -29,14 +29,26 @@ const Geometry* CircleNode::createGeometry() const
       // TODO add warning
       return p;
    }
+
+   using primitives::point2di;
+   point2di center;
+   if ( std::holds_alternative<bool>(this->params.center)){
+     int const c = std::get<bool>(this->params.center)?0:1;
+     center = point2di{c,c};
+   }else{
+     center = std::get<point2di>(this->params.center);
+   }
+
+   auto const offset = center * this->params.r;
+
    auto const fragments =
       primitives::get_fragments_from_r( this->params.r, this->params.fp);
    auto const r = this->params.r;
    VectorOfVector2d circle(fragments);
    std::ranges::generate(circle,
-      [r,fragments,i=0] () mutable {
+      [r,fragments, offset,i=0] () mutable {
          double const phi = (360.0 * i++) / fragments;
-         return VectorOfVector2d::value_type{r * cos_degrees(phi),r * sin_degrees(phi)};
+         return VectorOfVector2d::value_type{r * cos_degrees(phi)+ offset.x,r * sin_degrees(phi)+offset.y};
       }
    );
    Outline2d outline;
@@ -54,9 +66,22 @@ std::string CircleNode::toString() const
         << "($fn = " << this->params.fp.fn
         << ", $fa = " << this->params.fp.fa
         << ", $fs = " << this->params.fp.fs
-        << ", r = " << this->params.r
-        << ")";
- return stream.str();
+        << ", r = " << this->params.r;
+       // << ")";
+
+   if (std::holds_alternative<bool>(this->params.center)){
+      bool const center = std::get<bool>(this->params.center);
+      if ( center == true){
+         stream << ")";
+      }else{
+         stream << ", center = false)";
+      }
+   }else{
+      using primitives::point2di;
+      point2di center = std::get<point2di>(this->params.center);
+      stream << ", center = [" << center.x <<", " << center.y << "])";
+   }
+   return stream.str();
 }
 
 namespace primitives{
@@ -69,7 +94,7 @@ namespace primitives{
          "module %1$s() does not support child modules", inst->name());
       }
 
-      Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r"}, {"d"});
+      Parameters parameters = Parameters::parse(std::move(arguments), inst->location(), {"r", "center"}, {"d"});
 
       primitives::circle_params_t circle;
 
@@ -86,6 +111,7 @@ namespace primitives{
             "circle(r=%1$s)", rv.toEchoStringNoThrow());
          }
       }
+      primitives::get_center(parameters,circle.center);
       return std::make_shared<CircleNode>(
          *inst, std::move(circle)
       );

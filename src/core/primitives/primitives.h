@@ -102,6 +102,7 @@ namespace primitives{
    }
 
    bool get_center(Parameters const & parameters,std::variant<bool, point3di>& center);
+   bool get_center(Parameters const & parameters,std::variant<bool, point2di>& center);
 
    Value lookup_radius(const Parameters& parameters, const ModuleInstantiation *inst,
      const std::string& diameter_var, const std::string& radius_var);

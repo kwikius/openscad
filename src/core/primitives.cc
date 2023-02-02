@@ -104,6 +104,45 @@ namespace primitives{
      return false;
    }
 
+    bool get_center(Parameters const & parameters,std::variant<bool, point2di>& centerOut)
+    {
+     const auto& centerValue = parameters["center"];
+     if ( centerValue.isDefined()){
+        bool converted = false;
+        switch(centerValue.type()){
+          case Value::Type::BOOL:
+            centerOut = centerValue.toBool();
+            converted = true;
+            break;
+          case Value::Type::VECTOR:{
+           point2d c1;
+           converted = centerValue.getVec2(c1.x,c1.y);
+           if ( converted){
+              auto sign = [] (double v) {
+                 int const vi = static_cast<int>(v);
+                 return (vi < 0)
+                   ? -1
+                   : ((vi > 0)?1:0)
+                ;
+              };
+              centerOut = point2di{sign(c1.x),sign(c1.y)};
+           }
+           break;
+        }
+        default:
+            LOG(message_group::Warning, parameters.location(),parameters.documentRoot(),"square center unknown type");
+           break;
+        }
+        if (!converted){
+            LOG(message_group::Warning,parameters.location(),parameters.documentRoot(),
+           "Unable to convert square(.../center=%1$s, ...) parameter to a bool or a vec2 of signs",
+              centerValue.toEchoStringNoThrow());
+        }
+        return converted;
+     }
+     return false;
+   }
+
    /**
     * Return a radius value by looking up both a diameter and radius variable.
     * The diameter has higher priority, so if found an additionally set radius

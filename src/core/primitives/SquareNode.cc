@@ -27,11 +27,23 @@ const Geometry *SquareNode::createGeometry() const
     return p;
   }
   using primitives::point2d;
+  using primitives::point2di;
+  point2di center;
+  if ( std::holds_alternative<bool>(this->params.center)){
+     int const c = std::get<bool>(this->params.center)?0:1;
+     center = point2di{c,c};
+   }else{
+     center = std::get<point2di>(this->params.center);
+   }
+//  point2d const p1 = (this->params.center)
+//     ? -this->params.size/2
+//     : point2d{0.0,0.0};
 
-  point2d const p1 = (this->params.center)
-     ? -this->params.size/2
-     : point2d{0.0,0.0};
-  point2d const p2 = p1 + this->params.size;
+   point2d const size = this->params.size;
+   point2d const tx = point2d{ size.x * center.x, size.y * center.y};
+   point2d const p1 = (tx - size) / 2;
+   point2d const p2 = (tx + size) / 2;
+
   Vector2d const v1(p1.x,p1.y);
   Vector2d const v2(p2.x,p2.y);
 
@@ -45,12 +57,20 @@ const Geometry *SquareNode::createGeometry() const
 
 std::string SquareNode::toString() const
 {
- std::ostringstream stream;
- stream << "square(size = ["
+   std::ostringstream stream;
+   stream << "square(size = ["
         << this->params.size.x << ", "
-        << this->params.size.y << "], center = "
-        << (this->params.center ? "true" : "false") << ")";
- return stream.str();
+        << this->params.size.y << "], center = ";
+
+   if (std::holds_alternative<bool>(this->params.center)){
+      bool const center = std::get<bool>(this->params.center);
+      stream << (center ? "true" : "false") << ")";
+   }else{
+      using primitives::point2di;
+      point2di center = std::get<point2di>(this->params.center);
+      stream << "[" << center.x <<", " << center.y << "])";
+   }
+   return stream.str();
 }
 
 namespace primitives{
@@ -83,9 +103,7 @@ namespace primitives{
              "square(size=%1$s, ...)", size.toEchoStringNoThrow());
        }
      }
-     if (parameters["center"].type() == Value::Type::BOOL) {
-       square.center = parameters["center"].toBool();
-     }
+     primitives::get_center(parameters,square.center);
      return std::make_shared<SquareNode>(*inst,std::move(square));
    }
 }
